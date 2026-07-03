@@ -1,14 +1,15 @@
 import { NavLink, Outlet } from "react-router-dom";
+import Icon from "../components/Icon.jsx";
 import Logo from "../components/Logo.jsx";
 
 const NAV = [
-  { to: "/admin", label: "Dashboard", icon: "📊", end: true },
-  { to: "/admin/preferences", label: "Tercih Analizi", icon: "📈" },
-  { to: "/admin/quality", label: "Kalite Metrikleri", icon: "⭐" },
-  { to: "/admin/matrix", label: "Tercih × Memnuniyet", icon: "🎯" },
-  { to: "/admin/faults", label: "Arıza Bildirimleri", icon: "🔧" },
-  { to: "/admin/feedback", label: "Geri Bildirim", icon: "💬" },
-  { to: "/admin/inventory", label: "Makine Envanteri", icon: "🗂️" },
+  { to: "/admin", label: "Dashboard", icon: "chart", end: true },
+  { to: "/admin/preferences", label: "Tercih Analizi", icon: "trending" },
+  { to: "/admin/quality", label: "Kalite Metrikleri", icon: "star" },
+  { to: "/admin/matrix", label: "Tercih × Memnuniyet", icon: "target" },
+  { to: "/admin/faults", label: "Arıza Bildirimleri", icon: "wrench" },
+  { to: "/admin/feedback", label: "Geri Bildirim", icon: "message" },
+  { to: "/admin/inventory", label: "Makine Envanteri", icon: "clipboard" },
 ];
 
 export default function AdminLayout() {
@@ -35,7 +36,7 @@ export default function AdminLayout() {
                 }`
               }
             >
-              <span className="text-base">{n.icon}</span>
+              <Icon name={n.icon} size={17} />
               {n.label}
             </NavLink>
           ))}
@@ -45,7 +46,7 @@ export default function AdminLayout() {
             to="/admin/login"
             className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-500 hover:bg-gray-100"
           >
-            <span>🚪</span> Çıkış Yap
+            <Icon name="logout" size={17} /> Çıkış Yap
           </NavLink>
         </div>
       </aside>

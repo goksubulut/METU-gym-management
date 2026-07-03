@@ -1,13 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import Button from "../../components/Button.jsx";
 import Card from "../../components/Card.jsx";
+import Icon from "../../components/Icon.jsx";
 import Logo from "../../components/Logo.jsx";
 import qrIcon from "../../assets/qr-info.png";
 
 const STEPS = [
-  { icon: "🚪", title: "Kapıdaki QR", text: "Kapıdaki QR'ı okutarak uygulamanın nasıl çalıştığını ve makine QR'larının ne işe yaradığını anlatan bilgilendirme sayfasına ulaş." },
-  { icon: "🏋️", title: "Makine QR'ı", text: "Her makinenin üzerindeki QR'ı okut; kullanım videosu açılır." },
-  { icon: "🔧", title: "Arıza Bildir", text: "Makinede bir sorun fark edersen QR üzerinden hemen bildir." },
+  { icon: "qr", title: "Kapıdaki QR", text: "Kapıdaki QR'ı okutarak uygulamanın nasıl çalıştığını ve makine QR'larının ne işe yaradığını anlatan bilgilendirme sayfasına ulaş." },
+  { icon: "dumbbell", title: "Makine QR'ı", text: "Her makinenin üzerindeki QR'ı okut; kullanım videosu açılır." },
+  { icon: "wrench", title: "Arıza Bildir", text: "Makinede bir sorun fark edersen QR üzerinden hemen bildir." },
 ];
 
 export default function QRInfo() {
@@ -30,8 +31,8 @@ export default function QRInfo() {
       <div className="mt-6 space-y-3">
         {STEPS.map((s) => (
           <Card key={s.title} soft className="flex items-center gap-4 p-4">
-            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white text-xl shadow-sm">
-              {s.icon}
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white text-primary-600 shadow-sm">
+              <Icon name={s.icon} size={20} />
             </div>
             <div>
               <p className="text-sm font-bold text-gray-900">{s.title}</p>

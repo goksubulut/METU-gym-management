@@ -71,10 +71,10 @@ export default function AppointmentDetail() {
               full
               onClick={() => {
                 setStatus("checked-in");
-                toast(`${base.name} gelişi onaylandı ✅`, "success");
+                toast(`${base.name} gelişi onaylandı`, "success");
               }}
             >
-              ✓ Gelişi Onayla
+              Gelişi Onayla
             </Button>
           ) : (
             <Button

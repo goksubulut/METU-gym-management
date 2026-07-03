@@ -2,6 +2,7 @@ import { useState } from "react";
 import Button from "../../components/Button.jsx";
 import Card from "../../components/Card.jsx";
 import Tabs from "../../components/Tabs.jsx";
+import Icon from "../../components/Icon.jsx";
 import StarRating from "../../components/StarRating.jsx";
 import { Textarea, Select } from "../../components/Input.jsx";
 import { useToast } from "../../components/Toast.jsx";
@@ -10,8 +11,8 @@ import { machines } from "../../mock/machines.js";
 // NOT: Arıza bildirimi bu ekranda YOK. Arıza yalnızca makine QR kodu ile
 // (/machine/:id → Makine Detay) o makineye scope'lanmış olarak bildirilir.
 const TABS = [
-  { value: "suggest", label: "💬 Öneri / Şikayet" },
-  { value: "rate", label: "⭐ Puanla" },
+  { value: "suggest", label: "Öneri / Şikayet" },
+  { value: "rate", label: "Puanla" },
 ];
 
 export default function Feedback() {
@@ -21,14 +22,14 @@ export default function Feedback() {
 
   const submit = (e) => {
     e.preventDefault();
-    toast("Geri bildirimin gönderildi 🙌", "success");
+    toast("Geri bildirimin gönderildi", "success");
     setRating(0);
     e.target.reset();
   };
 
   return (
     <div className="px-4 py-5">
-      <h1 className="text-xl font-extrabold text-gray-900">Geri Bildirim</h1>
+      <h1 className="font-display text-xl font-bold tracking-tight text-gray-900">Geri Bildirim</h1>
       <p className="mb-4 text-sm text-gray-500">
         Deneyimini paylaş, salonu birlikte geliştirelim.
       </p>
@@ -83,7 +84,7 @@ export default function Feedback() {
       </Card>
 
       <Card soft className="mt-4 flex items-start gap-3 p-4">
-        <span className="text-xl">🔧</span>
+        <Icon name="wrench" size={19} className="mt-0.5 shrink-0 text-primary-600" />
         <p className="text-xs text-gray-500">
           Bir makinede arıza mı var? Makinenin üzerindeki <b>QR kodu</b> telefonunla
           okut; doğru makineye özel arıza bildirim formu açılır. Salonda aynı modelden

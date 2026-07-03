@@ -3,6 +3,7 @@ import Card from "../../components/Card.jsx";
 import Badge from "../../components/Badge.jsx";
 import Tabs from "../../components/Tabs.jsx";
 import EmptyState from "../../components/EmptyState.jsx";
+import Icon from "../../components/Icon.jsx";
 import { useState } from "react";
 import { warmups } from "../../mock/feedback.js";
 import { MUSCLE_GROUPS } from "../../mock/machines.js";
@@ -37,11 +38,11 @@ export default function Warmup() {
           {list.map((e, i) => (
             <Card key={i} className="flex items-center gap-3 p-3">
               <div
-                className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl text-lg ${
-                  e.type === "Isınma" ? "bg-primary-50" : "bg-blue-50"
+                className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl ${
+                  e.type === "Isınma" ? "bg-primary-50 text-primary-600" : "bg-blue-50 text-blue-600"
                 }`}
               >
-                {e.type === "Isınma" ? "🔥" : "🧊"}
+                <Icon name={e.type === "Isınma" ? "flame" : "snowflake"} size={20} />
               </div>
               <div className="flex-1">
                 <p className="text-sm font-bold text-gray-900">{e.name}</p>

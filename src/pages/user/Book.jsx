@@ -30,7 +30,7 @@ export default function Book() {
     set(arr.includes(val) ? arr.filter((x) => x !== val) : [...arr, val]);
 
   const confirm = () => {
-    toast("Randevun oluşturuldu 🎉", "success");
+    toast("Randevun oluşturuldu", "success");
     nav("/appointments");
   };
 

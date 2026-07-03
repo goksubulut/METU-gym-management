@@ -38,7 +38,7 @@ export default function CheckIn() {
 
   const checkin = (r) => {
     setStatus(r.id, "checked-in");
-    toast(`${r.name} check-in yapıldı ✅`, "success");
+    toast(`${r.name} check-in yapıldı`, "success");
   };
 
   const stats = {
@@ -56,7 +56,7 @@ export default function CheckIn() {
             <p className="text-sm text-gray-400">2 Temmuz 2026 · {stats.total} randevu</p>
           </div>
           <Button variant="outline" onClick={() => toast("Liste yenilendi")}>
-            ↻ Yenile
+            Yenile
           </Button>
         </div>
 
@@ -78,7 +78,7 @@ export default function CheckIn() {
         <div className="flex items-center gap-4">
           <div className="flex-1">
             <Input
-              placeholder="🔎 İsim veya telefon ile ara..."
+              placeholder="İsim veya telefon ile ara..."
               value={q}
               onChange={(e) => setQ(e.target.value)}
             />
@@ -92,7 +92,7 @@ export default function CheckIn() {
         />
 
         {filtered.length === 0 ? (
-          <EmptyState icon="🔍" title="Randevu bulunamadı" />
+          <EmptyState icon="search" title="Randevu bulunamadı" />
         ) : (
           <Card className="overflow-hidden">
             <table className="w-full text-sm">
@@ -212,7 +212,7 @@ export default function CheckIn() {
             </Card>
           ) : (
             <EmptyState
-              icon="👈"
+              icon="clipboard"
               title="Randevu seç"
               description="Detayları ve check-in onayını görmek için tablodan bir kayıt seç."
             />

@@ -28,7 +28,7 @@ export default function Faults() {
   const resolve = (id) => {
     setList((l) => l.map((f) => (f.id === id ? { ...f, status: "resolved" } : f)));
     setDetail(null);
-    toast("Arıza çözüldü olarak işaretlendi ✅", "success");
+    toast("Arıza çözüldü olarak işaretlendi", "success");
   };
 
   return (
@@ -50,7 +50,7 @@ export default function Faults() {
           onChange={setStatus}
         />
         <div className="w-64">
-          <Input placeholder="🔎 Ara..." value={q} onChange={(e) => setQ(e.target.value)} />
+          <Input placeholder="Ara..." value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
       </div>
 

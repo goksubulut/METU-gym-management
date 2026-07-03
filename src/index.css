@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,9 +9,20 @@
 
 body {
   margin: 0;
-  background: #f3f4f6;
+  background: #eef0f3;
   font-family: "Inter", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: #fecaca;
+}
+
+/* Başlıklar display fontuyla, sıkı izlemeyle */
+h1, h2, h3 {
+  font-family: "Space Grotesk", "Inter", sans-serif;
+  letter-spacing: -0.02em;
 }
 
 /* İnce scrollbar (yatay filtre şeritleri için) */
@@ -21,4 +32,38 @@ body {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Giriş animasyonu: içerik blokları yumuşakça yükselir */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-rise {
+  animation: rise 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.animate-rise-late {
+  animation: rise 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
+}
+
+/* Hero kartlardaki ince doku (radial ışık) — pseudo-element katmanı:
+   arka plan gradient'ini (bg-gradient-*) ezmeden üstüne biner. */
+.hero-sheen {
+  position: relative;
+  overflow: hidden;
+}
+.hero-sheen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(120% 90% at 85% -10%, rgba(255, 255, 255, 0.16), transparent 55%),
+    radial-gradient(90% 120% at -10% 110%, rgba(0, 0, 0, 0.22), transparent 50%);
 }

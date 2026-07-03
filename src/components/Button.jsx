@@ -1,19 +1,19 @@
 const VARIANTS = {
   primary:
-    "bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 shadow-sm",
+    "bg-gradient-to-b from-primary-500 to-primary-700 text-white shadow-glow hover:from-primary-600 hover:to-primary-800 active:shadow-none",
   secondary:
     "bg-primary-50 text-primary-700 hover:bg-primary-100 border border-primary-100",
   outline:
-    "bg-white text-primary-700 border border-primary-300 hover:bg-primary-50",
+    "bg-white text-primary-700 border border-primary-200 hover:border-primary-400 hover:bg-primary-50",
   ghost: "bg-transparent text-gray-600 hover:bg-gray-100",
   danger: "bg-red-600 text-white hover:bg-red-700",
-  dark: "bg-gray-900 text-white hover:bg-gray-800",
+  dark: "bg-gray-900 text-white hover:bg-gray-800 shadow-card",
 };
 
 const SIZES = {
-  sm: "h-9 px-3 text-sm",
+  sm: "h-9 px-4 text-sm",
   md: "h-11 px-5 text-sm",
-  lg: "h-14 px-6 text-base",
+  lg: "h-13 min-h-[3.25rem] px-6 text-base",
 };
 
 export default function Button({
@@ -26,7 +26,7 @@ export default function Button({
 }) {
   return (
     <button
-      className={`inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${VARIANTS[variant]} ${SIZES[size]} ${full ? "w-full" : ""} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-all duration-150 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 ${VARIANTS[variant]} ${SIZES[size]} ${full ? "w-full" : ""} ${className}`}
       {...props}
     >
       {children}

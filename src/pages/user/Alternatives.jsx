@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import Card from "../../components/Card.jsx";
 import Badge from "../../components/Badge.jsx";
+import Icon from "../../components/Icon.jsx";
 import { machineById, machines, MUSCLE_GROUPS } from "../../mock/machines.js";
 
 export default function Alternatives() {
@@ -29,8 +30,8 @@ export default function Alternatives() {
       </button>
 
       <Card soft className="mb-5 flex items-center gap-3 p-4">
-        <div className="grid h-12 w-12 place-items-center rounded-xl bg-white text-xl shadow-sm">
-          ⛔
+        <div className="grid h-12 w-12 place-items-center rounded-xl bg-white text-primary-600 shadow-sm">
+          <Icon name="ban" size={22} />
         </div>
         <div>
           <p className="text-xs font-semibold text-gray-400">Dolu bulduğun makine</p>
@@ -56,15 +57,17 @@ export default function Alternatives() {
             onClick={() => nav(`/machines/${m.id}`)}
             className="flex cursor-pointer items-center gap-3 px-4 py-3 hover:bg-gray-50"
           >
-            <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary-50 text-base">
-              🏋️
+            <span className="grid h-9 w-9 place-items-center rounded-lg bg-gray-900 text-white">
+              <Icon name="dumbbell" size={16} />
             </span>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold text-gray-900">{m.name}</p>
               <p className="text-xs text-gray-400">{m.location}</p>
             </div>
-            <span className="text-xs font-bold text-primary-600">★ {m.rating}</span>
-            <span className="text-gray-300">›</span>
+            <span className="flex items-center gap-1 text-xs font-bold text-primary-600">
+              <Icon name="star" size={12} className="fill-primary-600" /> {m.rating}
+            </span>
+            <Icon name="chevronRight" size={14} className="text-gray-300" />
           </li>
         ))}
       </ul>
@@ -73,8 +76,8 @@ export default function Alternatives() {
       <ul className="divide-y divide-gray-100 rounded-2xl border border-gray-100 bg-white">
         {exercises.map((e) => (
           <li key={e.name} className="flex items-center gap-3 px-4 py-3">
-            <span className="grid h-9 w-9 place-items-center rounded-lg bg-gray-100 text-base">
-              💪
+            <span className="grid h-9 w-9 place-items-center rounded-lg bg-gray-100 text-gray-600">
+              <Icon name="body" size={16} />
             </span>
             <div>
               <p className="text-sm font-semibold text-gray-900">{e.name}</p>

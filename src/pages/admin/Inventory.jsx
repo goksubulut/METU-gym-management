@@ -65,7 +65,7 @@ export default function Inventory() {
                   <Badge tone="gray">{m.category}</Badge>
                 </td>
                 <td className="px-5 py-3 text-gray-500">{m.location}</td>
-                <td className="px-5 py-3 font-bold text-primary-600">★ {m.rating}</td>
+                <td className="px-5 py-3 font-bold text-primary-600">{m.rating}</td>
                 <td className="px-5 py-3">
                   <div className="flex justify-end gap-3 text-sm font-semibold">
                     <button onClick={() => setQr(m)} className="text-gray-500">QR</button>

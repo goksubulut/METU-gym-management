@@ -1,17 +1,21 @@
+import Icon from "./Icon.jsx";
+
 export default function Logo({ size = 28, withText = true }) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2.5">
       <div
-        className="grid place-items-center rounded-xl bg-primary-600 font-black text-white"
-        style={{ width: size, height: size, fontSize: size * 0.5 }}
+        className="grid place-items-center rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 text-white shadow-glow"
+        style={{ width: size + 6, height: size + 6 }}
       >
-        M
+        <Icon name="dumbbell" size={size * 0.7} strokeWidth={2.1} />
       </div>
       {withText && (
         <div className="leading-none">
-          <span className="text-lg font-extrabold text-gray-900">METU GYM</span>
-          <span className="block text-[10px] font-medium tracking-wide text-primary-500">
-            management system
+          <span className="font-display text-lg font-bold tracking-tight text-gray-900">
+            METU <span className="text-primary-600">GYM</span>
+          </span>
+          <span className="block text-[9px] font-semibold uppercase tracking-[0.18em] text-gray-400">
+            Management System
           </span>
         </div>
       )}

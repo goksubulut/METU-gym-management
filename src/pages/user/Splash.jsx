@@ -1,26 +1,27 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../../components/Button.jsx";
+import Icon from "../../components/Icon.jsx";
 import Logo from "../../components/Logo.jsx";
 
 const SLIDES = [
   {
-    emoji: "📅",
+    icon: "calendar",
     title: "Randevunu Al",
     text: "Sabit saat slotlarından uygun olanı seç. Randevusuz salona giriş yok — yerin garanti.",
   },
   {
-    emoji: "💪",
+    icon: "body",
     title: "Kas Grubunu Planla",
     text: "Çalışacağın kas grubunu vücut şeması üzerinden seç, sana uygun makineleri gör.",
   },
   {
-    emoji: "📱",
+    icon: "qr",
     title: "QR ile Keşfet",
     text: "Makine üzerindeki QR'ı okut; kullanım videosuna ve arıza/öneri bildirme sayfasına anında ulaş.",
   },
   {
-    emoji: "⭐",
+    icon: "star",
     title: "Deneyimini Paylaş",
     text: "Makineleri puanla, arıza bildir, öneride bulun. Salonu birlikte geliştirelim.",
   },
@@ -44,10 +45,10 @@ export default function Splash() {
       </div>
 
       <div className="flex flex-1 flex-col items-center justify-center text-center">
-        <div className="mb-8 grid h-40 w-40 place-items-center rounded-full bg-primary-50 text-7xl">
-          {SLIDES[i].emoji}
+        <div className="hero-sheen mb-8 grid h-40 w-40 place-items-center rounded-[2.5rem] bg-gradient-to-br from-primary-500 to-primary-700 text-white shadow-glow">
+          <Icon name={SLIDES[i].icon} size={64} strokeWidth={1.4} />
         </div>
-        <h1 className="text-2xl font-extrabold text-gray-900">{SLIDES[i].title}</h1>
+        <h1 className="font-display text-2xl font-bold tracking-tight text-gray-900">{SLIDES[i].title}</h1>
         <p className="mt-3 max-w-xs text-sm leading-relaxed text-gray-500">
           {SLIDES[i].text}
         </p>

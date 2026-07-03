@@ -13,9 +13,9 @@ export default function Quality() {
       </div>
 
       <div className="grid grid-cols-3 gap-4">
-        <StatCard label="Ortalama Puan" value={summary.avgRating} icon="⭐" tone="amber" />
-        <StatCard label="Toplam Değerlendirme" value="1.204" icon="📝" tone="blue" />
-        <StatCard label="Çözüm Oranı" value="%86" icon="✅" tone="green" />
+        <StatCard label="Ortalama Puan" value={summary.avgRating} icon="star" tone="amber" />
+        <StatCard label="Toplam Değerlendirme" value="1.204" icon="clipboard" tone="blue" />
+        <StatCard label="Çözüm Oranı" value="%86" icon="check" tone="green" />
       </div>
 
       <div className="grid grid-cols-2 gap-6">

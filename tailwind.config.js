@@ -17,15 +17,24 @@ export default {
           800: "#991b1b",
           900: "#7f1d1d",
         },
+        // Koyu "mürekkep" yüzeyler (hero kartlar, koyu paneller)
+        ink: {
+          800: "#1f2430",
+          900: "#151923",
+          950: "#0d1017",
+        },
         // Referanstaki açık şeftali kart zeminine karşılık gelen kırmızı-nötr ton.
         soft: "#fdf1f1",
       },
       fontFamily: {
         sans: ["Inter", "system-ui", "-apple-system", "Segoe UI", "sans-serif"],
+        display: ["Space Grotesk", "Inter", "system-ui", "sans-serif"],
       },
       boxShadow: {
-        card: "0 2px 12px rgba(0,0,0,0.06)",
-        pop: "0 8px 30px rgba(0,0,0,0.12)",
+        card: "0 1px 2px rgba(16,20,28,0.04), 0 4px 16px rgba(16,20,28,0.06)",
+        pop: "0 4px 12px rgba(16,20,28,0.08), 0 16px 40px rgba(16,20,28,0.14)",
+        glow: "0 8px 24px rgba(220,38,38,0.35)",
+        "nav-float": "0 8px 32px rgba(16,20,28,0.16)",
       },
       borderRadius: {
         xl2: "1.25rem",

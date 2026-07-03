@@ -4,6 +4,7 @@ import Card from "../../components/Card.jsx";
 import Badge from "../../components/Badge.jsx";
 import Tabs from "../../components/Tabs.jsx";
 import EmptyState from "../../components/EmptyState.jsx";
+import Icon from "../../components/Icon.jsx";
 import { Input } from "../../components/Input.jsx";
 import { machines, CATEGORIES } from "../../mock/machines.js";
 
@@ -22,20 +23,20 @@ export default function Machines() {
   return (
     <div className="px-4 py-5">
       <div className="mb-3 flex items-center justify-between">
-        <h1 className="text-xl font-extrabold text-gray-900">Makineler</h1>
+        <h1 className="font-display text-xl font-bold tracking-tight text-gray-900">Makineler</h1>
         <div className="flex rounded-lg bg-gray-100 p-0.5">
           {[
-            ["grid", "▦"],
-            ["list", "☰"],
+            ["grid", "grid"],
+            ["list", "list"],
           ].map(([v, i]) => (
             <button
               key={v}
               onClick={() => setView(v)}
-              className={`grid h-8 w-8 place-items-center rounded-md text-sm ${
+              className={`grid h-8 w-8 place-items-center rounded-md ${
                 view === v ? "bg-white text-primary-600 shadow-sm" : "text-gray-400"
               }`}
             >
-              {i}
+              <Icon name={i} size={15} />
             </button>
           ))}
         </div>
@@ -43,7 +44,7 @@ export default function Machines() {
 
       <div className="mb-3">
         <Input
-          placeholder="🔎 Makine ara..."
+          placeholder="Makine ara..."
           value={q}
           onChange={(e) => setQ(e.target.value)}
         />
@@ -53,7 +54,7 @@ export default function Machines() {
 
       {filtered.length === 0 ? (
         <EmptyState
-          icon="🔍"
+          icon="search"
           title="Sonuç bulunamadı"
           description="Arama veya filtreni değiştirmeyi dene."
         />
@@ -61,13 +62,23 @@ export default function Machines() {
         <div className="grid grid-cols-2 gap-3">
           {filtered.map((m) => (
             <Card key={m.id} soft onClick={() => nav(`/machines/${m.id}`)} className="overflow-hidden">
-              <div className="grid h-24 place-items-center bg-primary-100 text-4xl">🏋️</div>
+              <div className="hero-sheen grid h-24 place-items-center bg-gray-900 bg-gradient-to-br from-ink-800 to-ink-950 text-white/85">
+                <Icon name="dumbbell" size={34} strokeWidth={1.4} />
+              </div>
               <div className="p-3">
                 <p className="truncate text-sm font-bold text-gray-900">{m.name}</p>
                 <p className="mb-2 text-[11px] text-gray-400">{m.category}</p>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-primary-600">★ {m.rating}</span>
-                  {m.hasVideo && <Badge tone="gray">▶ video</Badge>}
+                  <span className="flex items-center gap-1 text-xs font-bold text-primary-600">
+                    <Icon name="star" size={12} className="fill-primary-600" /> {m.rating}
+                  </span>
+                  {m.hasVideo && (
+                    <Badge tone="gray">
+                      <span className="inline-flex items-center gap-1">
+                        <Icon name="video" size={11} /> video
+                      </span>
+                    </Badge>
+                  )}
                 </div>
               </div>
             </Card>
@@ -77,8 +88,8 @@ export default function Machines() {
         <div className="space-y-2">
           {filtered.map((m) => (
             <Card key={m.id} onClick={() => nav(`/machines/${m.id}`)} className="flex items-center gap-3 p-3">
-              <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-primary-50 text-xl">
-                🏋️
+              <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-gray-900 text-white">
+                <Icon name="dumbbell" size={20} />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-bold text-gray-900">{m.name}</p>
@@ -86,7 +97,9 @@ export default function Machines() {
                   {m.category} · {m.location}
                 </p>
               </div>
-              <span className="text-sm font-bold text-primary-600">★ {m.rating}</span>
+              <span className="flex items-center gap-1 text-sm font-bold text-primary-600">
+                <Icon name="star" size={14} className="fill-primary-600" /> {m.rating}
+              </span>
             </Card>
           ))}
         </div>

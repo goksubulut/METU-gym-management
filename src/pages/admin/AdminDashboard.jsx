@@ -21,10 +21,10 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-4 gap-4">
-        <StatCard label="Bugünkü Randevu" value={summary.todayAppointments} delta="+12%" icon="📅" />
-        <StatCard label="Doluluk Oranı" value={`%${summary.occupancy}`} delta="+5%" icon="👥" tone="blue" />
-        <StatCard label="Ortalama Puan" value={summary.avgRating} delta="+0.2" icon="⭐" tone="amber" />
-        <StatCard label="Açık Arıza" value={summary.openFaults} delta="-2" icon="🔧" tone="green" />
+        <StatCard label="Bugünkü Randevu" value={summary.todayAppointments} delta="+12%" icon="calendar" />
+        <StatCard label="Doluluk Oranı" value={`%${summary.occupancy}`} delta="+5%" icon="users" tone="blue" />
+        <StatCard label="Ortalama Puan" value={summary.avgRating} delta="+0.2" icon="star" tone="amber" />
+        <StatCard label="Açık Arıza" value={summary.openFaults} delta="-2" icon="wrench" tone="green" />
       </div>
 
       <div className="grid grid-cols-3 gap-6">

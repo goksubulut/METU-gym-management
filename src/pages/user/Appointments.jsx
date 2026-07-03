@@ -76,7 +76,7 @@ export default function Appointments() {
 
       {filtered.length === 0 ? (
         <EmptyState
-          icon="📅"
+          icon="calendar"
           title={tab === "upcoming" ? "Yaklaşan randevun yok" : "Geçmiş kaydı yok"}
           action={
             tab === "upcoming" && (

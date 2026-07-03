@@ -51,8 +51,8 @@ export default function Auth() {
 
       <div className="mb-4 flex gap-2">
         {[
-          ["phone", "📱 Telefon"],
-          ["email", "✉️ E-posta"],
+          ["phone", "Telefon"],
+          ["email", "E-posta"],
         ].map(([v, l]) => (
           <button
             key={v}
@@ -95,10 +95,10 @@ export default function Auth() {
         <span className="h-px flex-1 bg-gray-200" />
       </div>
       <div className="flex justify-center gap-4">
-        <button className="grid h-12 w-12 place-items-center rounded-xl border border-gray-200 text-xl">
-          🇬
+        <button className="grid h-12 w-12 place-items-center rounded-xl border border-gray-200 font-display text-lg font-bold text-gray-700 transition-colors hover:border-gray-300">
+          G
         </button>
-        <button className="grid h-12 w-12 place-items-center rounded-xl border border-gray-200 text-xl">
+        <button className="grid h-12 w-12 place-items-center rounded-xl border border-gray-200 font-display text-lg font-bold text-gray-700 transition-colors hover:border-gray-300">
           f
         </button>
       </div>

@@ -1,4 +1,5 @@
 import Card from "./Card.jsx";
+import Icon from "./Icon.jsx";
 
 export default function StatCard({ label, value, delta, icon, tone = "primary" }) {
   const tones = {
@@ -12,7 +13,7 @@ export default function StatCard({ label, value, delta, icon, tone = "primary" }
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm font-medium text-gray-500">{label}</p>
-          <p className="mt-1 text-3xl font-extrabold text-gray-900">{value}</p>
+          <p className="mt-1 font-display text-3xl font-bold tracking-tight text-gray-900">{value}</p>
           {delta && (
             <p
               className={`mt-1 text-xs font-semibold ${
@@ -24,8 +25,8 @@ export default function StatCard({ label, value, delta, icon, tone = "primary" }
           )}
         </div>
         {icon && (
-          <div className={`grid h-11 w-11 place-items-center rounded-xl text-xl ${tones[tone]}`}>
-            {icon}
+          <div className={`grid h-11 w-11 place-items-center rounded-xl ${tones[tone]}`}>
+            <Icon name={icon} size={20} />
           </div>
         )}
       </div>

@@ -2,11 +2,19 @@ import { Link, useNavigate } from "react-router-dom";
 import Button from "../../components/Button.jsx";
 import Card from "../../components/Card.jsx";
 import Badge from "../../components/Badge.jsx";
+import Icon from "../../components/Icon.jsx";
 import { appointments } from "../../mock/appointments.js";
 import { machineById, MUSCLE_GROUPS } from "../../mock/machines.js";
 import { currentUser } from "../../mock/user.js";
 
 const labelOf = (id) => MUSCLE_GROUPS.find((m) => m.id === id)?.label || id;
+
+const QUICK_ACTIONS = [
+  { to: "/book", icon: "plus", title: "Randevu Al", desc: "Slot seç, hemen ayır", tone: "bg-gradient-to-br from-primary-500 to-primary-700 shadow-glow" },
+  { to: "/machines", icon: "dumbbell", title: "Makineler", desc: "Katalog & videolar", tone: "bg-gray-900" },
+  { to: "/muscle-groups", icon: "body", title: "Kas Haritası", desc: "Anatomiden seç", tone: "bg-gray-900" },
+  { to: "/feedback", icon: "message", title: "Geri Bildirim", desc: "Arıza & öneri", tone: "bg-gray-900" },
+];
 
 export default function Dashboard() {
   const nav = useNavigate();
@@ -14,23 +22,29 @@ export default function Dashboard() {
 
   return (
     <div className="px-4 py-5">
-      <div className="mb-5">
+      <div className="animate-rise mb-5">
         <p className="text-sm text-gray-400">Merhaba,</p>
-        <h1 className="text-2xl font-extrabold text-gray-900">{currentUser.name} 👋</h1>
+        <h1 className="font-display text-2xl font-bold tracking-tight text-gray-900">
+          {currentUser.name}
+        </h1>
       </div>
 
       {/* Aktif randevu kartı */}
       {active ? (
-        <Card className="overflow-hidden">
-          <div className="bg-primary-600 px-5 py-4 text-white">
+        <Card className="animate-rise overflow-hidden border-0">
+          <div className="hero-sheen bg-gray-900 bg-gradient-to-br from-ink-800 via-ink-900 to-ink-950 px-5 py-5 text-white">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wide text-primary-100">
+              <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-300">
+                <Icon name="calendar" size={13} />
                 Yaklaşan Randevu
               </span>
+              <span className="rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-semibold text-white/70">
+                Onaylı
+              </span>
             </div>
-            <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-3xl font-extrabold">{active.time}</span>
-              <span className="text-sm text-primary-100">
+            <div className="mt-3 flex items-baseline gap-2">
+              <span className="font-display text-4xl font-bold tracking-tight">{active.time}</span>
+              <span className="text-sm text-white/60">
                 {new Date(active.date).toLocaleDateString("tr-TR", {
                   day: "numeric",
                   month: "long",
@@ -66,44 +80,27 @@ export default function Dashboard() {
           </div>
         </Card>
       ) : (
-        <Card soft className="p-5 text-center">
+        <Card soft className="animate-rise p-5 text-center">
           <p className="text-sm text-gray-500">Yaklaşan randevun yok.</p>
         </Card>
       )}
 
       {/* Hızlı aksiyonlar */}
-      <div className="mt-5 grid grid-cols-2 gap-3">
-        <Card soft onClick={() => nav("/book")} className="p-5">
-          <div className="mb-2 grid h-11 w-11 place-items-center rounded-xl bg-primary-600 text-xl text-white">
-            ➕
-          </div>
-          <p className="text-sm font-bold text-gray-900">Randevu Al</p>
-          <p className="text-xs text-gray-500">Slot seç, hemen ayır</p>
-        </Card>
-        <Card soft onClick={() => nav("/machines")} className="p-5">
-          <div className="mb-2 grid h-11 w-11 place-items-center rounded-xl bg-gray-900 text-xl text-white">
-            🏋️
-          </div>
-          <p className="text-sm font-bold text-gray-900">Makinelere Göz At</p>
-          <p className="text-xs text-gray-500">Katalog & videolar</p>
-        </Card>
-        <Card soft onClick={() => nav("/muscle-groups")} className="p-5">
-          <div className="mb-2 grid h-11 w-11 place-items-center rounded-xl bg-primary-500 text-xl text-white">
-            💪
-          </div>
-          <p className="text-sm font-bold text-gray-900">Kas Grubu Seç</p>
-          <p className="text-xs text-gray-500">Şema üzerinden</p>
-        </Card>
-        <Card soft onClick={() => nav("/feedback")} className="p-5">
-          <div className="mb-2 grid h-11 w-11 place-items-center rounded-xl bg-primary-400 text-xl text-white">
-            💬
-          </div>
-          <p className="text-sm font-bold text-gray-900">Geri Bildirim</p>
-          <p className="text-xs text-gray-500">Arıza & öneri</p>
-        </Card>
+      <div className="animate-rise-late mt-5 grid grid-cols-2 gap-3">
+        {QUICK_ACTIONS.map((a) => (
+          <Card key={a.to} onClick={() => nav(a.to)} className="p-4">
+            <div
+              className={`mb-3 grid h-11 w-11 place-items-center rounded-xl text-white ${a.tone}`}
+            >
+              <Icon name={a.icon} size={20} />
+            </div>
+            <p className="text-sm font-bold text-gray-900">{a.title}</p>
+            <p className="text-xs text-gray-500">{a.desc}</p>
+          </Card>
+        ))}
       </div>
 
-      <div className="mt-5">
+      <div className="animate-rise-late mt-6">
         <div className="mb-2 flex items-center justify-between">
           <h2 className="text-base font-bold text-gray-900">İpuçları</h2>
           <Link to="/machines" className="text-xs font-semibold text-primary-600">
@@ -111,7 +108,9 @@ export default function Dashboard() {
           </Link>
         </div>
         <Card className="flex items-center gap-3 p-4">
-          <span className="text-2xl">🔥</span>
+          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary-50 text-primary-600">
+            <Icon name="flame" size={19} />
+          </div>
           <p className="text-sm text-gray-600">
             Antrenmandan önce 5-10 dk ısınmayı unutma. Kas grubuna özel ısınma listeni
             randevu ekranından görebilirsin.
