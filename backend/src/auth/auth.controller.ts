@@ -1,12 +1,14 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Patch, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import type { AccessTokenPayload, AuthResult, UserView } from './auth.types';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { Public } from './decorators/public.decorator';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshDto } from './dto/refresh.dto';
 import { RegisterDto } from './dto/register.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -50,5 +52,37 @@ export class AuthController {
   @ApiOperation({ summary: 'Oturum sahibinin bilgileri' })
   me(@CurrentUser() user: AccessTokenPayload): Promise<UserView> {
     return this.authService.me(user.sub);
+  }
+
+  @Patch('me')
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'E-posta güncelle' })
+  updateProfile(
+    @CurrentUser() user: AccessTokenPayload,
+    @Body() dto: UpdateProfileDto,
+  ): Promise<UserView> {
+    return this.authService.updateProfile(user.sub, dto);
+  }
+
+  @Patch('password')
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Parola değiştir (mevcut parola gerekli)' })
+  async changePassword(
+    @CurrentUser() user: AccessTokenPayload,
+    @Body() dto: ChangePasswordDto,
+  ): Promise<{ changed: true }> {
+    await this.authService.changePassword(user.sub, dto);
+    return { changed: true };
+  }
+
+  @Delete('me')
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Hesabı kalıcı olarak sil' })
+  async deleteAccount(@CurrentUser() user: AccessTokenPayload): Promise<{ deleted: true }> {
+    await this.authService.deleteAccount(user.sub);
+    return { deleted: true };
   }
 }

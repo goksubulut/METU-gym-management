@@ -1,19 +1,21 @@
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { NavLink, Outlet, useLocation, Link } from "react-router-dom";
 import Icon from "../components/Icon.jsx";
 import Logo from "../components/Logo.jsx";
-import { currentUser } from "../mock/user.js";
+import { getAuthUser, initialsFromName } from "../utils/authUser.js";
 
 const NAV = [
   { to: "/home", label: "Ana Sayfa", icon: "home" },
   { to: "/machines", label: "Makineler", icon: "dumbbell" },
   { to: "/book", label: "Randevu", icon: "plus", primary: true },
   { to: "/muscle-groups", label: "Kas Grubu", icon: "body" },
-  { to: "/appointments", label: "Profil", icon: "user" },
+  { to: "/profile", label: "Profil", icon: "user" },
 ];
 
 export default function UserLayout() {
   const { pathname } = useLocation();
   const bare = pathname === "/" || pathname === "/auth" || pathname === "/qr-info";
+  const profile = getAuthUser();
+  const avatar = initialsFromName(profile?.name);
 
   if (bare) return <Outlet />;
 
@@ -31,9 +33,13 @@ export default function UserLayout() {
               <Icon name="bell" size={19} />
               <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-primary-600 ring-2 ring-white" />
             </button>
-            <div className="grid h-9 w-9 place-items-center rounded-full bg-gray-900 bg-gradient-to-br from-ink-800 to-ink-950 text-[11px] font-bold text-white">
-              {currentUser.avatar}
-            </div>
+            <Link
+              to="/profile"
+              aria-label="Profil"
+              className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-ink-800 to-ink-950 text-[11px] font-bold text-white transition-opacity hover:opacity-90"
+            >
+              {avatar}
+            </Link>
           </div>
         </header>
 

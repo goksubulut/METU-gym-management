@@ -1,4 +1,9 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { Role, User } from '@prisma/client';
@@ -6,8 +11,10 @@ import * as argon2 from 'argon2';
 import { randomUUID } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { AccessTokenPayload, AuthResult, RefreshTokenPayload, UserView } from './auth.types';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Injectable()
 export class AuthService {
@@ -86,6 +93,62 @@ export class AuthService {
       throw new UnauthorizedException('Kullanıcı bulunamadı');
     }
     return this.toView(user);
+  }
+
+  async updateProfile(userId: string, dto: UpdateProfileDto): Promise<UserView> {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw new UnauthorizedException('Kullanıcı bulunamadı');
+    }
+
+    const email = dto.email.trim().toLowerCase();
+    if (email !== user.email) {
+      const taken = await this.prisma.user.findUnique({ where: { email } });
+      if (taken) {
+        throw new ConflictException('Bu e-posta ile kayıtlı bir hesap zaten var');
+      }
+    }
+
+    const updated = await this.prisma.user.update({
+      where: { id: userId },
+      data: { email },
+    });
+    return this.toView(updated);
+  }
+
+  async changePassword(userId: string, dto: ChangePasswordDto): Promise<void> {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw new UnauthorizedException('Kullanıcı bulunamadı');
+    }
+
+    const valid = await argon2.verify(user.passwordHash, dto.currentPassword);
+    if (!valid) {
+      throw new BadRequestException('Mevcut parola hatalı');
+    }
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        passwordHash: await argon2.hash(dto.newPassword),
+        refreshTokenHash: null,
+      },
+    });
+  }
+
+  async deleteAccount(userId: string): Promise<void> {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw new UnauthorizedException('Kullanıcı bulunamadı');
+    }
+
+    await this.prisma.$transaction([
+      this.prisma.suggestion.deleteMany({ where: { userId } }),
+      this.prisma.rating.deleteMany({ where: { userId } }),
+      this.prisma.faultReport.deleteMany({ where: { userId } }),
+      this.prisma.appointment.deleteMany({ where: { userId } }),
+      this.prisma.user.delete({ where: { id: userId } }),
+    ]);
   }
 
   private async issueTokens(user: User): Promise<AuthResult> {

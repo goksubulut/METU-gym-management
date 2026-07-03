@@ -18,6 +18,7 @@ import Alternatives from "./pages/user/Alternatives.jsx";
 import Warmup from "./pages/user/Warmup.jsx";
 import Feedback from "./pages/user/Feedback.jsx";
 import Appointments from "./pages/user/Appointments.jsx";
+import Profile from "./pages/user/Profile.jsx";
 
 // Admin pages
 import AdminLogin from "./pages/admin/AdminLogin.jsx";
@@ -54,6 +55,7 @@ export default function App() {
         <Route path="/warmup/:group" element={<Warmup />} />
         <Route path="/feedback" element={<Feedback />} />
         <Route path="/appointments" element={<Appointments />} />
+        <Route path="/profile" element={<Profile />} />
       </Route>
 
       {/* B. Yönetici paneli (masaüstü) */}
