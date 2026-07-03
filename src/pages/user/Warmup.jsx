@@ -1,0 +1,57 @@
+import { useNavigate, useParams } from "react-router-dom";
+import Card from "../../components/Card.jsx";
+import Badge from "../../components/Badge.jsx";
+import Tabs from "../../components/Tabs.jsx";
+import EmptyState from "../../components/EmptyState.jsx";
+import { useState } from "react";
+import { warmups } from "../../mock/feedback.js";
+import { MUSCLE_GROUPS } from "../../mock/machines.js";
+
+export default function Warmup() {
+  const { group } = useParams();
+  const nav = useNavigate();
+  const [active, setActive] = useState(group || "chest");
+  const list = warmups[active] || [];
+
+  const tabs = MUSCLE_GROUPS.filter((g) => warmups[g.id]).map((g) => ({
+    value: g.id,
+    label: g.label,
+  }));
+
+  return (
+    <div className="px-4 py-5">
+      <button onClick={() => nav(-1)} className="mb-3 text-sm text-gray-400">
+        ← Geri
+      </button>
+      <h1 className="text-xl font-extrabold text-gray-900">Isınma & Soğuma</h1>
+      <p className="mb-4 text-sm text-gray-500">
+        Kas grubuna özel hareketler. Antrenman öncesi ve sonrası uygula.
+      </p>
+
+      <Tabs tabs={tabs} active={active} onChange={setActive} className="mb-4" />
+
+      {list.length === 0 ? (
+        <EmptyState title="Hareket bulunamadı" />
+      ) : (
+        <div className="space-y-2">
+          {list.map((e, i) => (
+            <Card key={i} className="flex items-center gap-3 p-3">
+              <div
+                className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl text-lg ${
+                  e.type === "Isınma" ? "bg-primary-50" : "bg-blue-50"
+                }`}
+              >
+                {e.type === "Isınma" ? "🔥" : "🧊"}
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-bold text-gray-900">{e.name}</p>
+                <p className="text-xs text-gray-400">{e.duration}</p>
+              </div>
+              <Badge tone={e.type === "Isınma" ? "primary" : "blue"}>{e.type}</Badge>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

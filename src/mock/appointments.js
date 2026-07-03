@@ -1,0 +1,61 @@
+export const appointments = [
+  {
+    id: "a1",
+    date: "2026-07-02",
+    time: "18:30",
+    status: "upcoming",
+    muscleGroups: ["chest", "arms"],
+    machines: ["m3", "m6"],
+    note: "Üst vücut günü",
+  },
+  {
+    id: "a2",
+    date: "2026-07-05",
+    time: "10:00",
+    status: "upcoming",
+    muscleGroups: ["legs"],
+    machines: ["m1", "m7"],
+    note: "",
+  },
+  {
+    id: "a3",
+    date: "2026-06-28",
+    time: "19:00",
+    status: "completed",
+    muscleGroups: ["back"],
+    machines: ["m2", "m10"],
+    note: "",
+  },
+  {
+    id: "a4",
+    date: "2026-06-25",
+    time: "08:30",
+    status: "completed",
+    muscleGroups: ["cardio"],
+    machines: ["m4"],
+    note: "",
+  },
+  {
+    id: "a5",
+    date: "2026-06-20",
+    time: "17:30",
+    status: "cancelled",
+    muscleGroups: ["core"],
+    machines: ["m11"],
+    note: "",
+  },
+];
+
+// Resepsiyon paneli için bugünün randevu tablosu.
+export const todaysCheckins = [
+  { id: "c1", time: "08:00", name: "Ahmet Yılmaz", phone: "0532 111 22 33", status: "checked-in", muscleGroups: ["chest"], machines: ["m3"] },
+  { id: "c2", time: "08:30", name: "Elif Demir", phone: "0533 222 33 44", status: "checked-in", muscleGroups: ["legs"], machines: ["m1", "m7"] },
+  { id: "c3", time: "09:00", name: "Mehmet Kaya", phone: "0534 333 44 55", status: "pending", muscleGroups: ["back"], machines: ["m2"] },
+  { id: "c4", time: "09:30", name: "Zeynep Şahin", phone: "0535 444 55 66", status: "pending", muscleGroups: ["cardio"], machines: ["m4"] },
+  { id: "c5", time: "10:00", name: "Can Öztürk", phone: "0536 555 66 77", status: "no-show", muscleGroups: ["arms"], machines: ["m6"] },
+  { id: "c6", time: "10:30", name: "Aylin Arslan", phone: "0537 666 77 88", status: "pending", muscleGroups: ["glutes"], machines: ["m12"] },
+  { id: "c7", time: "11:00", name: "Burak Doğan", phone: "0538 777 88 99", status: "pending", muscleGroups: ["core"], machines: ["m11"] },
+  { id: "c8", time: "17:30", name: "Selin Aydın", phone: "0539 888 99 00", status: "pending", muscleGroups: ["shoulders"], machines: ["m5"] },
+  { id: "c9", time: "18:00", name: "Emre Çelik", phone: "0530 999 00 11", status: "pending", muscleGroups: ["chest", "back"], machines: ["m3", "m2"] },
+  { id: "c10", time: "18:30", name: "Gyedu Ernest", phone: "0541 000 11 22", status: "pending", muscleGroups: ["chest", "arms"], machines: ["m3", "m6"] },
+];
