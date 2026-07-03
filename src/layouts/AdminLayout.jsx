@@ -53,7 +53,7 @@ export default function AdminLayout() {
       <div className="ml-64 flex-1">
         <header className="flex items-center justify-between border-b border-gray-100 bg-white px-8 py-4">
           <div>
-            <p className="text-xs text-gray-400">FitBud Merkez Şube</p>
+            <p className="text-xs text-gray-400">METU GYM Merkez Şube</p>
             <p className="text-sm font-semibold text-gray-800">2 Temmuz 2026, Perşembe</p>
           </div>
           <div className="flex items-center gap-3">

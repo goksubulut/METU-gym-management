@@ -1,0 +1,252 @@
+// METU Gym Management System — Spor Salonu Randevu ve Makine Kullanım Uygulaması
+// Veri modeli kaynağı: SRS v1.0 Bölüm 5 (Veri Modeli)
+// + frontend'in beklediği ek alanlar (not, check-in durumları, telefon, resepsiyon rolü)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Enum'lar
+// ---------------------------------------------------------------------------
+
+// FR-AUTH-2: user + admin. RECEPTION frontend'deki check-in paneli için eklendi
+// (SRS Açık Nokta #2'nin fiili çözümü).
+enum Role {
+  USER
+  ADMIN
+  RECEPTION
+}
+
+// SRS Exercise.tip: makine / serbest / ısınma / soğuma
+enum ExerciseType {
+  MACHINE
+  FREE
+  WARMUP
+  COOLDOWN
+}
+
+// Randevu yaşam döngüsü. CHECKED_IN ve NO_SHOW resepsiyon paneli için.
+enum AppointmentStatus {
+  BOOKED
+  CHECKED_IN
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum FaultSeverity {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum FaultStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+}
+
+// SRS Suggestion.tip: öneri / şikayet
+enum SuggestionType {
+  SUGGESTION
+  COMPLAINT
+}
+
+// ---------------------------------------------------------------------------
+// Kimlik
+// ---------------------------------------------------------------------------
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  phone        String?
+  passwordHash String
+  role         Role     @default(USER)
+  createdAt    DateTime @default(now())
+
+  appointments Appointment[]
+  faultReports FaultReport[]
+  ratings      Rating[]
+  suggestions  Suggestion[]
+}
+
+// ---------------------------------------------------------------------------
+// Katalog: kas grubu, makine, egzersiz
+// ---------------------------------------------------------------------------
+
+model MuscleGroup {
+  id            String  @id // "chest", "back"... — frontend ile aynı slug'lar
+  name          String // "Göğüs", "Sırt"...
+  svgRegionCode String? // interaktif iskelet haritasındaki SVG path kimliği
+
+  machines     MachineMuscleGroup[]
+  exercises    ExerciseMuscleGroup[]
+  appointments AppointmentMuscleGroup[]
+}
+
+model Machine {
+  id          String   @id @default(cuid())
+  name        String
+  category    String // "Kardiyo" | "Serbest Ağırlık" | "Kablolu" | "Makine" | "Fonksiyonel"
+  photoUrl    String?
+  location    String // fiziksel konum, ör. "Zemin Kat — B3"
+  qrCode      String   @unique // makine QR'ının taşıdığı deep-link yolu, ör. "/machine/m1"
+  description String?
+  tips        String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  muscleGroups MachineMuscleGroup[]
+  videos       Video[]
+  faultReports FaultReport[]
+  ratings      Rating[]
+  appointments AppointmentMachine[]
+}
+
+// n-n: bir makine birden çok kas grubunu çalıştırır (SRS MachineMuscleGroup)
+model MachineMuscleGroup {
+  machineId     String
+  muscleGroupId String
+
+  machine     Machine     @relation(fields: [machineId], references: [id], onDelete: Cascade)
+  muscleGroup MuscleGroup @relation(fields: [muscleGroupId], references: [id], onDelete: Cascade)
+
+  @@id([machineId, muscleGroupId])
+}
+
+model Exercise {
+  id           String       @id @default(cuid())
+  name         String
+  type         ExerciseType
+  instructions String?
+  duration     String? // ısınma/soğuma için: "2 dk", "30 sn x2"
+  videoUrl     String?
+
+  muscleGroups ExerciseMuscleGroup[]
+}
+
+// n-n: bir egzersiz birden çok kas grubunu çalıştırır (SRS ExerciseMuscleGroup)
+model ExerciseMuscleGroup {
+  exerciseId    String
+  muscleGroupId String
+
+  exercise    Exercise    @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  muscleGroup MuscleGroup @relation(fields: [muscleGroupId], references: [id], onDelete: Cascade)
+
+  @@id([exerciseId, muscleGroupId])
+}
+
+// ---------------------------------------------------------------------------
+// Randevu: sabit slot modeli (2 Temmuz kararı)
+// ---------------------------------------------------------------------------
+
+model Slot {
+  id        String   @id @default(cuid())
+  date      DateTime @db.Date
+  startTime String // "08:00" — süre ve kapasite .env'den konfigüre edilir
+  endTime   String // "08:30"
+  capacity  Int
+
+  appointments Appointment[]
+
+  @@unique([date, startTime])
+}
+
+model Appointment {
+  id        String            @id @default(cuid())
+  userId    String
+  slotId    String
+  status    AppointmentStatus @default(BOOKED)
+  note      String?
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+  slot Slot @relation(fields: [slotId], references: [id])
+
+  machines     AppointmentMachine[]
+  muscleGroups AppointmentMuscleGroup[]
+}
+
+// Yol A: randevuya opsiyonel makine planı (SRS AppointmentMachine)
+model AppointmentMachine {
+  appointmentId String
+  machineId     String
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  machine     Machine     @relation(fields: [machineId], references: [id])
+
+  @@id([appointmentId, machineId])
+}
+
+// Frontend randevuda hedef kas gruplarını da tutuyor (Book akışı) — SRS'e ek.
+model AppointmentMuscleGroup {
+  appointmentId String
+  muscleGroupId String
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  muscleGroup MuscleGroup @relation(fields: [muscleGroupId], references: [id])
+
+  @@id([appointmentId, muscleGroupId])
+}
+
+// ---------------------------------------------------------------------------
+// İçerik: video
+// ---------------------------------------------------------------------------
+
+model Video {
+  id        String @id @default(cuid())
+  machineId String
+  title     String
+  url       String // Nginx'ten statik sunulur, ör. "/media/videos/m1.mp4"
+
+  machine Machine @relation(fields: [machineId], references: [id], onDelete: Cascade)
+}
+
+// ---------------------------------------------------------------------------
+// Geri bildirim: arıza, puan, öneri/şikayet
+// ---------------------------------------------------------------------------
+
+model FaultReport {
+  id          String        @id @default(cuid())
+  userId      String
+  machineId   String
+  description String
+  severity    FaultSeverity @default(MEDIUM)
+  status      FaultStatus   @default(OPEN)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id])
+  machine Machine @relation(fields: [machineId], references: [id])
+}
+
+model Rating {
+  id        String   @id @default(cuid())
+  userId    String
+  machineId String
+  score     Int // 1–5 (SRS Öneri; DTO katmanında doğrulanır)
+  tags      String[] // "Rahattı" | "Kalabalıktı" | "Arızalıydı" | "Ayarları bozuktu" | "Kullanımı zordu"
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  machine Machine @relation(fields: [machineId], references: [id])
+}
+
+model Suggestion {
+  id        String         @id @default(cuid())
+  userId    String
+  type      SuggestionType
+  tag       String? // "Ekipman" | "Temizlik" | "Uygulama" | "Personel"...
+  text      String
+  createdAt DateTime       @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}

@@ -3,3 +3,7 @@ dist
 .DS_Store
 *.log
 vite.config.js.timestamp-*.mjs
+
+# Backend
+.env
+coverage

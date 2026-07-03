@@ -1,0 +1,122 @@
+[
+  {
+    "id": "m1",
+    "name": "Leg Press 45°",
+    "category": "Makine",
+    "muscles": ["legs", "glutes"],
+    "location": "Zemin Kat — B3",
+    "hasVideo": true,
+    "description": "45 derece açılı bacak presi. Quadriceps, hamstring ve kalça kaslarını hedefler. Ağırlık plakaları ile ayarlanır.",
+    "tips": "Dizlerini içe kilitleme, sırtını mindere yasla, hareketi kontrollü yap."
+  },
+  {
+    "id": "m2",
+    "name": "Lat Pulldown",
+    "category": "Kablolu",
+    "muscles": ["back", "arms"],
+    "location": "1. Kat — A2",
+    "hasVideo": true,
+    "description": "Geniş kavrama ile sırt (latissimus dorsi) çalıştıran kablolu istasyon.",
+    "tips": "Çubuğu göğse doğru çek, omuzları aşağıda tut."
+  },
+  {
+    "id": "m3",
+    "name": "Chest Press",
+    "category": "Makine",
+    "muscles": ["chest", "shoulders", "arms"],
+    "location": "1. Kat — A5",
+    "hasVideo": true,
+    "description": "Oturarak göğüs presi. Pektoral kasları güvenli sabit yörüngeyle çalıştırır.",
+    "tips": "Dirsekleri omuz hizasında tut, tam uzatmada kilitleme."
+  },
+  {
+    "id": "m4",
+    "name": "Koşu Bandı Pro",
+    "category": "Kardiyo",
+    "muscles": ["cardio", "legs"],
+    "location": "Kardiyo Alanı — C1",
+    "hasVideo": false,
+    "description": "Eğim ve hız programlı koşu bandı. Isınma ve dayanıklılık için ideal.",
+    "tips": "Isınma için 5 dk yürüyüşle başla."
+  },
+  {
+    "id": "m5",
+    "name": "Cable Crossover",
+    "category": "Kablolu",
+    "muscles": ["chest", "shoulders"],
+    "location": "1. Kat — A6",
+    "hasVideo": true,
+    "description": "Çift kablolu istasyon; göğüs iç kısmını izole eder.",
+    "tips": "Hareketi göğüs merkezinde birleştir, sıkıştır."
+  },
+  {
+    "id": "m6",
+    "name": "Dumbbell Rack 2-50kg",
+    "category": "Serbest Ağırlık",
+    "muscles": ["arms", "shoulders", "chest", "back"],
+    "location": "Zemin Kat — B1",
+    "hasVideo": false,
+    "description": "2-50 kg dambıl seti. Çok yönlü serbest ağırlık antrenmanı.",
+    "tips": "Ağırlığı kademeli artır, formu bozma."
+  },
+  {
+    "id": "m7",
+    "name": "Squat Rack",
+    "category": "Serbest Ağırlık",
+    "muscles": ["legs", "glutes", "core"],
+    "location": "Zemin Kat — B5",
+    "hasVideo": true,
+    "description": "Bar ve güvenlik kollu squat rafı. Alt vücut için temel istasyon.",
+    "tips": "Güvenlik kollarını doğru yüksekliğe ayarla."
+  },
+  {
+    "id": "m8",
+    "name": "Rowing Machine",
+    "category": "Kardiyo",
+    "muscles": ["cardio", "back", "legs"],
+    "location": "Kardiyo Alanı — C4",
+    "hasVideo": true,
+    "description": "Kürek makinesi; tam vücut kardiyo ve sırt çalışması.",
+    "tips": "İtişi bacaklardan başlat, sonra sırt ve kolları kat."
+  },
+  {
+    "id": "m9",
+    "name": "Leg Extension",
+    "category": "Makine",
+    "muscles": ["legs"],
+    "location": "Zemin Kat — B4",
+    "hasVideo": false,
+    "description": "Quadriceps izolasyon makinesi.",
+    "tips": "Tepede 1 sn bekle, kontrollü indir."
+  },
+  {
+    "id": "m10",
+    "name": "Assisted Pull-up",
+    "category": "Fonksiyonel",
+    "muscles": ["back", "arms", "core"],
+    "location": "1. Kat — A8",
+    "hasVideo": true,
+    "description": "Destekli barfiks; sırt ve kol için ilerlemeli antrenman.",
+    "tips": "Destek ağırlığını gücüne göre azalt."
+  },
+  {
+    "id": "m11",
+    "name": "Ab Crunch Machine",
+    "category": "Makine",
+    "muscles": ["core"],
+    "location": "1. Kat — A9",
+    "hasVideo": false,
+    "description": "Karın kaslarını dirençli çalıştıran makine.",
+    "tips": "Boyun değil karın kaslarıyla katla."
+  },
+  {
+    "id": "m12",
+    "name": "Hip Thrust Bench",
+    "category": "Fonksiyonel",
+    "muscles": ["glutes", "legs"],
+    "location": "Zemin Kat — B6",
+    "hasVideo": true,
+    "description": "Kalça itişi için tasarlanmış özel bench.",
+    "tips": "Tepede kalçayı sık, beli aşırı gerginleştirme."
+  }
+]

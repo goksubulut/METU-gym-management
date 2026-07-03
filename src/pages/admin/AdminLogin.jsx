@@ -19,7 +19,7 @@ export default function AdminLogin() {
           }}
           className="space-y-4"
         >
-          <Input label="E-posta" type="email" placeholder="admin@fitbud.com" required />
+          <Input label="E-posta" type="email" placeholder="admin@metugym.local" required />
           <Input label="Şifre" type="password" placeholder="••••••••" required />
           <Button full size="lg" type="submit">
             Giriş Yap

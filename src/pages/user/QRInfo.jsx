@@ -23,7 +23,7 @@ export default function QRInfo() {
           QR Nasıl Çalışır?
         </h1>
         <p className="mt-2 max-w-xs text-sm text-gray-500">
-          FitBud'da QR kodlar salondaki deneyimini hızlandırır. İşte kullanım adımları:
+          METU GYM'de QR kodlar salondaki deneyimini hızlandırır. İşte kullanım adımları:
         </p>
       </div>
 

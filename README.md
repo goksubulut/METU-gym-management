@@ -1,4 +1,4 @@
-# FitBud — Spor Salonu Randevu & Makine Uygulaması (Frontend)
+# METU Gym Management System — Spor Salonu Randevu & Makine Uygulaması
 
 Referans gym uygulamasının tasarım dilini (kart yapıları, badge/buton stilleri, alt
 navigasyon, boşluk ve tipografi) koruyan; ancak **kırmızı tema** ve tamamen farklı

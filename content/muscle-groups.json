@@ -1,0 +1,10 @@
+[
+  { "id": "chest", "name": "Göğüs", "svgRegionCode": "front-chest" },
+  { "id": "back", "name": "Sırt", "svgRegionCode": "back-lats" },
+  { "id": "shoulders", "name": "Omuz", "svgRegionCode": "front-shoulders" },
+  { "id": "arms", "name": "Kol", "svgRegionCode": "front-arms" },
+  { "id": "legs", "name": "Bacak", "svgRegionCode": "front-quads" },
+  { "id": "core", "name": "Karın", "svgRegionCode": "front-abs" },
+  { "id": "glutes", "name": "Kalça", "svgRegionCode": "back-glutes" },
+  { "id": "cardio", "name": "Kardiyo", "svgRegionCode": "full-body" }
+]
