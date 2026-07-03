@@ -1,14 +1,42 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
 import Card from "../../components/Card.jsx";
 import Badge from "../../components/Badge.jsx";
 import Tabs from "../../components/Tabs.jsx";
-import { feedbackList } from "../../mock/feedback.js";
-import { CHART_COLORS, feedbackTags } from "../../mock/analytics.js";
+import { feedbackList as mockFeedback, } from "../../mock/feedback.js";
+import { CHART_COLORS, feedbackTags as mockTags } from "../../mock/analytics.js";
+import { fetchAdminSuggestions } from "../../api/admin.js";
+import { mergeById } from "../../api/client.js";
+
+function mergeTagCounts(mock, api) {
+  const map = new Map(mock.map((t) => [t.tag, t.value]));
+  for (const t of api) {
+    map.set(t.tag, (map.get(t.tag) ?? 0) + t.value);
+  }
+  return [...map.entries()].map(([tag, value]) => ({ tag, value }));
+}
 
 export default function FeedbackAdmin() {
   const [type, setType] = useState("all");
-  const filtered = feedbackList.filter((f) => type === "all" || f.type === type);
+  const [list, setList] = useState(mockFeedback);
+  const [tags, setTags] = useState(mockTags);
+
+  const load = useCallback(async () => {
+    try {
+      const { feedbackList, feedbackTags } = await fetchAdminSuggestions();
+      setList(mergeById(mockFeedback, feedbackList));
+      setTags(mergeTagCounts(mockTags, feedbackTags));
+    } catch {
+      setList(mockFeedback);
+      setTags(mockTags);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const filtered = list.filter((f) => type === "all" || f.type === type);
 
   return (
     <div className="space-y-6">
@@ -64,7 +92,7 @@ export default function FeedbackAdmin() {
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
               <Pie
-                data={feedbackTags}
+                data={tags}
                 dataKey="value"
                 nameKey="tag"
                 cx="50%"
@@ -72,7 +100,7 @@ export default function FeedbackAdmin() {
                 outerRadius={90}
                 label={(e) => e.tag}
               >
-                {feedbackTags.map((_, i) => (
+                {tags.map((_, i) => (
                   <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
                 ))}
               </Pie>

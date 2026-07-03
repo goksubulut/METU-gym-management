@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ResponsiveContainer,
   BarChart,
@@ -13,10 +13,27 @@ import {
 } from "recharts";
 import Card from "../../components/Card.jsx";
 import { Select } from "../../components/Input.jsx";
-import { machinePreference, muscleGroupPopularity, CHART_COLORS } from "../../mock/analytics.js";
+import {
+  machinePreference as mockMachinePref,
+  muscleGroupPopularity as mockMusclePop,
+  CHART_COLORS,
+} from "../../mock/analytics.js";
+import { fetchAdminPreferences } from "../../api/admin.js";
 
 export default function Preferences() {
   const [range, setRange] = useState("30");
+  const [machinePreference, setMachinePreference] = useState(mockMachinePref);
+  const [muscleGroupPopularity, setMuscleGroupPopularity] = useState(mockMusclePop);
+
+  useEffect(() => {
+    fetchAdminPreferences(Number(range))
+      .then((data) => {
+        if (data.machinePreference?.length) setMachinePreference(data.machinePreference);
+        if (data.muscleGroupPopularity?.length) setMuscleGroupPopularity(data.muscleGroupPopularity);
+      })
+      .catch(() => {});
+  }, [range]);
+
   const radial = muscleGroupPopularity.map((m, i) => ({
     ...m,
     fill: CHART_COLORS[i % CHART_COLORS.length],

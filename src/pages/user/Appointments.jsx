@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../../components/Button.jsx";
 import Card from "../../components/Card.jsx";
@@ -6,10 +6,16 @@ import Badge from "../../components/Badge.jsx";
 import Tabs from "../../components/Tabs.jsx";
 import Modal from "../../components/Modal.jsx";
 import EmptyState from "../../components/EmptyState.jsx";
+import Spinner from "../../components/Spinner.jsx";
 import { useToast } from "../../components/Toast.jsx";
-import { appointments as seed } from "../../mock/appointments.js";
+import { appointments as mockSeed } from "../../mock/appointments.js";
 import { machineById, MUSCLE_GROUPS } from "../../mock/machines.js";
-import { currentUser } from "../../mock/user.js";
+import { getAccessToken } from "../../api/client.js";
+import {
+  cancelAppointment,
+  fetchMyAppointments,
+  mapAppointmentFromApi,
+} from "../../api/bookings.js";
 
 const labelOf = (id) => MUSCLE_GROUPS.find((m) => m.id === id)?.label || id;
 const STATUS = {
@@ -18,36 +24,91 @@ const STATUS = {
   cancelled: { tone: "red", label: "İptal" },
 };
 
+function getProfile() {
+  try {
+    const raw = localStorage.getItem("authUser");
+    if (raw) return JSON.parse(raw);
+  } catch {
+    /* ignore */
+  }
+  return {
+    name: "Misafir",
+    email: "",
+    memberSince: "—",
+    avatar: "?",
+  };
+}
+
 export default function Appointments() {
   const nav = useNavigate();
   const toast = useToast();
   const [tab, setTab] = useState("upcoming");
-  const [list, setList] = useState(seed);
+  const [list, setList] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [cancelId, setCancelId] = useState(null);
+  const [profile, setProfile] = useState(getProfile);
+
+  const load = useCallback(async () => {
+    if (!getAccessToken()) {
+      setList(mockSeed);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    try {
+      const apiRows = await fetchMyAppointments();
+      const mapped = apiRows.map(mapAppointmentFromApi);
+      setList(mapped.length ? mapped : mockSeed);
+      setProfile(getProfile());
+    } catch {
+      setList(mockSeed);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const filtered = list.filter((a) =>
     tab === "upcoming" ? a.status === "upcoming" : a.status !== "upcoming"
   );
 
-  const doCancel = () => {
+  const doCancel = async () => {
+    const target = list.find((a) => a.id === cancelId);
+    if (target?.fromApi) {
+      try {
+        await cancelAppointment(cancelId);
+      } catch (err) {
+        toast(err.message ?? "İptal başarısız", "error");
+        setCancelId(null);
+        return;
+      }
+    }
     setList((l) => l.map((a) => (a.id === cancelId ? { ...a, status: "cancelled" } : a)));
     setCancelId(null);
     toast("Randevu iptal edildi", "error");
   };
 
+  const avatar =
+    profile.name
+      ?.split(" ")
+      .map((p) => p[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() ?? "?";
+
   return (
     <div className="px-4 py-5">
-      {/* Profil kartı */}
       <Card className="mb-5 flex items-center gap-4 p-4">
         <div className="grid h-16 w-16 place-items-center rounded-full bg-primary-100 text-xl font-extrabold text-primary-700">
-          {currentUser.avatar}
+          {avatar}
         </div>
         <div className="flex-1">
-          <p className="text-lg font-extrabold text-gray-900">{currentUser.name}</p>
-          <p className="text-sm text-gray-400">{currentUser.email}</p>
-          <p className="text-xs text-gray-400">Üyelik: {currentUser.memberSince}</p>
+          <p className="text-lg font-extrabold text-gray-900">{profile.name}</p>
+          <p className="text-sm text-gray-400">{profile.email}</p>
         </div>
-        <button className="text-sm font-semibold text-primary-600">Düzenle</button>
       </Card>
 
       <div className="mb-3 grid grid-cols-3 gap-2">
@@ -74,7 +135,11 @@ export default function Appointments() {
         className="mb-4"
       />
 
-      {filtered.length === 0 ? (
+      {loading ? (
+        <div className="grid place-items-center py-16">
+          <Spinner />
+        </div>
+      ) : filtered.length === 0 ? (
         <EmptyState
           icon="calendar"
           title={tab === "upcoming" ? "Yaklaşan randevun yok" : "Geçmiş kaydı yok"}
@@ -94,7 +159,7 @@ export default function Appointments() {
                 <div className="flex items-baseline gap-2">
                   <span className="text-xl font-extrabold text-gray-900">{a.time}</span>
                   <span className="text-sm text-gray-400">
-                    {new Date(a.date).toLocaleDateString("tr-TR", {
+                    {new Date(`${a.date}T12:00:00`).toLocaleDateString("tr-TR", {
                       day: "numeric",
                       month: "long",
                     })}

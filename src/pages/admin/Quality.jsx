@@ -1,10 +1,30 @@
+import { useEffect, useState } from "react";
 import Card from "../../components/Card.jsx";
 import StatCard from "../../components/StatCard.jsx";
 import Badge from "../../components/Badge.jsx";
 import StarRating from "../../components/StarRating.jsx";
-import { summary, mostFaulty, mostComplained } from "../../mock/analytics.js";
+import {
+  summary as mockSummary,
+  mostFaulty as mockFaulty,
+  mostComplained as mockComplained,
+} from "../../mock/analytics.js";
+import { fetchAdminQuality } from "../../api/admin.js";
 
 export default function Quality() {
+  const [summary, setSummary] = useState({ ...mockSummary, totalReviews: 1204, resolutionRate: 86 });
+  const [mostFaulty, setMostFaulty] = useState(mockFaulty);
+  const [mostComplained, setMostComplained] = useState(mockComplained);
+
+  useEffect(() => {
+    fetchAdminQuality()
+      .then((data) => {
+        setSummary(data.summary);
+        if (data.mostFaulty?.length) setMostFaulty(data.mostFaulty);
+        if (data.mostComplained?.length) setMostComplained(data.mostComplained);
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <div className="space-y-6">
       <div>
@@ -14,8 +34,18 @@ export default function Quality() {
 
       <div className="grid grid-cols-3 gap-4">
         <StatCard label="Ortalama Puan" value={summary.avgRating} icon="star" tone="amber" />
-        <StatCard label="Toplam Değerlendirme" value="1.204" icon="clipboard" tone="blue" />
-        <StatCard label="Çözüm Oranı" value="%86" icon="check" tone="green" />
+        <StatCard
+          label="Toplam Değerlendirme"
+          value={summary.totalReviews?.toLocaleString("tr-TR") ?? "—"}
+          icon="clipboard"
+          tone="blue"
+        />
+        <StatCard
+          label="Çözüm Oranı"
+          value={`%${summary.resolutionRate ?? 0}`}
+          icon="check"
+          tone="green"
+        />
       </div>
 
       <div className="grid grid-cols-2 gap-6">

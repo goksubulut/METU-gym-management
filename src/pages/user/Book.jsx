@@ -1,12 +1,19 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../../components/Button.jsx";
 import Card from "../../components/Card.jsx";
 import Badge from "../../components/Badge.jsx";
 import SlotButton from "../../components/SlotButton.jsx";
+import Spinner from "../../components/Spinner.jsx";
 import { useToast } from "../../components/Toast.jsx";
-import { upcomingDates, getSlots } from "../../mock/slots.js";
 import { MUSCLE_GROUPS, machinesByMuscle } from "../../mock/machines.js";
+import { upcomingDates } from "../../utils/dates.js";
+import { getAccessToken } from "../../api/client.js";
+import {
+  createAppointment,
+  fetchSlots,
+  mapSlotFromApi,
+} from "../../api/bookings.js";
 
 const STEPS = ["Tarih & Saat", "Kas Grubu / Makine", "Özet"];
 
@@ -19,8 +26,41 @@ export default function Book() {
   const [slot, setSlot] = useState(null);
   const [groups, setGroups] = useState([]);
   const [machines, setMachines] = useState([]);
+  const [slots, setSlots] = useState([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const slots = useMemo(() => getSlots(dateKey), [dateKey]);
+  useEffect(() => {
+    if (!getAccessToken()) {
+      toast("Randevu almak için giriş yapmalısın", "error");
+      nav("/auth");
+    }
+  }, [nav, toast]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoadingSlots(true);
+    setSlot(null);
+    fetchSlots(dateKey)
+      .then((data) => {
+        if (!cancelled) {
+          setSlots(data.slots.map(mapSlotFromApi));
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          toast(err.message ?? "Slotlar yüklenemedi", "error");
+          setSlots([]);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingSlots(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [dateKey, toast]);
+
   const suggested = useMemo(
     () => [...new Set(groups.flatMap((g) => machinesByMuscle(g)))],
     [groups]
@@ -29,14 +69,26 @@ export default function Book() {
   const toggle = (arr, set, val) =>
     set(arr.includes(val) ? arr.filter((x) => x !== val) : [...arr, val]);
 
-  const confirm = () => {
-    toast("Randevun oluşturuldu", "success");
-    nav("/appointments");
+  const confirm = async () => {
+    if (!slot?.id) return;
+    setSubmitting(true);
+    try {
+      await createAppointment({
+        slotId: slot.id,
+        machineIds: machines.length ? machines : undefined,
+        muscleGroupIds: groups.length ? groups : undefined,
+      });
+      toast("Randevun oluşturuldu", "success");
+      nav("/appointments");
+    } catch (err) {
+      toast(err.message ?? "Randevu oluşturulamadı", "error");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <div className="px-4 py-5">
-      {/* Adım göstergesi */}
       <div className="mb-5 flex items-center gap-2">
         {STEPS.map((s, i) => (
           <div key={s} className="flex flex-1 flex-col items-center">
@@ -57,7 +109,6 @@ export default function Book() {
         ))}
       </div>
 
-      {/* 5a — Tarih + slot */}
       {step === 0 && (
         <div>
           <h2 className="mb-3 text-lg font-bold text-gray-900">Tarih seç</h2>
@@ -65,10 +116,8 @@ export default function Book() {
             {dates.map((d) => (
               <button
                 key={d.key}
-                onClick={() => {
-                  setDateKey(d.key);
-                  setSlot(null);
-                }}
+                type="button"
+                onClick={() => setDateKey(d.key)}
                 className={`flex min-w-[56px] flex-col items-center rounded-xl border px-3 py-2 ${
                   dateKey === d.key
                     ? "border-primary-600 bg-primary-600 text-white"
@@ -85,21 +134,28 @@ export default function Book() {
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-lg font-bold text-gray-900">Saat seç</h2>
             <div className="flex items-center gap-2 text-[10px] text-gray-400">
-              <span className="flex items-center gap-1"><i className="h-2 w-2 rounded-full bg-emerald-500 inline-block" />Müsait</span>
-              <span className="flex items-center gap-1"><i className="h-2 w-2 rounded-full bg-amber-500 inline-block" />Orta</span>
-              <span className="flex items-center gap-1"><i className="h-2 w-2 rounded-full bg-red-500 inline-block" />Yoğun</span>
+              <span className="flex items-center gap-1"><i className="inline-block h-2 w-2 rounded-full bg-emerald-500" />Müsait</span>
+              <span className="flex items-center gap-1"><i className="inline-block h-2 w-2 rounded-full bg-amber-500" />Orta</span>
+              <span className="flex items-center gap-1"><i className="inline-block h-2 w-2 rounded-full bg-red-500" />Yoğun</span>
             </div>
           </div>
-          <div className="grid grid-cols-4 gap-2">
-            {slots.map((s) => (
-              <SlotButton
-                key={s.time}
-                slot={s}
-                selected={slot?.time === s.time}
-                onSelect={setSlot}
-              />
-            ))}
-          </div>
+
+          {loadingSlots ? (
+            <div className="grid place-items-center py-10">
+              <Spinner />
+            </div>
+          ) : (
+            <div className="grid grid-cols-4 gap-2">
+              {slots.map((s) => (
+                <SlotButton
+                  key={s.id ?? s.time}
+                  slot={s}
+                  selected={slot?.id === s.id || slot?.time === s.time}
+                  onSelect={setSlot}
+                />
+              ))}
+            </div>
+          )}
 
           <Button full size="lg" className="mt-6" disabled={!slot} onClick={() => setStep(1)}>
             Devam
@@ -107,7 +163,6 @@ export default function Book() {
         </div>
       )}
 
-      {/* 5b — Kas grubu / makine (opsiyonel) */}
       {step === 1 && (
         <div>
           <h2 className="text-lg font-bold text-gray-900">Kas grubu (opsiyonel)</h2>
@@ -118,6 +173,7 @@ export default function Book() {
             {MUSCLE_GROUPS.map((g) => (
               <button
                 key={g.id}
+                type="button"
                 onClick={() => toggle(groups, setGroups, g.id)}
                 className={`rounded-xl border px-4 py-2 text-sm font-semibold ${
                   groups.includes(g.id)
@@ -170,13 +226,12 @@ export default function Book() {
         </div>
       )}
 
-      {/* 5c — Özet */}
       {step === 2 && (
         <div>
           <h2 className="mb-4 text-lg font-bold text-gray-900">Özet & Onay</h2>
           <Card className="divide-y divide-gray-100">
             <Row label="Tarih">
-              {new Date(dateKey).toLocaleDateString("tr-TR", {
+              {new Date(`${dateKey}T12:00:00`).toLocaleDateString("tr-TR", {
                 weekday: "long",
                 day: "numeric",
                 month: "long",
@@ -215,8 +270,8 @@ export default function Book() {
             <Button variant="ghost" full onClick={() => setStep(1)}>
               Geri
             </Button>
-            <Button full onClick={confirm}>
-              Randevuyu Onayla
+            <Button full onClick={confirm} disabled={submitting}>
+              {submitting ? "Kaydediliyor…" : "Randevuyu Onayla"}
             </Button>
           </div>
         </div>

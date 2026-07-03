@@ -47,6 +47,7 @@ enum FaultSeverity {
 }
 
 enum FaultStatus {
+  PENDING
   OPEN
   IN_PROGRESS
   RESOLVED
@@ -223,7 +224,7 @@ model FaultReport {
   machineId   String
   description String
   severity    FaultSeverity @default(MEDIUM)
-  status      FaultStatus   @default(OPEN)
+  status      FaultStatus   @default(PENDING)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 

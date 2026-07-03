@@ -4,17 +4,32 @@ import Button from "../../components/Button.jsx";
 import Logo from "../../components/Logo.jsx";
 import { Input } from "../../components/Input.jsx";
 import { useToast } from "../../components/Toast.jsx";
+import { login, register } from "../../api/auth.js";
 
 export default function Auth() {
   const [mode, setMode] = useState("login");
-  const [method, setMethod] = useState("phone");
+  const [loading, setLoading] = useState(false);
   const nav = useNavigate();
   const toast = useToast();
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
-    toast(mode === "login" ? "Giriş başarılı" : "Kayıt tamamlandı", "success");
-    nav("/home");
+    const form = e.target;
+    setLoading(true);
+    try {
+      if (mode === "login") {
+        await login(form.email.value, form.password.value);
+        toast("Giriş başarılı", "success");
+      } else {
+        await register(form.name.value, form.email.value, form.phone?.value, form.password.value);
+        toast("Kayıt tamamlandı", "success");
+      }
+      nav("/home");
+    } catch (err) {
+      toast(err.message ?? "İşlem başarısız", "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -30,6 +45,7 @@ export default function Auth() {
         ].map(([v, l]) => (
           <button
             key={v}
+            type="button"
             onClick={() => setMode(v)}
             className={`flex-1 rounded-lg py-2.5 text-sm font-semibold transition-colors ${
               mode === v ? "bg-white text-primary-600 shadow-sm" : "text-gray-500"
@@ -49,59 +65,33 @@ export default function Auth() {
           : "Birkaç bilgiyle hesabını oluştur."}
       </p>
 
-      <div className="mb-4 flex gap-2">
-        {[
-          ["phone", "Telefon"],
-          ["email", "E-posta"],
-        ].map(([v, l]) => (
-          <button
-            key={v}
-            onClick={() => setMethod(v)}
-            className={`flex-1 rounded-xl border py-2.5 text-sm font-semibold ${
-              method === v
-                ? "border-primary-600 bg-primary-50 text-primary-700"
-                : "border-gray-200 text-gray-500"
-            }`}
-          >
-            {l}
-          </button>
-        ))}
-      </div>
-
       <form onSubmit={submit} className="space-y-4">
         {mode === "register" && (
-          <Input label="Ad Soyad" placeholder="Adın ve soyadın" required />
+          <>
+            <Input name="name" label="Ad Soyad" placeholder="Adın ve soyadın" required />
+            <Input name="phone" label="Telefon (opsiyonel)" placeholder="05XX XXX XX XX" type="tel" />
+          </>
         )}
-        {method === "phone" ? (
-          <Input label="Telefon" placeholder="05XX XXX XX XX" type="tel" required />
-        ) : (
-          <Input label="E-posta" placeholder="ornek@mail.com" type="email" required />
-        )}
-        <Input label="Şifre" placeholder="••••••••" type="password" required />
+        <Input
+          name="email"
+          label="E-posta"
+          placeholder="gyeduernest@gmail.com"
+          type="email"
+          defaultValue={mode === "login" ? "gyeduernest@gmail.com" : ""}
+          required
+        />
+        <Input name="password" label="Şifre" placeholder="••••••••" type="password" required />
 
         {mode === "login" && (
-          <p className="text-right text-xs font-semibold text-primary-600">
-            Şifremi unuttum?
+          <p className="text-xs text-gray-400">
+            Demo: <b>gyeduernest@gmail.com</b> / <b>user1234</b>
           </p>
         )}
 
-        <Button full size="lg" type="submit">
-          {mode === "login" ? "Giriş Yap" : "Hesap Oluştur"}
+        <Button full size="lg" type="submit" disabled={loading}>
+          {loading ? "Bekle…" : mode === "login" ? "Giriş Yap" : "Hesap Oluştur"}
         </Button>
       </form>
-
-      <div className="my-6 flex items-center gap-3 text-xs text-gray-400">
-        <span className="h-px flex-1 bg-gray-200" /> veya
-        <span className="h-px flex-1 bg-gray-200" />
-      </div>
-      <div className="flex justify-center gap-4">
-        <button className="grid h-12 w-12 place-items-center rounded-xl border border-gray-200 font-display text-lg font-bold text-gray-700 transition-colors hover:border-gray-300">
-          G
-        </button>
-        <button className="grid h-12 w-12 place-items-center rounded-xl border border-gray-200 font-display text-lg font-bold text-gray-700 transition-colors hover:border-gray-300">
-          f
-        </button>
-      </div>
     </div>
   );
 }

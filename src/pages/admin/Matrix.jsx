@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   ResponsiveContainer,
   ScatterChart,
@@ -10,9 +11,9 @@ import {
   ReferenceLine,
 } from "recharts";
 import Card from "../../components/Card.jsx";
-import { matrixData } from "../../mock/analytics.js";
+import { matrixData as mockMatrix } from "../../mock/analytics.js";
+import { fetchAdminMatrix } from "../../api/admin.js";
 
-// Eşik değerleri (kadran sınırları)
 const USE_MID = 110;
 const RATE_MID = 4.5;
 
@@ -33,6 +34,16 @@ function classify(d) {
 }
 
 export default function Matrix() {
+  const [matrixData, setMatrixData] = useState(mockMatrix);
+
+  useEffect(() => {
+    fetchAdminMatrix()
+      .then((data) => {
+        if (data.matrixData?.length) setMatrixData(data.matrixData);
+      })
+      .catch(() => {});
+  }, []);
+
   const grouped = [[], [], [], []];
   matrixData.forEach((d) => grouped[classify(d)].push(d));
   const colors = ["#059669", "#dc2626", "#2563eb", "#9ca3af"];

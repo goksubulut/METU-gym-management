@@ -4,12 +4,14 @@ import Card from "../../components/Card.jsx";
 import Tabs from "../../components/Tabs.jsx";
 import Icon from "../../components/Icon.jsx";
 import StarRating from "../../components/StarRating.jsx";
+import RatingTagPicker from "../../components/RatingTagPicker.jsx";
 import { Textarea, Select } from "../../components/Input.jsx";
 import { useToast } from "../../components/Toast.jsx";
+import { useNavigate } from "react-router-dom";
 import { machines } from "../../mock/machines.js";
+import { getAccessToken } from "../../api/client.js";
+import { createRating, createSuggestion } from "../../api/feedback.js";
 
-// NOT: Arıza bildirimi bu ekranda YOK. Arıza yalnızca makine QR kodu ile
-// (/machine/:id → Makine Detay) o makineye scope'lanmış olarak bildirilir.
 const TABS = [
   { value: "suggest", label: "Öneri / Şikayet" },
   { value: "rate", label: "Puanla" },
@@ -18,13 +20,44 @@ const TABS = [
 export default function Feedback() {
   const [tab, setTab] = useState("suggest");
   const [rating, setRating] = useState(0);
+  const [ratingTags, setRatingTags] = useState([]);
+  const [submitting, setSubmitting] = useState(false);
   const toast = useToast();
+  const nav = useNavigate();
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
-    toast("Geri bildirimin gönderildi", "success");
-    setRating(0);
-    e.target.reset();
+    if (!getAccessToken()) {
+      toast("Geri bildirim için giriş yapmalısın", "error");
+      nav("/auth");
+      return;
+    }
+
+    const form = e.target;
+    setSubmitting(true);
+    try {
+      if (tab === "rate") {
+        const machineId = form.machineId.value;
+        if (!machineId || rating === 0 || ratingTags.length === 0) {
+          toast("Makine, puan ve en az bir etiket gerekli", "error");
+          return;
+        }
+        await createRating(machineId, rating, ratingTags);
+      } else {
+        const type = form.type.value;
+        const tag = form.tag.value;
+        const text = form.text.value;
+        await createSuggestion(type, tag, text);
+      }
+      toast("Geri bildirimin gönderildi", "success");
+      setRating(0);
+      setRatingTags([]);
+      form.reset();
+    } catch (err) {
+      toast(err.message ?? "Gönderilemedi", "error");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -40,24 +73,24 @@ export default function Feedback() {
         <form onSubmit={submit} className="space-y-4">
           {tab === "suggest" && (
             <>
-              <Select label="Tür" defaultValue="Öneri">
+              <Select name="type" label="Tür" defaultValue="Öneri">
                 <option>Öneri</option>
                 <option>Şikayet</option>
               </Select>
-              <Select label="Konu" defaultValue="Ekipman">
+              <Select name="tag" label="Konu" defaultValue="Ekipman">
                 <option>Ekipman</option>
                 <option>Temizlik</option>
                 <option>Personel</option>
                 <option>Uygulama</option>
                 <option>Diğer</option>
               </Select>
-              <Textarea label="Mesajın" placeholder="Görüşünü yaz..." required />
+              <Textarea name="text" label="Mesajın" placeholder="Görüşünü yaz..." required />
             </>
           )}
 
           {tab === "rate" && (
             <>
-              <Select label="Makine" defaultValue="">
+              <Select name="machineId" label="Makine" defaultValue="" required>
                 <option value="" disabled>
                   Makine seç
                 </option>
@@ -73,12 +106,18 @@ export default function Feedback() {
                 </span>
                 <StarRating value={rating} onChange={setRating} size="lg" />
               </div>
-              <Textarea label="Yorum (opsiyonel)" placeholder="Deneyimini anlat..." />
+              {rating > 0 && (
+                <RatingTagPicker selected={ratingTags} onChange={setRatingTags} />
+              )}
             </>
           )}
 
-          <Button full type="submit">
-            Gönder
+          <Button
+            full
+            type="submit"
+            disabled={submitting || (tab === "rate" && (rating === 0 || ratingTags.length === 0))}
+          >
+            {submitting ? "Gönderiliyor…" : "Gönder"}
           </Button>
         </form>
       </Card>
@@ -87,8 +126,7 @@ export default function Feedback() {
         <Icon name="wrench" size={19} className="mt-0.5 shrink-0 text-primary-600" />
         <p className="text-xs text-gray-500">
           Bir makinede arıza mı var? Makinenin üzerindeki <b>QR kodu</b> telefonunla
-          okut; doğru makineye özel arıza bildirim formu açılır. Salonda aynı modelden
-          birden fazla makine olabildiği için arıza yalnızca QR üzerinden bildirilir.
+          okut; doğru makineye özel arıza bildirim formu açılır.
         </p>
       </Card>
     </div>

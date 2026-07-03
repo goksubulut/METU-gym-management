@@ -6,9 +6,12 @@ import Badge from "../../components/Badge.jsx";
 import Icon from "../../components/Icon.jsx";
 import Modal from "../../components/Modal.jsx";
 import StarRating from "../../components/StarRating.jsx";
+import RatingTagPicker from "../../components/RatingTagPicker.jsx";
 import { Textarea, Select } from "../../components/Input.jsx";
 import { useToast } from "../../components/Toast.jsx";
 import { machineById, MUSCLE_GROUPS } from "../../mock/machines.js";
+import { getAccessToken } from "../../api/client.js";
+import { createFault, createRating } from "../../api/feedback.js";
 
 export default function MachineDetail() {
   const { id } = useParams();
@@ -18,17 +21,65 @@ export default function MachineDetail() {
   const [params] = useSearchParams();
   const m = machineById(id);
   const [rating, setRating] = useState(0);
-  // QR ile /machine/:id üzerinden gelindi mi? (arıza bildiriminin tek kanalı)
+  const [ratingTags, setRatingTags] = useState([]);
+  const [faultOpen, setFaultOpen] = useState(location.pathname.startsWith("/machine/") && params.get("report") === "1");
+  const [faultSeverity, setFaultSeverity] = useState("medium");
+  const [faultDesc, setFaultDesc] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const viaQR = location.pathname.startsWith("/machine/");
-  // QR "?report=1" ile açılırsa arıza formu doğrudan açılır (makine zaten scope'lu).
-  const [faultOpen, setFaultOpen] = useState(viaQR && params.get("report") === "1");
 
   if (!m)
     return <div className="p-8 text-center text-gray-400">Makine bulunamadı.</div>;
 
+  const requireAuth = () => {
+    if (!getAccessToken()) {
+      toast("Bu işlem için giriş yapmalısın", "error");
+      nav("/auth");
+      return false;
+    }
+    return true;
+  };
+
+  const submitRating = async () => {
+    if (!requireAuth()) return;
+    if (ratingTags.length === 0) {
+      toast("En az bir deneyim etiketi seç", "error");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await createRating(m.id, rating, ratingTags);
+      toast("Puanın kaydedildi", "success");
+      setRating(0);
+      setRatingTags([]);
+    } catch (err) {
+      toast(err.message ?? "Puan kaydedilemedi", "error");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const submitFault = async () => {
+    if (!requireAuth()) return;
+    if (faultDesc.trim().length < 5) {
+      toast("Açıklama en az 5 karakter olmalı", "error");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await createFault(m.id, faultDesc.trim(), faultSeverity);
+      setFaultOpen(false);
+      setFaultDesc("");
+      toast("Arıza bildirimin alındı", "success");
+    } catch (err) {
+      toast(err.message ?? "Arıza bildirilemedi", "error");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div className="pb-6">
-      {/* Video / medya alanı */}
       <div className="hero-sheen relative grid h-56 place-items-center bg-gray-900 bg-gradient-to-br from-ink-800 via-ink-900 to-ink-950">
         <button
           onClick={() => nav(-1)}
@@ -44,9 +95,7 @@ export default function MachineDetail() {
                 <path d="M8.5 6.5v11l9-5.5z" />
               </svg>
             </div>
-            <span className="mt-2 text-xs font-semibold text-white/70">
-              Kullanım videosu
-            </span>
+            <span className="mt-2 text-xs font-semibold text-white/70">Kullanım videosu</span>
           </div>
         ) : (
           <Icon name="dumbbell" size={56} strokeWidth={1.2} className="text-white/60" />
@@ -58,8 +107,7 @@ export default function MachineDetail() {
           <Card soft className="mb-3 flex items-center gap-2.5 p-3">
             <Icon name="qr" size={18} className="shrink-0 text-primary-600" />
             <p className="text-xs text-gray-600">
-              Bu sayfa <b>makine QR kodu</b> ile açıldı. Arıza bildirimi bu makineye
-              ({m.location}) özel olarak gönderilir.
+              Bu sayfa <b>makine QR kodu</b> ile açıldı. Arıza bildirimi bu makineye ({m.location}) özel gönderilir.
             </p>
           </Card>
         )}
@@ -94,41 +142,35 @@ export default function MachineDetail() {
           </div>
         </Card>
 
-        {/* Kullanıcı puanlama */}
-        <Card className="mt-4 p-4 text-center">
-          <p className="mb-2 text-sm font-bold text-gray-900">Bu makineyi puanla</p>
-          <StarRating value={rating} onChange={setRating} size="lg" />
+        <Card className="mt-4 p-4">
+          <p className="mb-2 text-center text-sm font-bold text-gray-900">Bu makineyi puanla</p>
+          <div className="flex justify-center">
+            <StarRating value={rating} onChange={setRating} size="lg" />
+          </div>
           {rating > 0 && (
-            <Button
-              size="sm"
-              className="mt-3"
-              onClick={() => {
-                toast("Puanın kaydedildi", "success");
-                setRating(0);
-              }}
-            >
-              Gönder
-            </Button>
+            <div className="mt-4">
+              <RatingTagPicker selected={ratingTags} onChange={setRatingTags} />
+              <Button
+                size="sm"
+                full
+                className="mt-4"
+                disabled={submitting || ratingTags.length === 0}
+                onClick={submitRating}
+              >
+                {submitting ? "Kaydediliyor…" : "Gönder"}
+              </Button>
+            </div>
           )}
         </Card>
 
-        {/* Aksiyonlar — kullanıcı tarafından tetiklenir */}
         <div className="mt-5 space-y-2">
-          <Button
-            variant="secondary"
-            full
-            onClick={() => nav(`/alternatives/${m.id}`)}
-          >
+          <Button variant="secondary" full onClick={() => nav(`/alternatives/${m.id}`)}>
             <Icon name="refresh" size={17} /> Bu makine dolu, alternatif göster
           </Button>
           <Button variant="danger" full onClick={() => setFaultOpen(true)}>
             <Icon name="wrench" size={17} /> Arıza Bildir
           </Button>
         </div>
-        <p className="mt-2 text-center text-[11px] text-gray-400">
-          Alternatif önerisi yalnızca sen dolu bulduğunda gösterilir; sistem otomatik
-          bildirim göndermez.
-        </p>
       </div>
 
       <Modal
@@ -140,13 +182,8 @@ export default function MachineDetail() {
             <Button variant="ghost" onClick={() => setFaultOpen(false)}>
               Vazgeç
             </Button>
-            <Button
-              onClick={() => {
-                setFaultOpen(false);
-                toast("Arıza bildirimin alındı", "success");
-              }}
-            >
-              Gönder
+            <Button onClick={submitFault} disabled={submitting}>
+              {submitting ? "Gönderiliyor…" : "Gönder"}
             </Button>
           </>
         }
@@ -155,12 +192,22 @@ export default function MachineDetail() {
           <p className="text-sm text-gray-500">
             <b>{m.name}</b> için arıza detayını gir.
           </p>
-          <Select label="Öncelik" defaultValue="medium">
+          <Select
+            label="Öncelik"
+            value={faultSeverity}
+            onChange={(e) => setFaultSeverity(e.target.value)}
+          >
             <option value="low">Düşük</option>
             <option value="medium">Orta</option>
             <option value="high">Yüksek (kullanılamaz)</option>
           </Select>
-          <Textarea label="Açıklama" placeholder="Sorunu kısaca anlat..." />
+          <Textarea
+            label="Açıklama"
+            placeholder="Sorunu kısaca anlat..."
+            value={faultDesc}
+            onChange={(e) => setFaultDesc(e.target.value)}
+            required
+          />
         </div>
       </Modal>
     </div>

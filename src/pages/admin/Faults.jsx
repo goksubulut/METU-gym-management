@@ -1,22 +1,55 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Card from "../../components/Card.jsx";
 import Badge from "../../components/Badge.jsx";
 import Button from "../../components/Button.jsx";
 import Modal from "../../components/Modal.jsx";
 import Tabs from "../../components/Tabs.jsx";
-import { Input } from "../../components/Input.jsx";
+import { Input, Select } from "../../components/Input.jsx";
 import { useToast } from "../../components/Toast.jsx";
-import { faults as seed } from "../../mock/feedback.js";
+import { faults as mockFaults } from "../../mock/feedback.js";
+import { fetchAdminFaults, updateAdminFaultStatus } from "../../api/admin.js";
+import { isMockRowId, mergeById } from "../../api/client.js";
 
 const SEV = { high: { tone: "red", label: "Yüksek" }, medium: { tone: "yellow", label: "Orta" }, low: { tone: "gray", label: "Düşük" } };
-const ST = { open: { tone: "red", label: "Açık" }, "in-progress": { tone: "yellow", label: "İşlemde" }, resolved: { tone: "green", label: "Çözüldü" } };
+const ST = {
+  pending: { tone: "gray", label: "Beklemede" },
+  open: { tone: "red", label: "Açık" },
+  "in-progress": { tone: "yellow", label: "İşlemde" },
+  resolved: { tone: "green", label: "Çözüldü" },
+};
+const STATUS_OPTIONS = [
+  { value: "open", label: "Açık" },
+  { value: "in-progress", label: "İşlemde" },
+  { value: "resolved", label: "Çözüldü" },
+];
 
 export default function Faults() {
   const toast = useToast();
-  const [list, setList] = useState(seed);
+  const [list, setList] = useState(mockFaults);
   const [status, setStatus] = useState("all");
   const [q, setQ] = useState("");
   const [detail, setDetail] = useState(null);
+  const [editStatus, setEditStatus] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const load = useCallback(async () => {
+    try {
+      const apiRows = await fetchAdminFaults();
+      setList(mergeById(mockFaults, apiRows));
+    } catch {
+      setList(mockFaults);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  useEffect(() => {
+    if (detail) {
+      setEditStatus(detail.status === "pending" ? "" : detail.status);
+    }
+  }, [detail]);
 
   const filtered = list.filter(
     (f) =>
@@ -25,23 +58,39 @@ export default function Faults() {
         f.issue.toLowerCase().includes(q.toLowerCase()))
   );
 
-  const resolve = (id) => {
-    setList((l) => l.map((f) => (f.id === id ? { ...f, status: "resolved" } : f)));
-    setDetail(null);
-    toast("Arıza çözüldü olarak işaretlendi", "success");
+  const saveStatus = async () => {
+    if (!detail || !editStatus) return;
+    setSaving(true);
+    try {
+      if (!isMockRowId(detail.id)) {
+        const updated = await updateAdminFaultStatus(detail.id, editStatus);
+        setList((l) => l.map((f) => (f.id === detail.id ? updated : f)));
+        setDetail(updated);
+      } else {
+        const updated = { ...detail, status: editStatus };
+        setList((l) => l.map((f) => (f.id === detail.id ? updated : f)));
+        setDetail(updated);
+      }
+      toast("Durum güncellendi", "success");
+    } catch (err) {
+      toast(err.message ?? "Güncelleme başarısız", "error");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-extrabold text-gray-900">Arıza Bildirimleri</h1>
-        <p className="text-sm text-gray-400">Bildirimleri filtrele, incele ve çöz</p>
+        <p className="text-sm text-gray-400">Bildirimleri filtrele, incele ve durumunu güncelle</p>
       </div>
 
       <div className="flex items-center justify-between gap-4">
         <Tabs
           tabs={[
             { value: "all", label: "Tümü" },
+            { value: "pending", label: "Beklemede" },
             { value: "open", label: "Açık" },
             { value: "in-progress", label: "İşlemde" },
             { value: "resolved", label: "Çözüldü" },
@@ -102,9 +151,12 @@ export default function Faults() {
               <Button variant="ghost" onClick={() => setDetail(null)}>
                 Kapat
               </Button>
-              {detail.status !== "resolved" && (
-                <Button onClick={() => resolve(detail.id)}>Çözüldü İşaretle</Button>
-              )}
+              <Button
+                onClick={saveStatus}
+                disabled={saving || !editStatus || editStatus === detail.status}
+              >
+                {saving ? "Kaydediliyor…" : "Durumu Kaydet"}
+              </Button>
             </>
           )
         }
@@ -115,11 +167,28 @@ export default function Faults() {
             <Row label="Bildiren" value={detail.reporter} />
             <Row label="Tarih" value={detail.date} />
             <Row label="Öncelik" value={SEV[detail.severity].label} />
-            <Row label="Durum" value={ST[detail.status].label} />
+            <Select
+              label="Durum"
+              value={editStatus}
+              onChange={(e) => setEditStatus(e.target.value)}
+            >
+              <option value="" disabled>
+                {detail.status === "pending" ? "Durum seçin…" : "Durumu değiştir…"}
+              </option>
+              {STATUS_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </Select>
             <div>
               <p className="mb-1 text-xs font-semibold text-gray-400">Açıklama</p>
               <p className="rounded-xl bg-gray-50 p-3 text-gray-700">{detail.issue}</p>
             </div>
+            <p className="text-xs text-gray-400">
+              Yeni bildirimler <b>Beklemede</b> olarak gelir; Açık, İşlemde veya Çözüldü durumunu
+              admin belirler.
+            </p>
           </div>
         )}
       </Modal>

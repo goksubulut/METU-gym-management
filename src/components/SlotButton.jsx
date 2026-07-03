@@ -9,7 +9,10 @@ function fill(ratio) {
 }
 
 export default function SlotButton({ slot, selected, onSelect }) {
-  const info = fill(slot.booked / slot.capacity);
+  const disabled = slot.isFull || slot.isPast || slot.booked >= slot.capacity;
+  const info = disabled
+    ? { tone: "gray", label: slot.isPast ? "Geçti" : "Dolu", disabled: true }
+    : fill(slot.booked / slot.capacity);
   return (
     <button
       disabled={info.disabled}

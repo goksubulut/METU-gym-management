@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -10,9 +11,30 @@ import {
 import Card from "../../components/Card.jsx";
 import StatCard from "../../components/StatCard.jsx";
 import StarRating from "../../components/StarRating.jsx";
-import { summary, occupancyTrend, topMachines } from "../../mock/analytics.js";
+import {
+  summary as mockSummary,
+  occupancyTrend as mockTrend,
+  topMachines as mockTop,
+} from "../../mock/analytics.js";
+import { fetchAdminDashboard } from "../../api/admin.js";
 
 export default function AdminDashboard() {
+  const [summary, setSummary] = useState(mockSummary);
+  const [occupancyTrend, setOccupancyTrend] = useState(mockTrend);
+  const [topMachines, setTopMachines] = useState(mockTop);
+
+  useEffect(() => {
+    fetchAdminDashboard()
+      .then((data) => {
+        if (data.summary?.todayAppointments > 0 || data.topMachines?.length) {
+          setSummary(data.summary);
+          if (data.occupancyTrend?.length) setOccupancyTrend(data.occupancyTrend);
+          if (data.topMachines?.length) setTopMachines(data.topMachines);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <div className="space-y-6">
       <div>

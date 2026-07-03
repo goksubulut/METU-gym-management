@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Card from "../../components/Card.jsx";
 import Badge from "../../components/Badge.jsx";
 import Button from "../../components/Button.jsx";
@@ -6,8 +6,10 @@ import Tabs from "../../components/Tabs.jsx";
 import EmptyState from "../../components/EmptyState.jsx";
 import { Input } from "../../components/Input.jsx";
 import { useToast } from "../../components/Toast.jsx";
-import { todaysCheckins } from "../../mock/appointments.js";
+import { todaysCheckins as mockRows } from "../../mock/appointments.js";
 import { machineById, MUSCLE_GROUPS } from "../../mock/machines.js";
+import { fetchTodayAppointments, updateReceptionStatus } from "../../api/reception.js";
+import { isMockRowId, mergeById } from "../../api/client.js";
 
 const ST = {
   pending: { tone: "yellow", label: "Bekliyor" },
@@ -16,12 +18,36 @@ const ST = {
 };
 const labelOf = (id) => MUSCLE_GROUPS.find((m) => m.id === id)?.label || id;
 
+function sortByTime(rows) {
+  return [...rows].sort((a, b) => a.time.localeCompare(b.time));
+}
+
 export default function CheckIn() {
   const toast = useToast();
-  const [rows, setRows] = useState(todaysCheckins);
+  const [rows, setRows] = useState(mockRows);
   const [q, setQ] = useState("");
   const [hour, setHour] = useState("all");
   const [selected, setSelected] = useState(null);
+
+  const todayLabel = new Date().toLocaleDateString("tr-TR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    weekday: "long",
+  });
+
+  const load = useCallback(async () => {
+    try {
+      const apiRows = await fetchTodayAppointments();
+      setRows(sortByTime(mergeById(mockRows, apiRows)));
+    } catch {
+      setRows(mockRows);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const hours = ["all", ...new Set(rows.map((r) => r.time.slice(0, 2) + ":00"))];
 
@@ -31,13 +57,24 @@ export default function CheckIn() {
       (r.name.toLowerCase().includes(q.toLowerCase()) || r.phone.includes(q))
   );
 
-  const setStatus = (id, status) => {
+  const applyStatus = async (id, status) => {
     setRows((l) => l.map((r) => (r.id === id ? { ...r, status } : r)));
     setSelected((s) => (s && s.id === id ? { ...s, status } : s));
+
+    if (!isMockRowId(id)) {
+      try {
+        const updated = await updateReceptionStatus(id, status);
+        setRows((l) => l.map((r) => (r.id === id ? updated : r)));
+        setSelected((s) => (s && s.id === id ? updated : s));
+      } catch (err) {
+        toast(err.message ?? "Durum güncellenemedi", "error");
+        load();
+      }
+    }
   };
 
   const checkin = (r) => {
-    setStatus(r.id, "checked-in");
+    applyStatus(r.id, "checked-in");
     toast(`${r.name} check-in yapıldı`, "success");
   };
 
@@ -53,9 +90,11 @@ export default function CheckIn() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-extrabold text-gray-900">Bugünün Check-in'i</h1>
-            <p className="text-sm text-gray-400">2 Temmuz 2026 · {stats.total} randevu</p>
+            <p className="text-sm text-gray-400">
+              {todayLabel} · {stats.total} randevu
+            </p>
           </div>
-          <Button variant="outline" onClick={() => toast("Liste yenilendi")}>
+          <Button variant="outline" onClick={() => { load(); toast("Liste yenilendi"); }}>
             Yenile
           </Button>
         </div>
@@ -143,7 +182,6 @@ export default function CheckIn() {
         )}
       </div>
 
-      {/* Detay paneli */}
       <div className="w-80 shrink-0">
         <div className="sticky top-24">
           {selected ? (
@@ -192,20 +230,25 @@ export default function CheckIn() {
                     variant="outline"
                     full
                     onClick={() => {
-                      setStatus(selected.id, "pending");
+                      applyStatus(selected.id, "pending");
                       toast("Check-in geri alındı", "error");
                     }}
                   >
                     ↩ Geri Al
                   </Button>
                 )}
-                {selected.status !== "no-show" && (
+                {selected.status !== "checked-in" && selected.status !== "no-show" && (
                   <Button
                     variant="ghost"
                     full
-                    onClick={() => setStatus(selected.id, "no-show")}
+                    onClick={() => applyStatus(selected.id, "no-show")}
                   >
                     Gelmedi işaretle
+                  </Button>
+                )}
+                {selected.status === "no-show" && (
+                  <Button full onClick={() => checkin(selected)}>
+                    Geldi olarak işaretle
                   </Button>
                 )}
               </div>

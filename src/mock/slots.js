@@ -28,7 +28,8 @@ export const slotsByDate = {
 export function upcomingDates(count = 7) {
   const days = ["Paz", "Pzt", "Sal", "Çar", "Per", "Cum", "Cmt"];
   const out = [];
-  const now = new Date("2026-07-02");
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
   for (let i = 0; i < count; i++) {
     const d = new Date(now);
     d.setDate(now.getDate() + i);
