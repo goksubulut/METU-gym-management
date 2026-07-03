@@ -7,3 +7,6 @@ vite.config.js.timestamp-*.mjs
 # Backend
 .env
 coverage
+
+# Kişisel Claude Code araçları (repoya girmez)
+.claude/

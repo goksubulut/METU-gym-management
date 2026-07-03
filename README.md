@@ -98,7 +98,7 @@ npm run test:e2e         # e2e testler (Postgres ayakta olmalı)
 
 - [x] Backend iskeleti, veri modeli, seed, health ucu
 - [x] Auth modülü (kayıt/giriş, JWT, rol guard'ları)
-- [ ] Slot & randevu modülü (doluluk tahmini dahil)
+- [x] Slot & randevu modülü (doluluk tahmini dahil)
 - [ ] Katalog: makine + kas grubu + egzersiz uçları
 - [ ] Alternatif öneri motoru
 - [ ] Geri bildirim: puan, arıza, öneri/şikayet
