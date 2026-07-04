@@ -25,6 +25,16 @@ describe('Feedback, Admin, Reception, QR (e2e)', () => {
     return res.body.data.accessToken as string;
   }
 
+  /** Test kullanıcısını, ona bağlı geri bildirim kayıtlarıyla birlikte siler (FK sırası önemli). */
+  async function cleanupTestUser(): Promise<void> {
+    const where = { user: { email: testUser.email } };
+    await prisma.faultReport.deleteMany({ where });
+    await prisma.rating.deleteMany({ where });
+    await prisma.suggestion.deleteMany({ where });
+    await prisma.appointment.deleteMany({ where });
+    await prisma.user.deleteMany({ where: { email: testUser.email } });
+  }
+
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -38,7 +48,7 @@ describe('Feedback, Admin, Reception, QR (e2e)', () => {
     await app.init();
 
     prisma = app.get(PrismaService);
-    await prisma.user.deleteMany({ where: { email: testUser.email } });
+    await cleanupTestUser();
     const reg = await request(app.getHttpServer()).post('/api/auth/register').send(testUser);
     userToken = reg.body.data.accessToken;
     adminToken = await login('admin@metugym.local', 'admin1234');
@@ -46,7 +56,7 @@ describe('Feedback, Admin, Reception, QR (e2e)', () => {
   });
 
   afterAll(async () => {
-    await prisma.user.deleteMany({ where: { email: testUser.email } });
+    await cleanupTestUser();
     await app.close();
   });
 
@@ -132,12 +142,13 @@ describe('Feedback, Admin, Reception, QR (e2e)', () => {
       const fault = list.body.data.faults?.[0] ?? list.body.data[0];
       expect(fault).toBeDefined();
 
+      // API, UI biçimindeki durum değerlerini kullanır ('in-progress' vb.)
       const res = await request(app.getHttpServer())
         .patch(`/api/admin/faults/${fault.id}`)
         .set('Authorization', `Bearer ${adminToken}`)
-        .send({ status: 'IN_PROGRESS' })
+        .send({ status: 'in-progress' })
         .expect(200);
-      expect(res.body.data.status).toBe('IN_PROGRESS');
+      expect(res.body.data.status).toBe('in-progress');
     });
   });
 
