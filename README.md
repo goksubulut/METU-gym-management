@@ -101,8 +101,8 @@ npm run test:e2e         # e2e testler (Postgres ayakta olmalı)
 - [x] Slot & randevu modülü (doluluk tahmini dahil)
 - [x] Katalog: makine + kas grubu + egzersiz uçları (public)
 - [x] Alternatif öneri motoru (`GET /machines/:id/alternatives`)
-- [ ] Geri bildirim: puan, arıza, öneri/şikayet
-- [ ] Admin raporları + resepsiyon check-in uçları
-- [ ] QR üretimi ve video sunumu (Nginx)
-- [ ] Frontend'in mock'tan gerçek API'ye geçirilmesi
+- [x] Geri bildirim: puan, arıza, öneri/şikayet
+- [x] Admin raporları + resepsiyon check-in uçları
+- [x] QR üretimi (`GET /qr/door`, `GET /qr/machines/:id`) ve video sunumu (`/media`, üretimde Nginx)
+- [ ] Frontend'in mock'tan gerçek API'ye geçirilmesi (kısmen: dashboard + resepsiyon bağlandı)
 - [ ] Docker ile tam paket (API + Nginx) ve CI
