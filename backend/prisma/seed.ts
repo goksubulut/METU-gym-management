@@ -68,11 +68,11 @@ function slotTimes(): string[] {
 interface MuscleGroupContent { id: string; name: string; svgRegionCode: string }
 interface MachineContent {
   id: string; name: string; category: string; muscles: string[];
-  location: string; hasVideo: boolean; description: string; tips: string;
+  location: string; hasVideo: boolean; description: string; tips: string; photoUrl?: string;
 }
 interface ExerciseContent {
   name: string; type: 'MACHINE' | 'FREE' | 'WARMUP' | 'COOLDOWN';
-  muscles: string[]; instructions?: string; duration?: string;
+  muscles: string[]; instructions?: string; duration?: string; videoUrl?: string;
 }
 
 async function seedContent() {
@@ -93,12 +93,12 @@ async function seedContent() {
       where: { id: m.id },
       update: {
         name: m.name, category: m.category, location: m.location,
-        description: m.description, tips: m.tips,
+        description: m.description, tips: m.tips, photoUrl: m.photoUrl,
       },
       create: {
         id: m.id, name: m.name, category: m.category, location: m.location,
         qrCode: `/machine/${m.id}`, // frontend'deki QR deep-link rotası
-        description: m.description, tips: m.tips,
+        description: m.description, tips: m.tips, photoUrl: m.photoUrl,
         muscleGroups: { create: m.muscles.map((mid) => ({ muscleGroupId: mid })) },
         videos: m.hasVideo
           ? { create: [{ title: `${m.name} Kullanım Videosu`, url: `/media/videos/${m.id}.mp4` }] }
@@ -114,7 +114,7 @@ async function seedContent() {
     await prisma.exercise.create({
       data: {
         name: ex.name, type: ex.type,
-        instructions: ex.instructions, duration: ex.duration,
+        instructions: ex.instructions, duration: ex.duration, videoUrl: ex.videoUrl,
         muscleGroups: { create: ex.muscles.map((mid) => ({ muscleGroupId: mid })) },
       },
     });

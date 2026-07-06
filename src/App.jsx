@@ -14,6 +14,8 @@ import Book from "./pages/user/Book.jsx";
 import MuscleGroups from "./pages/user/MuscleGroups.jsx";
 import Machines from "./pages/user/Machines.jsx";
 import MachineDetail from "./pages/user/MachineDetail.jsx";
+import Exercises from "./pages/user/Exercises.jsx";
+import ExerciseDetail from "./pages/user/ExerciseDetail.jsx";
 import Alternatives from "./pages/user/Alternatives.jsx";
 import Warmup from "./pages/user/Warmup.jsx";
 import Feedback from "./pages/user/Feedback.jsx";
@@ -53,6 +55,8 @@ export default function App() {
         <Route path="/muscle-groups" element={<MuscleGroups />} />
         <Route path="/machines" element={<Machines />} />
         <Route path="/machines/:id" element={<MachineDetail />} />
+        <Route path="/exercises" element={<Exercises />} />
+        <Route path="/exercises/:id" element={<ExerciseDetail />} />
         {/* Makine QR kodu bu deep-link'i taşır: /machine/{machine_id}.
             Telefon kamerasıyla okununca doğrudan bu sayfayı açar. */}
         <Route path="/machine/:id" element={<MachineDetail />} />

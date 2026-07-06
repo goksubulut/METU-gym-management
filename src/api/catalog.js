@@ -16,6 +16,7 @@ export function mapMachineFromApi(m) {
     faults: m.openFaults ?? 0,
     description: m.description ?? "",
     tips: m.tips ?? "",
+    photoUrl: m.photoUrl ?? null,
   };
 }
 
@@ -54,4 +55,33 @@ export function fetchMuscleGroupDetail(id) {
 /** FR-QR-2/3: makine QR'ı (PNG data-URL) — yalnızca admin token'ıyla çalışır. */
 export function fetchMachineQr(id) {
   return apiFetch(`/qr/machines/${id}`);
+}
+
+/** API egzersiz kaydını frontend sözleşmesine çevirir (mapMachineFromApi ile aynı desen). */
+export function mapExerciseFromApi(e) {
+  return {
+    id: e.id,
+    name: e.name,
+    type: e.type,
+    instructions: e.instructions ?? "",
+    duration: e.duration ?? null,
+    videoUrl: e.videoUrl ?? null,
+    muscles: (e.muscleGroups ?? []).map((g) => g.id),
+  };
+}
+
+/** Egzersiz listesi; opsiyonel tip / kas grubu filtresi (FR-WU-1). */
+export async function fetchExercises({ type, muscleGroup } = {}) {
+  const params = new URLSearchParams();
+  if (type && type !== "Tümü") params.set("type", type);
+  if (muscleGroup) params.set("muscleGroup", muscleGroup);
+  const qs = params.toString();
+  const rows = await apiFetch(`/exercises${qs ? `?${qs}` : ""}`);
+  return rows.map(mapExerciseFromApi);
+}
+
+/** Egzersiz detayı — kendi katalog ekranı için. */
+export async function fetchExercise(id) {
+  const e = await apiFetch(`/exercises/${id}`);
+  return mapExerciseFromApi(e);
 }

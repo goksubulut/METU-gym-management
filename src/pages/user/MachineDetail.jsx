@@ -85,16 +85,22 @@ export default function MachineDetail() {
 
   return (
     <div className="pb-6">
-      <div className="hero-sheen relative grid h-56 place-items-center bg-gray-900 bg-gradient-to-br from-ink-800 via-ink-900 to-ink-950">
+      <div className="hero-sheen relative grid h-56 place-items-center overflow-hidden bg-gray-900 bg-gradient-to-br from-ink-800 via-ink-900 to-ink-950">
+        {m.photoUrl && (
+          <>
+            <img src={m.photoUrl} alt={m.name} className="absolute inset-0 h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-ink-950/85 via-ink-950/25 to-transparent" />
+          </>
+        )}
         <button
           onClick={() => nav(-1)}
-          className="absolute left-4 top-4 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-gray-700 shadow"
+          className="absolute left-4 top-4 z-10 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-gray-700 shadow"
           aria-label="Geri"
         >
           <Icon name="chevronRight" size={17} className="rotate-180" />
         </button>
         {m.hasVideo ? (
-          <div className="flex flex-col items-center">
+          <div className="relative z-10 flex flex-col items-center">
             <div className="grid h-16 w-16 place-items-center rounded-full bg-white text-primary-600 shadow-glow">
               <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
                 <path d="M8.5 6.5v11l9-5.5z" />
@@ -102,9 +108,9 @@ export default function MachineDetail() {
             </div>
             <span className="mt-2 text-xs font-semibold text-white/70">Kullanım videosu</span>
           </div>
-        ) : (
+        ) : !m.photoUrl ? (
           <Icon name="dumbbell" size={56} strokeWidth={1.2} className="text-white/60" />
-        )}
+        ) : null}
       </div>
 
       <div className="px-4 py-4">

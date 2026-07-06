@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Public } from '../../auth/decorators/public.decorator';
 import { ExercisesQuery } from './dto/exercises.query';
@@ -14,5 +14,12 @@ export class ExercisesController {
   @ApiOperation({ summary: 'Egzersiz listesi — tip/kas grubu filtreli (FR-WU-1 dahil)' })
   findAll(@Query() query: ExercisesQuery): Promise<ExerciseListItem[]> {
     return this.exercisesService.findAll(query);
+  }
+
+  @Public()
+  @Get(':id')
+  @ApiOperation({ summary: 'Egzersiz detayı — kendi katalog ekranı için' })
+  findOne(@Param('id') id: string): Promise<ExerciseListItem> {
+    return this.exercisesService.findOne(id);
   }
 }

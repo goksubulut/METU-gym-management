@@ -6,6 +6,7 @@
     "muscles": ["legs", "glutes"],
     "location": "Zemin Kat — B3",
     "hasVideo": true,
+    "photoUrl": "/media/photos/m1.jpg",
     "description": "45 derece açılı bacak presi. Quadriceps, hamstring ve kalça kaslarını hedefler. Ağırlık plakaları ile ayarlanır.",
     "tips": "Dizlerini içe kilitleme, sırtını mindere yasla, hareketi kontrollü yap."
   },
@@ -16,6 +17,7 @@
     "muscles": ["back", "arms"],
     "location": "1. Kat — A2",
     "hasVideo": true,
+    "photoUrl": "/media/photos/m2.jpg",
     "description": "Geniş kavrama ile sırt (latissimus dorsi) çalıştıran kablolu istasyon.",
     "tips": "Çubuğu göğse doğru çek, omuzları aşağıda tut."
   },
@@ -26,6 +28,7 @@
     "muscles": ["chest", "shoulders", "arms"],
     "location": "1. Kat — A5",
     "hasVideo": true,
+    "photoUrl": "/media/photos/m3.jpg",
     "description": "Oturarak göğüs presi. Pektoral kasları güvenli sabit yörüngeyle çalıştırır.",
     "tips": "Dirsekleri omuz hizasında tut, tam uzatmada kilitleme."
   },
@@ -36,6 +39,7 @@
     "muscles": ["cardio", "legs"],
     "location": "Kardiyo Alanı — C1",
     "hasVideo": false,
+    "photoUrl": "/media/photos/m4.jpg",
     "description": "Eğim ve hız programlı koşu bandı. Isınma ve dayanıklılık için ideal.",
     "tips": "Isınma için 5 dk yürüyüşle başla."
   },
@@ -46,6 +50,7 @@
     "muscles": ["chest", "shoulders"],
     "location": "1. Kat — A6",
     "hasVideo": true,
+    "photoUrl": "/media/photos/m5.jpg",
     "description": "Çift kablolu istasyon; göğüs iç kısmını izole eder.",
     "tips": "Hareketi göğüs merkezinde birleştir, sıkıştır."
   },
@@ -66,6 +71,7 @@
     "muscles": ["legs", "glutes", "core"],
     "location": "Zemin Kat — B5",
     "hasVideo": true,
+    "photoUrl": "/media/photos/m7.jpg",
     "description": "Bar ve güvenlik kollu squat rafı. Alt vücut için temel istasyon.",
     "tips": "Güvenlik kollarını doğru yüksekliğe ayarla."
   },
@@ -76,6 +82,7 @@
     "muscles": ["cardio", "back", "legs"],
     "location": "Kardiyo Alanı — C4",
     "hasVideo": true,
+    "photoUrl": "/media/photos/m8.jpg",
     "description": "Kürek makinesi; tam vücut kardiyo ve sırt çalışması.",
     "tips": "İtişi bacaklardan başlat, sonra sırt ve kolları kat."
   },
@@ -86,6 +93,7 @@
     "muscles": ["legs"],
     "location": "Zemin Kat — B4",
     "hasVideo": false,
+    "photoUrl": "/media/photos/m9.jpg",
     "description": "Quadriceps izolasyon makinesi.",
     "tips": "Tepede 1 sn bekle, kontrollü indir."
   },
@@ -96,6 +104,7 @@
     "muscles": ["back", "arms", "core"],
     "location": "1. Kat — A8",
     "hasVideo": true,
+    "photoUrl": "/media/photos/m10.jpg",
     "description": "Destekli barfiks; sırt ve kol için ilerlemeli antrenman.",
     "tips": "Destek ağırlığını gücüne göre azalt."
   },
@@ -106,6 +115,7 @@
     "muscles": ["core"],
     "location": "1. Kat — A9",
     "hasVideo": false,
+    "photoUrl": "/media/photos/m11.jpg",
     "description": "Karın kaslarını dirençli çalıştıran makine.",
     "tips": "Boyun değil karın kaslarıyla katla."
   },
@@ -116,6 +126,7 @@
     "muscles": ["glutes", "legs"],
     "location": "Zemin Kat — B6",
     "hasVideo": true,
+    "photoUrl": "/media/photos/m12.jpg",
     "description": "Kalça itişi için tasarlanmış özel bench.",
     "tips": "Tepede kalçayı sık, beli aşırı gerginleştirme."
   }

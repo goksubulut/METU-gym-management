@@ -45,20 +45,31 @@ const BODY_PART_COLORS = {
 // Seçili olmayan kas: kartın beyaz zemininden net ayrışan nötr gri-bej.
 const MUSCLE_BASE = ["#D6D0C8", "#9E9384"];
 
+// Kaynak path verisinde (body-data.js) "abductors" için ayrı bir SVG bölgesi yok —
+// sadece "adductors" var. Kalça abduktorleri (gluteus medius/minimus) anatomik olarak
+// kalça/gluteal bölgesiyle aynı alanda olduğundan, seçili/hover olduğunda "gluteal"
+// bölgesi abductors'ın rengiyle boyanır; böylece "Dış Bacak" çipi artık diyagramda
+// görünür bir karşılık bulur (önceden hiçbir path'te data-muscle="abductors" yoktu).
+const REGION_ALIASES = { gluteal: "abductors" };
+
 function musclePaths(part) {
   return [...(part.path.common || []), ...(part.path.left || []), ...(part.path.right || [])];
 }
 
 function Muscle({ part, selected, hovered, onToggle, onHover }) {
-  const muscle = MUSCLES[part.slug];
+  const ownMuscle = MUSCLES[part.slug];
+  const aliasSlug = REGION_ALIASES[part.slug];
+  const aliasActive = aliasSlug && (selected.includes(aliasSlug) || hovered === aliasSlug);
+  const activeSlug = aliasActive ? aliasSlug : part.slug;
+  const muscle = aliasActive ? MUSCLES[aliasSlug] : ownMuscle;
   const bodyColor = BODY_PART_COLORS[part.slug];
 
   let fill;
   let stroke;
   let fillOpacity = 1;
   if (muscle) {
-    const isSelected = selected.includes(part.slug);
-    const isHovered = hovered === part.slug;
+    const isSelected = selected.includes(activeSlug);
+    const isHovered = hovered === activeSlug;
     if (isSelected) [fill, stroke] = muscle.color;
     else if (isHovered) {
       [fill, stroke] = muscle.color;
@@ -68,7 +79,7 @@ function Muscle({ part, selected, hovered, onToggle, onHover }) {
     [fill, stroke] = bodyColor || ["#E3DACD", "#C6A588"];
   }
 
-  const interactive = muscle
+  const interactive = ownMuscle
     ? {
         onClick: () => onToggle(part.slug),
         onMouseEnter: () => onHover(part.slug),
@@ -81,7 +92,7 @@ function Muscle({ part, selected, hovered, onToggle, onHover }) {
     <path
       key={i}
       d={d}
-      data-muscle={muscle ? part.slug : undefined}
+      data-muscle={ownMuscle ? part.slug : undefined}
       fill={fill}
       fillOpacity={fillOpacity}
       stroke={stroke}

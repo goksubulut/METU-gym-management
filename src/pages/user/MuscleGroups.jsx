@@ -7,7 +7,7 @@ import EmptyState from "../../components/EmptyState.jsx";
 import Icon from "../../components/Icon.jsx";
 import BodyDiagram, { MUSCLES } from "../../components/BodyDiagram.jsx";
 import { machinesByMuscle } from "../../mock/machines.js";
-import { fetchMachines } from "../../api/catalog.js";
+import { fetchMachines, fetchExercises } from "../../api/catalog.js";
 
 // Panel bölümleri: ana grup başlığı altında o gruba ait ince kaslar.
 // Grup id'leri backend MuscleGroup.id ile birebir aynı.
@@ -29,10 +29,14 @@ export default function MuscleGroups() {
   const [hovered, setHovered] = useState(null);
   const [cardio, setCardio] = useState(false);
   const [apiMachines, setApiMachines] = useState(null); // null = API henüz gelmedi
+  const [apiExercises, setApiExercises] = useState([]);
 
   useEffect(() => {
     fetchMachines()
       .then(setApiMachines)
+      .catch(() => {});
+    fetchExercises({ type: "FREE" })
+      .then(setApiExercises)
       .catch(() => {});
   }, []);
 
@@ -67,6 +71,11 @@ export default function MuscleGroups() {
     );
     return out;
   }, [activeGroups, apiMachines]);
+
+  const exercises = useMemo(
+    () => apiExercises.filter((e) => e.muscles.some((g) => activeGroups.includes(g))),
+    [activeGroups, apiExercises],
+  );
 
   const hasSelection = selected.length > 0 || cardio;
 
@@ -211,8 +220,12 @@ export default function MuscleGroups() {
                   onClick={() => nav(`/machines/${m.id}`)}
                   className="flex items-center gap-3 p-3"
                 >
-                  <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gray-900 text-white">
-                    <Icon name="dumbbell" size={20} />
+                  <div className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-xl bg-gray-900 text-white">
+                    {m.photoUrl ? (
+                      <img src={m.photoUrl} alt={m.name} className="h-full w-full object-cover" />
+                    ) : (
+                      <Icon name="dumbbell" size={20} />
+                    )}
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-bold text-gray-900">{m.name}</p>
@@ -225,6 +238,41 @@ export default function MuscleGroups() {
                     <Icon name="star" size={14} className="fill-primary-600" />
                     {m.rating}
                   </span>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Eşleşen egzersizler — aynı kas gruplarını çalıştıran serbest hareketler */}
+        <div className="mt-6">
+          <div className="mb-2 flex items-center justify-between">
+            <h2 className="text-sm font-bold text-gray-900">Eşleşen Egzersizler</h2>
+            <Badge tone="primary">{exercises.length}</Badge>
+          </div>
+
+          {exercises.length === 0 ? (
+            <EmptyState
+              icon="body"
+              title="Kas seç"
+              description="Seçtiğin kasları çalıştıran serbest egzersizler burada listelenir."
+            />
+          ) : (
+            <div className="space-y-2">
+              {exercises.map((e) => (
+                <Card
+                  key={e.id}
+                  onClick={() => nav(`/exercises/${e.id}`)}
+                  className="flex items-center gap-3 p-3"
+                >
+                  <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gray-900 text-white">
+                    <Icon name="dumbbell" size={20} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-bold text-gray-900">{e.name}</p>
+                    <p className="truncate text-xs text-gray-400">{e.instructions}</p>
+                  </div>
+                  <Icon name="chevronRight" size={16} className="shrink-0 text-gray-300" />
                 </Card>
               ))}
             </div>

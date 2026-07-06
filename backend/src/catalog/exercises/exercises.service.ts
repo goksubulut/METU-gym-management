@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ExercisesQuery } from './dto/exercises.query';
 
@@ -35,5 +35,25 @@ export class ExercisesService {
       videoUrl: e.videoUrl,
       muscleGroups: e.muscleGroups.map((mg) => mg.muscleGroup),
     }));
+  }
+
+  /** Egzersiz detayı — kendi katalog/detay ekranı için (FR-WU-1 ekini genişletir). */
+  async findOne(id: string): Promise<ExerciseListItem> {
+    const exercise = await this.prisma.exercise.findUnique({
+      where: { id },
+      include: { muscleGroups: { include: { muscleGroup: { select: { id: true, name: true } } } } },
+    });
+    if (!exercise) {
+      throw new NotFoundException('Egzersiz bulunamadı');
+    }
+    return {
+      id: exercise.id,
+      name: exercise.name,
+      type: exercise.type,
+      instructions: exercise.instructions,
+      duration: exercise.duration,
+      videoUrl: exercise.videoUrl,
+      muscleGroups: exercise.muscleGroups.map((mg) => mg.muscleGroup),
+    };
   }
 }

@@ -71,8 +71,12 @@ export default function Machines() {
         <div className="grid grid-cols-2 gap-3">
           {filtered.map((m) => (
             <Card key={m.id} soft onClick={() => nav(`/machines/${m.id}`)} className="overflow-hidden">
-              <div className="hero-sheen grid h-24 place-items-center bg-gray-900 bg-gradient-to-br from-ink-800 to-ink-950 text-white/85">
-                <Icon name="dumbbell" size={34} strokeWidth={1.4} />
+              <div className="hero-sheen relative grid h-24 place-items-center overflow-hidden bg-gray-900 bg-gradient-to-br from-ink-800 to-ink-950 text-white/85">
+                {m.photoUrl ? (
+                  <img src={m.photoUrl} alt={m.name} className="absolute inset-0 h-full w-full object-cover" />
+                ) : (
+                  <Icon name="dumbbell" size={34} strokeWidth={1.4} />
+                )}
               </div>
               <div className="p-3">
                 <p className="truncate text-sm font-bold text-gray-900">{m.name}</p>
@@ -97,8 +101,12 @@ export default function Machines() {
         <div className="space-y-2">
           {filtered.map((m) => (
             <Card key={m.id} onClick={() => nav(`/machines/${m.id}`)} className="flex items-center gap-3 p-3">
-              <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-gray-900 text-white">
-                <Icon name="dumbbell" size={20} />
+              <div className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-xl bg-gray-900 text-white">
+                {m.photoUrl ? (
+                  <img src={m.photoUrl} alt={m.name} className="h-full w-full object-cover" />
+                ) : (
+                  <Icon name="dumbbell" size={20} />
+                )}
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-bold text-gray-900">{m.name}</p>
