@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Card from "../../components/Card.jsx";
 import Badge from "../../components/Badge.jsx";
@@ -7,6 +7,7 @@ import EmptyState from "../../components/EmptyState.jsx";
 import Icon from "../../components/Icon.jsx";
 import BodyDiagram, { MUSCLES } from "../../components/BodyDiagram.jsx";
 import { machinesByMuscle } from "../../mock/machines.js";
+import { fetchMachines } from "../../api/catalog.js";
 
 // Panel bölümleri: ana grup başlığı altında o gruba ait ince kaslar.
 // Grup id'leri backend MuscleGroup.id ile birebir aynı.
@@ -27,6 +28,13 @@ export default function MuscleGroups() {
   const [selected, setSelected] = useState([]); // ince kas slug'ları
   const [hovered, setHovered] = useState(null);
   const [cardio, setCardio] = useState(false);
+  const [apiMachines, setApiMachines] = useState(null); // null = API henüz gelmedi
+
+  useEffect(() => {
+    fetchMachines()
+      .then(setApiMachines)
+      .catch(() => {});
+  }, []);
 
   const toggle = (slug) =>
     setSelected((s) => (s.includes(slug) ? s.filter((x) => x !== slug) : [...s, slug]));
@@ -44,10 +52,13 @@ export default function MuscleGroups() {
   }, [selected, cardio]);
 
   const machines = useMemo(() => {
+    // API geldiyse gerçek katalog, gelmediyse mock ile eşleştir.
+    const byGroup = (g) =>
+      apiMachines ? apiMachines.filter((m) => m.muscles.includes(g)) : machinesByMuscle(g);
     const seen = new Set();
     const out = [];
     activeGroups.forEach((g) =>
-      machinesByMuscle(g).forEach((m) => {
+      byGroup(g).forEach((m) => {
         if (!seen.has(m.id)) {
           seen.add(m.id);
           out.push(m);
@@ -55,7 +66,7 @@ export default function MuscleGroups() {
       }),
     );
     return out;
-  }, [activeGroups]);
+  }, [activeGroups, apiMachines]);
 
   const hasSelection = selected.length > 0 || cardio;
 

@@ -4,15 +4,38 @@ import Badge from "../../components/Badge.jsx";
 import Tabs from "../../components/Tabs.jsx";
 import EmptyState from "../../components/EmptyState.jsx";
 import Icon from "../../components/Icon.jsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { warmups } from "../../mock/feedback.js";
 import { MUSCLE_GROUPS } from "../../mock/machines.js";
+import { fetchMuscleGroupDetail } from "../../api/catalog.js";
+
+/** API cevabındaki warmup/cooldown egzersizlerini mock sözleşmesine çevirir. */
+function mapWarmupsFromApi(detail) {
+  const toRow = (type) => (e) => ({ name: e.name, duration: e.duration ?? "", type });
+  return [
+    ...(detail.exercises?.warmup ?? []).map(toRow("Isınma")),
+    ...(detail.exercises?.cooldown ?? []).map(toRow("Soğuma")),
+  ];
+}
 
 export default function Warmup() {
   const { group } = useParams();
   const nav = useNavigate();
   const [active, setActive] = useState(group || "chest");
-  const list = warmups[active] || [];
+  const [apiLists, setApiLists] = useState({}); // groupId -> hareket listesi
+
+  // FR-WU-1: seçilen kas grubunun ısınma/soğuma hareketleri API'den;
+  // backend kapalıysa mock ile devam edilir.
+  useEffect(() => {
+    if (apiLists[active]) return;
+    fetchMuscleGroupDetail(active)
+      .then((detail) =>
+        setApiLists((prev) => ({ ...prev, [active]: mapWarmupsFromApi(detail) })),
+      )
+      .catch(() => {});
+  }, [active, apiLists]);
+
+  const list = apiLists[active] ?? warmups[active] ?? [];
 
   const tabs = MUSCLE_GROUPS.filter((g) => warmups[g.id]).map((g) => ({
     value: g.id,

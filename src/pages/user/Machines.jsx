@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Card from "../../components/Card.jsx";
 import Badge from "../../components/Badge.jsx";
@@ -6,13 +6,22 @@ import Tabs from "../../components/Tabs.jsx";
 import EmptyState from "../../components/EmptyState.jsx";
 import Icon from "../../components/Icon.jsx";
 import { Input } from "../../components/Input.jsx";
-import { machines, CATEGORIES } from "../../mock/machines.js";
+import { machines as mockMachines, CATEGORIES } from "../../mock/machines.js";
+import { fetchMachines } from "../../api/catalog.js";
 
 export default function Machines() {
   const nav = useNavigate();
+  const [machines, setMachines] = useState(mockMachines);
   const [cat, setCat] = useState("Tümü");
   const [q, setQ] = useState("");
   const [view, setView] = useState("grid");
+
+  // Katalog API'den yüklenir; backend kapalıysa mock ile devam edilir.
+  useEffect(() => {
+    fetchMachines()
+      .then(setMachines)
+      .catch(() => {});
+  }, []);
 
   const filtered = machines.filter(
     (m) =>

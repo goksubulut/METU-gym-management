@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Button from "../../components/Button.jsx";
 import Card from "../../components/Card.jsx";
@@ -12,6 +12,7 @@ import { useToast } from "../../components/Toast.jsx";
 import { machineById, MUSCLE_GROUPS } from "../../mock/machines.js";
 import { getAccessToken } from "../../api/client.js";
 import { createFault, createRating } from "../../api/feedback.js";
+import { fetchMachine } from "../../api/catalog.js";
 
 export default function MachineDetail() {
   const { id } = useParams();
@@ -19,7 +20,8 @@ export default function MachineDetail() {
   const toast = useToast();
   const location = useLocation();
   const [params] = useSearchParams();
-  const m = machineById(id);
+  // Önce mock'tan (anında render), sonra API'den güncel veriyle tazelenir.
+  const [m, setM] = useState(() => machineById(id));
   const [rating, setRating] = useState(0);
   const [ratingTags, setRatingTags] = useState([]);
   const [faultOpen, setFaultOpen] = useState(location.pathname.startsWith("/machine/") && params.get("report") === "1");
@@ -27,6 +29,12 @@ export default function MachineDetail() {
   const [faultDesc, setFaultDesc] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const viaQR = location.pathname.startsWith("/machine/");
+
+  useEffect(() => {
+    fetchMachine(id)
+      .then(setM)
+      .catch(() => {});
+  }, [id]);
 
   if (!m)
     return <div className="p-8 text-center text-gray-400">Makine bulunamadı.</div>;

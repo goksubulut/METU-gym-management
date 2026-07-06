@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Card from "../../components/Card.jsx";
 import Badge from "../../components/Badge.jsx";
 import Button from "../../components/Button.jsx";
@@ -6,6 +6,7 @@ import Modal from "../../components/Modal.jsx";
 import { Input, Select } from "../../components/Input.jsx";
 import { useToast } from "../../components/Toast.jsx";
 import { machines as seed, CATEGORIES } from "../../mock/machines.js";
+import { fetchMachines, fetchMachineQr } from "../../api/catalog.js";
 
 const empty = { name: "", category: "Makine", location: "", rating: 4.5 };
 
@@ -13,8 +14,29 @@ export default function Inventory() {
   const toast = useToast();
   const [list, setList] = useState(seed);
   const [form, setForm] = useState(null); // null | {machine}
-  const [qr, setQr] = useState(null);
+  const [qr, setQr] = useState(null); // {machine, dataUrl?, url?}
   const [del, setDel] = useState(null);
+
+  useEffect(() => {
+    fetchMachines()
+      .then(setList)
+      .catch(() => {});
+  }, []);
+
+  /** QR modalını açar; PNG'yi backend'den üretir (FR-QR-2/3). */
+  const openQr = async (machine) => {
+    setQr({ ...machine });
+    try {
+      const generated = await fetchMachineQr(machine.id);
+      setQr((prev) =>
+        prev && prev.id === machine.id
+          ? { ...prev, dataUrl: generated.dataUrl, url: generated.url }
+          : prev,
+      );
+    } catch (err) {
+      toast(err.message ?? "QR üretilemedi", "error");
+    }
+  };
 
   const openNew = () => setForm({ ...empty, id: null });
   const openEdit = (m) => setForm({ ...m });
@@ -68,7 +90,7 @@ export default function Inventory() {
                 <td className="px-5 py-3 font-bold text-primary-600">{m.rating}</td>
                 <td className="px-5 py-3">
                   <div className="flex justify-end gap-3 text-sm font-semibold">
-                    <button onClick={() => setQr(m)} className="text-gray-500">QR</button>
+                    <button onClick={() => openQr(m)} className="text-gray-500">QR</button>
                     <button onClick={() => openEdit(m)} className="text-primary-600">Düzenle</button>
                     <button onClick={() => setDel(m)} className="text-red-500">Sil</button>
                   </div>
@@ -121,28 +143,29 @@ export default function Inventory() {
       <Modal open={!!qr} onClose={() => setQr(null)} title="QR Kodu" size="sm">
         {qr && (
           <div className="flex flex-col items-center">
-            <div className="grid h-40 w-40 place-items-center rounded-2xl border-4 border-gray-900 bg-white">
-              <div className="grid grid-cols-5 grid-rows-5 gap-0.5">
-                {Array.from({ length: 25 }).map((_, k) => (
-                  <span
-                    key={k}
-                    className={`h-2.5 w-2.5 ${(k * 7 + qr.name.length) % 3 === 0 ? "bg-gray-900" : "bg-transparent"}`}
-                  />
-                ))}
-              </div>
+            <div className="grid h-44 w-44 place-items-center rounded-2xl border-4 border-gray-900 bg-white p-2">
+              {qr.dataUrl ? (
+                <img src={qr.dataUrl} alt={`${qr.name} QR kodu`} className="h-full w-full" />
+              ) : (
+                <p className="text-xs text-gray-400">QR üretiliyor…</p>
+              )}
             </div>
             <p className="mt-3 text-sm font-bold text-gray-900">{qr.name}</p>
             <p className="text-xs text-gray-400">{qr.location}</p>
             <code className="mt-2 rounded-lg bg-gray-100 px-2 py-1 text-[11px] text-gray-600">
-              /machine/{qr.id}
+              {qr.url ?? `/machine/${qr.id}`}
             </code>
             <p className="mt-2 max-w-[220px] text-center text-[11px] text-gray-400">
               QR bu linki taşır; telefon kamerasıyla okununca makine detayını açar ve
               arıza bildirimi bu makineye scope'lanır.
             </p>
-            <Button size="sm" className="mt-4" onClick={() => setQr(null)}>
-              İndir (PNG)
-            </Button>
+            <a
+              href={qr.dataUrl}
+              download={`metugym-qr-${qr.id}.png`}
+              className={qr.dataUrl ? "" : "pointer-events-none opacity-40"}
+            >
+              <Button size="sm" className="mt-4">İndir (PNG)</Button>
+            </a>
           </div>
         )}
       </Modal>

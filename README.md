@@ -104,5 +104,5 @@ npm run test:e2e         # e2e testler (Postgres ayakta olmalı)
 - [x] Geri bildirim: puan, arıza, öneri/şikayet
 - [x] Admin raporları + resepsiyon check-in uçları
 - [x] QR üretimi (`GET /qr/door`, `GET /qr/machines/:id`) ve video sunumu (`/media`, üretimde Nginx)
-- [ ] Frontend'in mock'tan gerçek API'ye geçirilmesi (kısmen: dashboard + resepsiyon bağlandı)
+- [x] Frontend'in mock'tan gerçek API'ye geçirilmesi (tüm ekranlar; backend kapalıyken mock'a düşer)
 - [ ] Docker ile tam paket (API + Nginx) ve CI
