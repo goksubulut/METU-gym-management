@@ -6,15 +6,6 @@ import Tabs from "../../components/Tabs.jsx";
 import { feedbackList as mockFeedback, } from "../../mock/feedback.js";
 import { CHART_COLORS, feedbackTags as mockTags } from "../../mock/analytics.js";
 import { fetchAdminSuggestions } from "../../api/admin.js";
-import { mergeById } from "../../api/client.js";
-
-function mergeTagCounts(mock, api) {
-  const map = new Map(mock.map((t) => [t.tag, t.value]));
-  for (const t of api) {
-    map.set(t.tag, (map.get(t.tag) ?? 0) + t.value);
-  }
-  return [...map.entries()].map(([tag, value]) => ({ tag, value }));
-}
 
 export default function FeedbackAdmin() {
   const [type, setType] = useState("all");
@@ -23,9 +14,10 @@ export default function FeedbackAdmin() {
 
   const load = useCallback(async () => {
     try {
+      // API başarılıysa tek kaynak; mock ile birleştirmek kayıtları çiftliyordu.
       const { feedbackList, feedbackTags } = await fetchAdminSuggestions();
-      setList(mergeById(mockFeedback, feedbackList));
-      setTags(mergeTagCounts(mockTags, feedbackTags));
+      setList(feedbackList ?? []);
+      setTags(feedbackTags ?? []);
     } catch {
       setList(mockFeedback);
       setTags(mockTags);

@@ -20,12 +20,12 @@ export const occupancyTrend = [
 
 // Makine türü bazlı tercih (bar chart)
 export const machinePreference = [
-  { name: "Squat Rack", count: 143 },
+  { name: "Kıvrık Deadlift", count: 143 },
   { name: "Chest Press", count: 152 },
   { name: "Koşu Bandı", count: 210 },
-  { name: "Lat Pulldown", count: 96 },
+  { name: "Pull Down", count: 96 },
   { name: "Leg Press", count: 128 },
-  { name: "Dumbbell", count: 188 },
+  { name: "Functional Trainer", count: 188 },
 ];
 
 // Kas grubu popülerlik
@@ -42,44 +42,44 @@ export const muscleGroupPopularity = [
 
 // En çok tercih edilen makineler (dashboard widget)
 export const topMachines = [
-  { name: "Koşu Bandı Pro", rating: 4.2, uses: 210 },
-  { name: "Dumbbell Rack", rating: 4.8, uses: 188 },
+  { name: "Koşu Bandı", rating: 4.2, uses: 210 },
+  { name: "Functional Trainer", rating: 4.8, uses: 188 },
   { name: "Chest Press", rating: 4.7, uses: 152 },
-  { name: "Squat Rack", rating: 4.9, uses: 143 },
-  { name: "Leg Press 45°", rating: 4.6, uses: 128 },
+  { name: "Kıvrık Deadlift", rating: 4.9, uses: 143 },
+  { name: "Leg Press", rating: 4.6, uses: 128 },
 ];
 
 // Kalite metrikleri — en çok arızalanan
 export const mostFaulty = [
-  { name: "Koşu Bandı Pro", faults: 4, rating: 4.2 },
-  { name: "Rowing Machine", faults: 3, rating: 4.3 },
-  { name: "Leg Press 45°", faults: 2, rating: 4.6 },
+  { name: "Koşu Bandı", faults: 4, rating: 4.2 },
+  { name: "Eliptik Bisiklet", faults: 3, rating: 4.3 },
+  { name: "Leg Press", faults: 2, rating: 4.6 },
   { name: "Chest Press", faults: 1, rating: 4.7 },
 ];
 
 // En çok şikayet alan
 export const mostComplained = [
-  { name: "Koşu Bandı Pro", complaints: 6 },
-  { name: "Rowing Machine", complaints: 3 },
-  { name: "Squat Rack", complaints: 2 },
-  { name: "Ab Crunch Machine", complaints: 1 },
+  { name: "Koşu Bandı", complaints: 6 },
+  { name: "Eliptik Bisiklet", complaints: 3 },
+  { name: "Kıvrık Deadlift", complaints: 2 },
+  { name: "Abdominal Crunch", complaints: 1 },
 ];
 
 // Tercih × Memnuniyet matrisi (scatter). x: kullanım, y: memnuniyet (puan)
 // Kadranlar: Başarılı / Bakım Önceliği / Görünürlük Artır / Kaldırılabilir
 export const matrixData = [
-  { name: "Koşu Bandı Pro", uses: 210, rating: 4.2 },
-  { name: "Dumbbell Rack", uses: 188, rating: 4.8 },
+  { name: "Koşu Bandı", uses: 210, rating: 4.2 },
+  { name: "Functional Trainer", uses: 188, rating: 4.8 },
   { name: "Chest Press", uses: 152, rating: 4.7 },
-  { name: "Squat Rack", uses: 143, rating: 4.9 },
-  { name: "Leg Press 45°", uses: 128, rating: 4.6 },
-  { name: "Lat Pulldown", uses: 96, rating: 4.4 },
-  { name: "Hip Thrust Bench", uses: 98, rating: 4.7 },
-  { name: "Rowing Machine", uses: 89, rating: 4.3 },
-  { name: "Leg Extension", uses: 67, rating: 4.1 },
-  { name: "Assisted Pull-up", uses: 55, rating: 4.6 },
-  { name: "Ab Crunch Machine", uses: 41, rating: 4.0 },
-  { name: "Cable Crossover", uses: 74, rating: 4.5 },
+  { name: "Kıvrık Deadlift", uses: 143, rating: 4.9 },
+  { name: "Leg Press", uses: 128, rating: 4.6 },
+  { name: "Pull Down", uses: 96, rating: 4.4 },
+  { name: "Hip Thrust", uses: 98, rating: 4.7 },
+  { name: "Eliptik Bisiklet", uses: 89, rating: 4.3 },
+  { name: "Horizontal Leg Curl", uses: 67, rating: 4.1 },
+  { name: "Low Row", uses: 55, rating: 4.6 },
+  { name: "Abdominal Crunch", uses: 41, rating: 4.0 },
+  { name: "Pec Fly & Rear Delt", uses: 74, rating: 4.5 },
 ];
 
 // Geri bildirim etiket dağılımı (pie)

@@ -6,12 +6,32 @@ import Icon from "../../components/Icon.jsx";
 import { machineById, machines, MUSCLE_GROUPS } from "../../mock/machines.js";
 import { fetchAlternatives } from "../../api/catalog.js";
 
-/** Backend kapalıysa mock'tan aynı mantıkla (ortak kas grubu) hesaplanır. */
+/** Backend kapalıysa mock'tan aynı mantıkla hesaplanır: kardiyo/kuvvet ayrımı +
+ *  önce ince hedef kas örtüşmesi, sonra hedef paylaşma oranı (puan kullanılmaz). */
 function mockAlternatives(source) {
+  const sourceTargets = source.targetMuscles ?? [];
+  const sourceIsCardio = source.muscles.includes("cardio");
+  const shared = (m) => (m.targetMuscles ?? []).filter((t) => sourceTargets.includes(t));
+  const sharedGroups = (m) => m.muscles.filter((x) => source.muscles.includes(x)).length;
+  const ratio = (m) => {
+    const total = (m.targetMuscles ?? []).length;
+    return total > 0 ? shared(m).length / total : 0;
+  };
+  const alternativeMachines = machines
+    .filter((m) => m.id !== source.id && m.muscles.some((x) => source.muscles.includes(x)))
+    .filter((m) => m.muscles.includes("cardio") === sourceIsCardio)
+    .sort(
+      (a, b) =>
+        shared(b).length - shared(a).length ||
+        ratio(b) - ratio(a) ||
+        sharedGroups(b) - sharedGroups(a) ||
+        a.name.localeCompare(b.name),
+    );
+  const noDirectMatch =
+    sourceTargets.length > 0 && alternativeMachines.every((m) => shared(m).length === 0);
   return {
-    alternativeMachines: machines.filter(
-      (m) => m.id !== source.id && m.muscles.some((x) => source.muscles.includes(x)),
-    ),
+    noDirectMatch,
+    alternativeMachines,
     alternativeExercises: [
       { id: "x1", name: "Vücut ağırlığı varyasyonu", instructions: "Ekipmansız, aynı kas grubu" },
       { id: "x2", name: "Dambıl alternatifi", instructions: "Serbest ağırlık rafından" },
@@ -61,6 +81,20 @@ export default function Alternatives() {
           </div>
         </div>
       </Card>
+
+      {result.noDirectMatch && (
+        <Card soft className="mb-4 flex gap-3 p-4">
+          <Icon name="bulb" size={20} className="mt-0.5 shrink-0 text-primary-600" />
+          <div>
+            <p className="text-sm font-bold text-gray-900">Birebir muadil yok</p>
+            <p className="text-sm text-gray-600">
+              Bu makinenin çalıştırdığı kası birebir hedefleyen başka bir makine salonda bulunmuyor.
+              Aşağıdaki makineler aynı bölgeyi genel olarak çalıştırır; ayrıca egzersiz
+              alternatiflerine göz atman önerilir.
+            </p>
+          </div>
+        </Card>
+      )}
 
       <h2 className="mb-2 text-base font-bold text-gray-900">
         Alternatif makineler

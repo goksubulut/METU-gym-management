@@ -9,6 +9,7 @@ export function mapMachineFromApi(m) {
     name: m.name,
     category: m.category,
     muscles: (m.muscleGroups ?? []).map((g) => g.id),
+    targetMuscles: m.targetMuscles ?? [],
     rating: m.rating ?? 0,
     reviews: m.reviews ?? 0,
     location: m.location,
@@ -42,6 +43,7 @@ export async function fetchAlternatives(id, slotId) {
   const data = await apiFetch(`/machines/${id}/alternatives${qs}`);
   return {
     machine: data.machine,
+    noDirectMatch: data.noDirectMatch ?? false,
     alternativeMachines: data.alternativeMachines.map(mapMachineFromApi),
     alternativeExercises: data.alternativeExercises,
   };

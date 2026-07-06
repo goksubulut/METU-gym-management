@@ -14,6 +14,10 @@ RUN npm run build
 
 FROM node:20-alpine
 ENV NODE_ENV=production
+# Saat dilimi: "bugünün randevuları" gibi tarih hesapları yerel güne göre
+# yapılır. tzdata olmadan alpine UTC'de kalır ve gece yarısı civarı gün kayar.
+RUN apk add --no-cache tzdata
+ENV TZ=Europe/Istanbul
 WORKDIR /app
 COPY package*.json ./
 # prisma CLI çalışma imajında da gerekli: konteyner açılışında "migrate deploy" koşar

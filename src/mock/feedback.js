@@ -1,12 +1,12 @@
 // Arıza bildirimleri
 export const faults = [
-  { id: "f1", machineId: "m4", machine: "Koşu Bandı Pro", issue: "Ekran donuyor, hız değişmiyor", severity: "high", status: "open", date: "2026-07-01", reporter: "Ahmet Y." },
-  { id: "f2", machineId: "m8", machine: "Rowing Machine", issue: "Zincir gürültü yapıyor", severity: "medium", status: "open", date: "2026-06-30", reporter: "Elif D." },
-  { id: "f3", machineId: "m1", machine: "Leg Press 45°", issue: "Sağ pedal gevşek", severity: "medium", status: "in-progress", date: "2026-06-29", reporter: "Mehmet K." },
-  { id: "f4", machineId: "m3", machine: "Chest Press", issue: "Minder yırtık", severity: "low", status: "resolved", date: "2026-06-25", reporter: "Zeynep Ş." },
-  { id: "f5", machineId: "m4", machine: "Koşu Bandı Pro", issue: "Acil durdurma çalışmıyor", severity: "high", status: "open", date: "2026-07-02", reporter: "Can Ö." },
-  { id: "f6", machineId: "m7", machine: "Squat Rack", issue: "Güvenlik kolu sıkışıyor", severity: "high", status: "in-progress", date: "2026-06-28", reporter: "Aylin A." },
-  { id: "f7", machineId: "m11", machine: "Ab Crunch Machine", issue: "Ayar pimi kayıp", severity: "low", status: "resolved", date: "2026-06-22", reporter: "Burak D." },
+  { id: "f1", machineId: "m1", machine: "Koşu Bandı", issue: "Ekran donuyor, hız değişmiyor", severity: "high", status: "open", date: "2026-07-01", reporter: "Ahmet Y." },
+  { id: "f2", machineId: "m2", machine: "Eliptik Bisiklet", issue: "Pedal gürültü yapıyor", severity: "medium", status: "open", date: "2026-06-30", reporter: "Elif D." },
+  { id: "f3", machineId: "m13", machine: "Leg Press", issue: "Ağırlık pimi gevşek", severity: "medium", status: "in-progress", date: "2026-06-29", reporter: "Mehmet K." },
+  { id: "f4", machineId: "m19", machine: "Chest Press", issue: "Minder yırtık", severity: "low", status: "resolved", date: "2026-06-25", reporter: "Zeynep Ş." },
+  { id: "f5", machineId: "m1", machine: "Koşu Bandı", issue: "Acil durdurma çalışmıyor", severity: "high", status: "open", date: "2026-07-02", reporter: "Can Ö." },
+  { id: "f6", machineId: "m7", machine: "Kıvrık Deadlift (Trap Bar)", issue: "Güvenlik kolu sıkışıyor", severity: "high", status: "in-progress", date: "2026-06-28", reporter: "Aylin A." },
+  { id: "f7", machineId: "m25", machine: "Abdominal Crunch", issue: "Ayar pimi kayıp", severity: "low", status: "resolved", date: "2026-06-22", reporter: "Burak D." },
 ];
 
 // Öneri / şikayet geri bildirimleri

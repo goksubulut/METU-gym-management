@@ -69,8 +69,11 @@ export default function MuscleGroups() {
         }
       }),
     );
-    return out;
-  }, [activeGroups, apiMachines]);
+    // Hibrit öneri: seçilen ince kasları (biceps, quadriceps...) doğrudan hedefleyen
+    // makineler üste sıralanır; kalanlar puana göre gelir.
+    const targeting = (m) => (m.targetMuscles ?? []).filter((t) => selected.includes(t)).length;
+    return out.sort((a, b) => targeting(b) - targeting(a) || (b.rating ?? 0) - (a.rating ?? 0));
+  }, [activeGroups, apiMachines, selected]);
 
   const exercises = useMemo(
     () => apiExercises.filter((e) => e.muscles.some((g) => activeGroups.includes(g))),

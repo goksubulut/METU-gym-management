@@ -110,6 +110,10 @@ model Machine {
   qrCode      String   @unique // makine QR'ının taşıdığı deep-link yolu, ör. "/machine/m1"
   description String?
   tips        String?
+  // Hibrit öneri motoru: kaba MachineMuscleGroup bağının yanında ince hedef kas
+  // etiketleri (BodyDiagram MUSCLES slug'ları: biceps, triceps, quadriceps...).
+  // Alternatif sıralaması önce bu ince örtüşmeye bakar.
+  targetMuscles String[] @default([])
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
 
@@ -138,6 +142,9 @@ model Exercise {
   instructions String?
   duration     String? // ısınma/soğuma için: "2 dk", "30 sn x2"
   videoUrl     String?
+  // Hibrit öneri motoru: Machine.targetMuscles ile aynı ince kas slug'ları.
+  // Alternatif egzersiz sıralaması önce bu ince örtüşmeye bakar.
+  targetMuscles String[] @default([])
 
   muscleGroups ExerciseMuscleGroup[]
 }

@@ -14,6 +14,7 @@ services:
       POSTGRES_USER: metugym
       POSTGRES_PASSWORD: metugym_dev_password
       POSTGRES_DB: metugym
+      TZ: ${TZ:-Europe/Istanbul}
     ports:
       # Host tarafında 5433: makinede 5432'yi kullanan yerel bir PostgreSQL
       # kurulumu var; çakışmamak için farklı port yayınlanıyor.
@@ -31,6 +32,7 @@ services:
     container_name: metugym-api
     environment:
       DATABASE_URL: postgresql://metugym:metugym_dev_password@db:5432/metugym?schema=public
+      TZ: ${TZ:-Europe/Istanbul}
       PORT: 3000
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:8080}
       APP_BASE_URL: ${APP_BASE_URL:-http://localhost:8080}

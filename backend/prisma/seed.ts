@@ -68,11 +68,12 @@ function slotTimes(): string[] {
 interface MuscleGroupContent { id: string; name: string; svgRegionCode: string }
 interface MachineContent {
   id: string; name: string; category: string; muscles: string[];
+  targetMuscles?: string[];
   location: string; hasVideo: boolean; description: string; tips: string; photoUrl?: string;
 }
 interface ExerciseContent {
   name: string; type: 'MACHINE' | 'FREE' | 'WARMUP' | 'COOLDOWN';
-  muscles: string[]; instructions?: string; duration?: string; videoUrl?: string;
+  muscles: string[]; targetMuscles?: string[]; instructions?: string; duration?: string; videoUrl?: string;
 }
 
 async function seedContent() {
@@ -89,20 +90,30 @@ async function seedContent() {
   }
 
   for (const m of machines) {
+    const videoCreate = m.hasVideo
+      ? [{ title: `${m.name} Kullanım Videosu`, url: `/media/videos/${m.id}.mp4` }]
+      : [];
     await prisma.machine.upsert({
       where: { id: m.id },
+      // Güncellemede ilişkiler de senkronlanmalı: aksi halde içerik yeniden
+      // eşlenip makine adı değişse bile eski kas grubu/video bağları kalır
+      // (ör. m1 "Leg Press" → "Koşu Bandı" ama grupları [legs] kalırdı).
       update: {
         name: m.name, category: m.category, location: m.location,
-        description: m.description, tips: m.tips, photoUrl: m.photoUrl,
+        description: m.description, tips: m.tips,
+        photoUrl: m.photoUrl ?? null,
+        targetMuscles: m.targetMuscles ?? [],
+        muscleGroups: { deleteMany: {}, create: m.muscles.map((mid) => ({ muscleGroupId: mid })) },
+        videos: { deleteMany: {}, create: videoCreate },
       },
       create: {
         id: m.id, name: m.name, category: m.category, location: m.location,
         qrCode: `/machine/${m.id}`, // frontend'deki QR deep-link rotası
-        description: m.description, tips: m.tips, photoUrl: m.photoUrl,
+        description: m.description, tips: m.tips,
+        photoUrl: m.photoUrl ?? null,
+        targetMuscles: m.targetMuscles ?? [],
         muscleGroups: { create: m.muscles.map((mid) => ({ muscleGroupId: mid })) },
-        videos: m.hasVideo
-          ? { create: [{ title: `${m.name} Kullanım Videosu`, url: `/media/videos/${m.id}.mp4` }] }
-          : undefined,
+        videos: { create: videoCreate },
       },
     });
   }
@@ -114,7 +125,9 @@ async function seedContent() {
     await prisma.exercise.create({
       data: {
         name: ex.name, type: ex.type,
-        instructions: ex.instructions, duration: ex.duration, videoUrl: ex.videoUrl,
+        instructions: ex.instructions, duration: ex.duration,
+        videoUrl: ex.videoUrl ?? null,
+        targetMuscles: ex.targetMuscles ?? [],
         muscleGroups: { create: ex.muscles.map((mid) => ({ muscleGroupId: mid })) },
       },
     });
@@ -219,23 +232,24 @@ async function seedAppointments() {
   // Tekrar çalıştırmada çift kayıt olmaması için demo randevular temizlenir.
   await prisma.appointment.deleteMany();
 
+  // Makine id'leri gerçek katalogla (content/machines.json, m1..m25) hizalanmıştır.
   const demo: DemoAppointment[] = [
     // Gyedu Ernest'in randevu geçmişi (mock a1-a5)
-    { user: 'Gyedu Ernest', dayOffset: 0, time: '18:30', status: 'BOOKED', muscleGroups: ['chest', 'arms'], machines: ['m3', 'm6'], note: 'Üst vücut günü' },
-    { user: 'Gyedu Ernest', dayOffset: 2, time: '10:00', status: 'BOOKED', muscleGroups: ['legs'], machines: ['m1', 'm7'] },
-    { user: 'Gyedu Ernest', dayOffset: -5, time: '19:00', status: 'COMPLETED', muscleGroups: ['back'], machines: ['m2', 'm10'] },
-    { user: 'Gyedu Ernest', dayOffset: -6, time: '08:30', status: 'COMPLETED', muscleGroups: ['cardio'], machines: ['m4'] },
-    { user: 'Gyedu Ernest', dayOffset: -3, time: '17:30', status: 'CANCELLED', muscleGroups: ['core'], machines: ['m11'] },
+    { user: 'Gyedu Ernest', dayOffset: 0, time: '18:30', status: 'BOOKED', muscleGroups: ['chest', 'arms'], machines: ['m19', 'm9'], note: 'Üst vücut günü' },
+    { user: 'Gyedu Ernest', dayOffset: 2, time: '10:00', status: 'BOOKED', muscleGroups: ['legs'], machines: ['m13', 'm7'] },
+    { user: 'Gyedu Ernest', dayOffset: -5, time: '19:00', status: 'COMPLETED', muscleGroups: ['back'], machines: ['m10', 'm11'] },
+    { user: 'Gyedu Ernest', dayOffset: -6, time: '08:30', status: 'COMPLETED', muscleGroups: ['cardio'], machines: ['m1'] },
+    { user: 'Gyedu Ernest', dayOffset: -3, time: '17:30', status: 'CANCELLED', muscleGroups: ['core'], machines: ['m25'] },
     // Bugünün resepsiyon check-in listesi (mock todaysCheckins c1-c9)
-    { user: 'Ahmet Yılmaz', dayOffset: 0, time: '08:00', status: 'CHECKED_IN', muscleGroups: ['chest'], machines: ['m3'] },
-    { user: 'Elif Demir', dayOffset: 0, time: '08:30', status: 'CHECKED_IN', muscleGroups: ['legs'], machines: ['m1', 'm7'] },
-    { user: 'Mehmet Kaya', dayOffset: 0, time: '09:00', status: 'BOOKED', muscleGroups: ['back'], machines: ['m2'] },
-    { user: 'Zeynep Şahin', dayOffset: 0, time: '09:30', status: 'BOOKED', muscleGroups: ['cardio'], machines: ['m4'] },
-    { user: 'Can Öztürk', dayOffset: 0, time: '10:00', status: 'NO_SHOW', muscleGroups: ['arms'], machines: ['m6'] },
-    { user: 'Aylin Arslan', dayOffset: 0, time: '10:30', status: 'BOOKED', muscleGroups: ['glutes'], machines: ['m12'] },
-    { user: 'Burak Doğan', dayOffset: 0, time: '11:00', status: 'BOOKED', muscleGroups: ['core'], machines: ['m11'] },
-    { user: 'Selin Aydın', dayOffset: 0, time: '17:30', status: 'BOOKED', muscleGroups: ['shoulders'], machines: ['m5'] },
-    { user: 'Emre Çelik', dayOffset: 0, time: '18:00', status: 'BOOKED', muscleGroups: ['chest', 'back'], machines: ['m3', 'm2'] },
+    { user: 'Ahmet Yılmaz', dayOffset: 0, time: '08:00', status: 'CHECKED_IN', muscleGroups: ['chest'], machines: ['m19'] },
+    { user: 'Elif Demir', dayOffset: 0, time: '08:30', status: 'CHECKED_IN', muscleGroups: ['legs'], machines: ['m13', 'm7'] },
+    { user: 'Mehmet Kaya', dayOffset: 0, time: '09:00', status: 'BOOKED', muscleGroups: ['back'], machines: ['m10'] },
+    { user: 'Zeynep Şahin', dayOffset: 0, time: '09:30', status: 'BOOKED', muscleGroups: ['cardio'], machines: ['m1'] },
+    { user: 'Can Öztürk', dayOffset: 0, time: '10:00', status: 'NO_SHOW', muscleGroups: ['arms'], machines: ['m22'] },
+    { user: 'Aylin Arslan', dayOffset: 0, time: '10:30', status: 'BOOKED', muscleGroups: ['glutes'], machines: ['m14'] },
+    { user: 'Burak Doğan', dayOffset: 0, time: '11:00', status: 'BOOKED', muscleGroups: ['core'], machines: ['m25'] },
+    { user: 'Selin Aydın', dayOffset: 0, time: '17:30', status: 'BOOKED', muscleGroups: ['shoulders'], machines: ['m17'] },
+    { user: 'Emre Çelik', dayOffset: 0, time: '18:00', status: 'BOOKED', muscleGroups: ['chest', 'back'], machines: ['m19', 'm10'] },
   ];
 
   for (const a of demo) {
@@ -266,13 +280,13 @@ async function seedFeedback() {
 
   // mock/feedback.js → faults (f1-f7)
   const faults: Array<{ user: string; machineId: string; description: string; severity: FaultSeverity; status: FaultStatus; dayOffset: number }> = [
-    { user: 'Ahmet Yılmaz', machineId: 'm4', description: 'Ekran donuyor, hız değişmiyor', severity: 'HIGH', status: 'OPEN', dayOffset: -2 },
-    { user: 'Elif Demir', machineId: 'm8', description: 'Zincir gürültü yapıyor', severity: 'MEDIUM', status: 'OPEN', dayOffset: -3 },
-    { user: 'Mehmet Kaya', machineId: 'm1', description: 'Sağ pedal gevşek', severity: 'MEDIUM', status: 'IN_PROGRESS', dayOffset: -4 },
-    { user: 'Zeynep Şahin', machineId: 'm3', description: 'Minder yırtık', severity: 'LOW', status: 'RESOLVED', dayOffset: -8 },
-    { user: 'Can Öztürk', machineId: 'm4', description: 'Acil durdurma çalışmıyor', severity: 'HIGH', status: 'OPEN', dayOffset: -1 },
+    { user: 'Ahmet Yılmaz', machineId: 'm1', description: 'Ekran donuyor, hız değişmiyor', severity: 'HIGH', status: 'OPEN', dayOffset: -2 },
+    { user: 'Elif Demir', machineId: 'm2', description: 'Pedal gürültü yapıyor', severity: 'MEDIUM', status: 'OPEN', dayOffset: -3 },
+    { user: 'Mehmet Kaya', machineId: 'm13', description: 'Ağırlık pimi gevşek', severity: 'MEDIUM', status: 'IN_PROGRESS', dayOffset: -4 },
+    { user: 'Zeynep Şahin', machineId: 'm19', description: 'Minder yırtık', severity: 'LOW', status: 'RESOLVED', dayOffset: -8 },
+    { user: 'Can Öztürk', machineId: 'm1', description: 'Acil durdurma çalışmıyor', severity: 'HIGH', status: 'OPEN', dayOffset: -1 },
     { user: 'Aylin Arslan', machineId: 'm7', description: 'Güvenlik kolu sıkışıyor', severity: 'HIGH', status: 'IN_PROGRESS', dayOffset: -5 },
-    { user: 'Burak Doğan', machineId: 'm11', description: 'Ayar pimi kayıp', severity: 'LOW', status: 'RESOLVED', dayOffset: -11 },
+    { user: 'Burak Doğan', machineId: 'm25', description: 'Ayar pimi kayıp', severity: 'LOW', status: 'RESOLVED', dayOffset: -11 },
   ];
   for (const f of faults) {
     const user = await findUser(f.user);
@@ -304,8 +318,8 @@ async function seedFeedback() {
 
   // Puanlar: mock'taki ortalama puana yaklaşan 4'er kayıt (makine başına).
   const mockAverages: Record<string, number> = {
-    m1: 4.6, m2: 4.4, m3: 4.7, m4: 4.2, m5: 4.5, m6: 4.8,
-    m7: 4.9, m8: 4.3, m9: 4.1, m10: 4.6, m11: 4.0, m12: 4.7,
+    m1: 4.6, m2: 4.4, m5: 4.7, m6: 4.2, m7: 4.5, m9: 4.8,
+    m10: 4.9, m13: 4.3, m14: 4.1, m17: 4.6, m19: 4.7, m25: 4.0,
   };
   const raters = ['Ahmet Yılmaz', 'Elif Demir', 'Mehmet Kaya', 'Zeynep Şahin'];
   const tagPool = ['Rahattı', 'Kalabalıktı', 'Arızalıydı', 'Ayarları bozuktu', 'Kullanımı zordu'];

@@ -122,9 +122,16 @@ export default function Dashboard() {
                 <p className="mb-2 text-xs font-semibold text-gray-400">Planlanan Makineler</p>
                 <div className="flex flex-wrap gap-1.5">
                   {active.machines.map((m) => (
-                    <Badge key={m} tone="gray">
-                      {machineById(m)?.name}
-                    </Badge>
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => nav(`/machines/${m}`)}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-semibold text-gray-700 transition-colors hover:border-primary-200 hover:bg-primary-50 hover:text-primary-700"
+                    >
+                      <Icon name="dumbbell" size={12} />
+                      {machineById(m)?.name ?? m}
+                      <Icon name="chevronRight" size={12} className="text-gray-300" />
+                    </button>
                   ))}
                 </div>
               </>

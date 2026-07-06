@@ -8,7 +8,7 @@ import { Input, Select } from "../../components/Input.jsx";
 import { useToast } from "../../components/Toast.jsx";
 import { faults as mockFaults } from "../../mock/feedback.js";
 import { fetchAdminFaults, updateAdminFaultStatus } from "../../api/admin.js";
-import { isMockRowId, mergeById } from "../../api/client.js";
+import { isMockRowId } from "../../api/client.js";
 
 const SEV = { high: { tone: "red", label: "Yüksek" }, medium: { tone: "yellow", label: "Orta" }, low: { tone: "gray", label: "Düşük" } };
 const ST = {
@@ -34,8 +34,10 @@ export default function Faults() {
 
   const load = useCallback(async () => {
     try {
+      // API başarılıysa tek kaynak; mock ile birleştirmek kayıtları
+      // çiftliyordu (mock ve seed aynı demo verilerini içeriyor).
       const apiRows = await fetchAdminFaults();
-      setList(mergeById(mockFaults, apiRows));
+      setList(apiRows ?? []);
     } catch {
       setList(mockFaults);
     }

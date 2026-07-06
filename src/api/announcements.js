@@ -1,15 +1,19 @@
 import { announcements as mockAnnouncements } from "../mock/announcements.js";
-import { apiFetch, mergeById } from "./client.js";
+import { apiFetch } from "./client.js";
 
 export function fetchAnnouncements() {
   return apiFetch("/announcements");
 }
 
-/** Aktif duyurular — mock + API (admin ile aynı birleştirme, yalnızca yayında olanlar). */
+/** Aktif duyurular. API kayıtları kaynak kabul edilir (seed'de mock duyurular da
+ *  bulunduğundan mock ile birleştirmek çift kayıt üretiyordu). Mock yalnızca API
+ *  boşsa/erişilemezse fallback olarak kullanılır. */
 export async function loadActiveAnnouncements() {
   try {
     const apiRows = await fetchAnnouncements();
-    return mergeById(mockAnnouncements, apiRows).filter((a) => a.isActive !== false);
+    const active = (apiRows ?? []).filter((a) => a.isActive !== false);
+    if (active.length) return active;
+    return mockAnnouncements.filter((a) => a.isActive !== false);
   } catch {
     return mockAnnouncements.filter((a) => a.isActive !== false);
   }

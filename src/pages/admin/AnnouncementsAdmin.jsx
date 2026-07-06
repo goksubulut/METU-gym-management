@@ -17,7 +17,7 @@ import {
   fetchAdminAnnouncements,
   updateAdminAnnouncement,
 } from "../../api/announcements.js";
-import { isMockRowId, mergeById } from "../../api/client.js";
+import { isMockRowId } from "../../api/client.js";
 
 const EMPTY_FORM = { title: "", body: "", category: "general", isActive: true };
 
@@ -32,8 +32,9 @@ export default function AnnouncementsAdmin() {
 
   const load = useCallback(async () => {
     try {
+      // API başarılıysa tek kaynak; mock ile birleştirmek kayıtları çiftliyordu.
       const apiRows = await fetchAdminAnnouncements();
-      setList(mergeById(mockSeed, apiRows));
+      setList(apiRows ?? []);
     } catch {
       setList(mockSeed);
     }

@@ -7,6 +7,7 @@ import Tabs from "./Tabs.jsx";
 import Modal from "./Modal.jsx";
 import EmptyState from "./EmptyState.jsx";
 import Spinner from "./Spinner.jsx";
+import Icon from "./Icon.jsx";
 import { useToast } from "./Toast.jsx";
 import { appointments as mockSeed } from "../mock/appointments.js";
 import { machineById, MUSCLE_GROUPS } from "../mock/machines.js";
@@ -144,12 +145,43 @@ export default function MyAppointmentsSection({ className = "" }) {
                     {labelOf(g)}
                   </Badge>
                 ))}
-                {a.machines.map((m) => (
-                  <Badge key={m} tone="gray">
-                    {machineById(m)?.name}
-                  </Badge>
-                ))}
               </div>
+
+              {a.machines?.length > 0 && (
+                <div className="mt-3">
+                  <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-gray-400">
+                    Seçili makineler
+                  </p>
+                  <div className="flex flex-col gap-1.5">
+                    {a.machines.map((m) => {
+                      const machine = machineById(m);
+                      return (
+                        <button
+                          key={m}
+                          type="button"
+                          onClick={() => nav(`/machines/${m}`)}
+                          className="flex items-center gap-2.5 rounded-xl border border-gray-100 bg-gray-50 px-3 py-2 text-left transition-colors hover:border-primary-200 hover:bg-primary-50"
+                        >
+                          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-gray-900 text-white">
+                            <Icon name="dumbbell" size={15} />
+                          </span>
+                          <span className="min-w-0 flex-1">
+                            <span className="block truncate text-sm font-semibold text-gray-900">
+                              {machine?.name ?? m}
+                            </span>
+                            {machine?.location && (
+                              <span className="block truncate text-[11px] text-gray-400">
+                                {machine.location}
+                              </span>
+                            )}
+                          </span>
+                          <Icon name="chevronRight" size={14} className="shrink-0 text-gray-300" />
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
               {isEditable(a.status) && (
                 <div className="mt-3 flex gap-2">
                   <Button

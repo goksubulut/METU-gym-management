@@ -9,6 +9,7 @@ export interface ExerciseListItem {
   instructions: string | null;
   duration: string | null;
   videoUrl: string | null;
+  targetMuscles: string[];
   muscleGroups: { id: string; name: string }[];
 }
 
@@ -33,6 +34,7 @@ export class ExercisesService {
       instructions: e.instructions,
       duration: e.duration,
       videoUrl: e.videoUrl,
+      targetMuscles: e.targetMuscles,
       muscleGroups: e.muscleGroups.map((mg) => mg.muscleGroup),
     }));
   }

@@ -13,6 +13,7 @@ export interface MachineListItem {
   description: string | null;
   tips: string | null;
   muscleGroups: { id: string; name: string }[];
+  targetMuscles: string[]; // ince hedef kas slug'ları (hibrit öneri)
   rating: number | null; // ortalama puan (1 ondalık) — hiç puan yoksa null
   reviews: number;
   openFaults: number;
@@ -26,18 +27,24 @@ export interface MachineDetail extends MachineListItem {
 
 export interface AlternativeMachine extends MachineListItem {
   sharedMuscleGroups: string[]; // istenen makineyle ortak kas grubu id'leri
+  sharedTargets: string[]; // istenen makineyle ortak ince hedef kaslar (hibrit sıralama)
   plannedCount?: number; // slotId verildiyse: o slotta bu makineyi planlayan onaylı randevu sayısı
 }
 
 export interface AlternativesResult {
-  machine: { id: string; name: string; muscleGroups: string[] };
+  machine: { id: string; name: string; muscleGroups: string[]; targetMuscles: string[] };
   slotId: string | null;
+  // true: salonda bu makinenin ince hedef kasını birebir paylaşan başka makine yok
+  // (ör. Adductor & Abductor). UI'da bilgilendirme banner'ı gösterilir.
+  noDirectMatch: boolean;
   alternativeMachines: AlternativeMachine[];
   alternativeExercises: {
     id: string;
     name: string;
     type: string;
     instructions: string | null;
+    targetMuscles: string[];
+    sharedTargets: string[];
     muscleGroups: { id: string; name: string }[];
   }[];
 }
@@ -87,8 +94,18 @@ export class MachinesService {
   /**
    * Öneri motoru (FR-RC-1..4): aynı kas grubunu çalıştıran alternatif
    * makineler + egzersizler. Ayrı tablo yok — kas grubu bağlarından türetilir.
-   * Sıralama: ortak kas grubu sayısı çok → puanı yüksek olan önce (liste
-   * biçimi, anket S5 kararı).
+   *
+   * Kurallar:
+   * 1. Kardiyo ↔ kuvvet ayrımı: kardiyo makinesi dolunca yalnızca kardiyo,
+   *    kuvvet makinesi dolunca kardiyo hariç makineler önerilir (koşu bandı
+   *    dolunca leg press önerilmesin, tersi de).
+   * 2. Sıralama: önce ortak ince hedef kas (targetMuscles) sayısı, sonra
+   *    "hedef paylaşma oranı" (ortak hedef / adayın toplam hedefi) — böylece en
+   *    isabetli/özel makine öne gelir (biceps curl dolunca preacher curl, triceps
+   *    press'ten önce). Puan sıralamada KULLANILMAZ; puansız makineler
+   *    cezalandırılmaz.
+   * 3. noDirectMatch: hiçbir aday ince hedef kası paylaşmıyorsa (ör. Adductor &
+   *    Abductor) UI'da "birebir muadil yok" bilgilendirmesi için işaretlenir.
    */
   async findAlternatives(id: string, slotId?: string): Promise<AlternativesResult> {
     const machine = await this.prisma.machine.findUnique({ where: { id }, include: MACHINE_INCLUDE });
@@ -96,8 +113,10 @@ export class MachinesService {
       throw new NotFoundException('Makine bulunamadı');
     }
     const groupIds = machine.muscleGroups.map((mg) => mg.muscleGroup.id);
+    const sourceTargets = machine.targetMuscles;
+    const sourceIsCardio = groupIds.includes('cardio');
 
-    const candidates = await this.prisma.machine.findMany({
+    const rawCandidates = await this.prisma.machine.findMany({
       where: {
         isActive: true,
         id: { not: id },
@@ -105,25 +124,43 @@ export class MachinesService {
       },
       include: MACHINE_INCLUDE,
     });
+    // Kural 1: kaynakla aynı sınıf (kardiyo/kuvvet) makineler kalsın.
+    const candidates = rawCandidates.filter(
+      (m) => m.muscleGroups.some((mg) => mg.muscleGroup.id === 'cardio') === sourceIsCardio,
+    );
     const stats = await this.loadStats(candidates.map((m) => m.id));
     const planned = slotId ? await this.loadPlannedCounts(slotId) : undefined;
+
+    // Hedef paylaşma oranı: ortak ince hedef / adayın toplam hedef sayısı.
+    const targetRatio = (sharedLen: number, total: number) => (total > 0 ? sharedLen / total : 0);
 
     const alternativeMachines = candidates
       .map((m) => {
         const shared = m.muscleGroups.map((mg) => mg.muscleGroup.id).filter((g) => groupIds.includes(g));
+        const sharedTargets = m.targetMuscles.filter((t) => sourceTargets.includes(t));
         return {
           ...this.toListItem(m, stats),
           sharedMuscleGroups: shared,
+          sharedTargets,
           plannedCount: planned ? (planned.get(m.id) ?? 0) : undefined,
         };
       })
       .sort(
         (a, b) =>
-          b.sharedMuscleGroups.length - a.sharedMuscleGroups.length || (b.rating ?? 0) - (a.rating ?? 0),
+          b.sharedTargets.length - a.sharedTargets.length ||
+          targetRatio(b.sharedTargets.length, b.targetMuscles.length) -
+            targetRatio(a.sharedTargets.length, a.targetMuscles.length) ||
+          b.sharedMuscleGroups.length - a.sharedMuscleGroups.length ||
+          a.name.localeCompare(b.name),
       );
+
+    // Kural 3: ince hedef kası paylaşan hiçbir makine yoksa bilgilendir.
+    const noDirectMatch =
+      sourceTargets.length > 0 && alternativeMachines.every((m) => m.sharedTargets.length === 0);
 
     // Alternatif egzersizler: aynı kas grubunu çalıştıran serbest/makine egzersizleri
     // (ısınma-soğuma hariç — onlar FR-WU-1 kapsamında ayrı sunulur).
+    // Makinelerle aynı mantık: önce ince hedef örtüşmesi, sonra paylaşma oranı, sonra ad.
     const exercises = await this.prisma.exercise.findMany({
       where: {
         type: { in: ['FREE', 'MACHINE'] },
@@ -133,17 +170,30 @@ export class MachinesService {
       orderBy: { name: 'asc' },
     });
 
-    return {
-      machine: { id: machine.id, name: machine.name, muscleGroups: groupIds },
-      slotId: slotId ?? null,
-      alternativeMachines,
-      alternativeExercises: exercises.map((e) => ({
+    const alternativeExercises = exercises
+      .map((e) => ({
         id: e.id,
         name: e.name,
         type: e.type,
         instructions: e.instructions,
+        targetMuscles: e.targetMuscles,
+        sharedTargets: e.targetMuscles.filter((t) => sourceTargets.includes(t)),
         muscleGroups: e.muscleGroups.map((mg) => mg.muscleGroup),
-      })),
+      }))
+      .sort(
+        (a, b) =>
+          b.sharedTargets.length - a.sharedTargets.length ||
+          targetRatio(b.sharedTargets.length, b.targetMuscles.length) -
+            targetRatio(a.sharedTargets.length, a.targetMuscles.length) ||
+          a.name.localeCompare(b.name),
+      );
+
+    return {
+      machine: { id: machine.id, name: machine.name, muscleGroups: groupIds, targetMuscles: sourceTargets },
+      slotId: slotId ?? null,
+      noDirectMatch,
+      alternativeMachines,
+      alternativeExercises,
     };
   }
 
@@ -193,6 +243,7 @@ export class MachinesService {
       description: machine.description,
       tips: machine.tips,
       muscleGroups: machine.muscleGroups.map((mg) => mg.muscleGroup),
+      targetMuscles: machine.targetMuscles,
       rating: rating ? Math.round(rating.avg * 10) / 10 : null,
       reviews: rating?.count ?? 0,
       openFaults: stats.openFaults.get(machine.id) ?? 0,

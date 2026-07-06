@@ -8,7 +8,7 @@ import { TransformInterceptor } from './../src/common/interceptors/transform.int
 
 /**
  * Katalog + öneri motoru. Uçlar @Public olduğundan token gerekmez (FR-CAT-1).
- * Seed verisine dayanır (12 makine, 8 kas grubu, 35 egzersiz).
+ * Seed verisine dayanır (25 makine, 8 kas grubu, 39 egzersiz).
  */
 describe('Catalog (e2e)', () => {
   let app: INestApplication<App>;
@@ -33,12 +33,14 @@ describe('Catalog (e2e)', () => {
   describe('GET /api/machines', () => {
     it('token olmadan makine listesini döner (FR-CAT-1)', async () => {
       const res = await request(app.getHttpServer()).get('/api/machines').expect(200);
-      expect(res.body.data.length).toBeGreaterThanOrEqual(12);
+      expect(res.body.data.length).toBeGreaterThanOrEqual(25);
       const m = res.body.data.find((x: { id: string }) => x.id === 'm1');
-      expect(m.name).toBe('Leg Press 45°');
+      expect(m.name).toBe('Koşu Bandı');
       expect(m).toHaveProperty('rating');
       expect(m).toHaveProperty('openFaults');
       expect(m.muscleGroups.map((g: { id: string }) => g.id)).toContain('legs');
+      // Hibrit öneri: ince hedef kas etiketi de dönmeli
+      expect(Array.isArray(m.targetMuscles)).toBe(true);
     });
 
     it('kategori filtresi çalışır', async () => {
@@ -58,15 +60,17 @@ describe('Catalog (e2e)', () => {
         .get('/api/machines?muscleGroup=chest')
         .expect(200);
       const ids = res.body.data.map((m: { id: string }) => m.id);
-      expect(ids).toEqual(expect.arrayContaining(['m3', 'm5', 'm6']));
+      // Göğüs grubundaki makineler: Incline Chest Press, Chest Press, Pec Fly & Rear Delt
+      expect(ids).toEqual(expect.arrayContaining(['m18', 'm19', 'm20']));
     });
   });
 
   describe('GET /api/machines/:id', () => {
     it('detay video ve QR bilgisiyle döner (FR-QR-2)', async () => {
-      const res = await request(app.getHttpServer()).get('/api/machines/m1').expect(200);
+      // m13 (Leg Press) videolu bir makine
+      const res = await request(app.getHttpServer()).get('/api/machines/m13').expect(200);
       expect(res.body.data.videos.length).toBeGreaterThan(0);
-      expect(res.body.data.qrCode).toBe('/machine/m1');
+      expect(res.body.data.qrCode).toBe('/machine/m13');
       expect(res.body.data.tips).toBeTruthy();
     });
 
@@ -77,23 +81,52 @@ describe('Catalog (e2e)', () => {
 
   describe('GET /api/machines/:id/alternatives — öneri motoru', () => {
     it('aynı kas grubunu çalıştıran makine ve egzersizleri döner (FR-RC-1)', async () => {
-      const res = await request(app.getHttpServer()).get('/api/machines/m1/alternatives').expect(200);
+      // m22 = Biceps Curl (arms / biceps). Hibrit motor biceps hedefli makineleri öne alır.
+      const res = await request(app.getHttpServer()).get('/api/machines/m22/alternatives').expect(200);
       const { machine, alternativeMachines, alternativeExercises } = res.body.data;
 
-      expect(machine.id).toBe('m1');
+      expect(machine.id).toBe('m22');
       // Kendisi listede olmamalı
-      expect(alternativeMachines.some((m: { id: string }) => m.id === 'm1')).toBe(false);
+      expect(alternativeMachines.some((m: { id: string }) => m.id === 'm22')).toBe(false);
       // Her alternatif en az bir ortak kas grubu paylaşmalı
       expect(
         alternativeMachines.every((m: { sharedMuscleGroups: string[] }) => m.sharedMuscleGroups.length > 0),
       ).toBe(true);
-      // m7 (Squat Rack: legs+glutes+core) m1 (legs+glutes) ile 2 grup paylaşır → üst sıralarda
-      const m7Index = alternativeMachines.findIndex((m: { id: string }) => m.id === 'm7');
-      expect(m7Index).toBeGreaterThanOrEqual(0);
-      expect(m7Index).toBeLessThan(3);
+      // Hibrit sıralama: Preacher Curl (m24, biceps) triceps makinesi (m23) önünde gelmeli
+      const preacherIndex = alternativeMachines.findIndex((m: { id: string }) => m.id === 'm24');
+      const tricepsIndex = alternativeMachines.findIndex((m: { id: string }) => m.id === 'm23');
+      expect(preacherIndex).toBeGreaterThanOrEqual(0);
+      expect(tricepsIndex).toBeGreaterThanOrEqual(0);
+      expect(preacherIndex).toBeLessThan(tricepsIndex);
+      // Preacher Curl ince hedef kası 'biceps' örtüşmesine sahip olmalı
+      const preacher = alternativeMachines[preacherIndex];
+      expect(preacher.sharedTargets).toContain('biceps');
       // Egzersiz alternatifi var ve ısınma/soğuma içermiyor
       expect(alternativeExercises.length).toBeGreaterThan(0);
       expect(alternativeExercises.every((e: { type: string }) => ['FREE', 'MACHINE'].includes(e.type))).toBe(true);
+    });
+
+    it('kardiyo makinesi dolunca yalnızca kardiyo makineleri önerir', async () => {
+      // m1 = Koşu Bandı (kardiyo). Kuvvet makineleri (leg press vb.) listeye girmemeli.
+      const res = await request(app.getHttpServer()).get('/api/machines/m1/alternatives').expect(200);
+      const alts = res.body.data.alternativeMachines;
+      expect(alts.length).toBeGreaterThan(0);
+      expect(
+        alts.every((m: { muscleGroups: { id: string }[] }) =>
+          m.muscleGroups.some((g) => g.id === 'cardio'),
+        ),
+      ).toBe(true);
+    });
+
+    it('birebir hedef muadili olmayan makinede noDirectMatch=true döner', async () => {
+      // m15 = Adductor & Abductor; adductors/abductors hedefini paylaşan başka makine yok.
+      const res = await request(app.getHttpServer()).get('/api/machines/m15/alternatives').expect(200);
+      expect(res.body.data.noDirectMatch).toBe(true);
+      expect(
+        res.body.data.alternativeMachines.every(
+          (m: { sharedTargets: string[] }) => m.sharedTargets.length === 0,
+        ),
+      ).toBe(true);
     });
 
     it('slotId verilirse plannedCount alanı döner (FR-RC-4)', async () => {
@@ -116,7 +149,8 @@ describe('Catalog (e2e)', () => {
     it('detay: makineler + tipe göre gruplu egzersizler (FR-CAT-3, FR-WU-1)', async () => {
       const res = await request(app.getHttpServer()).get('/api/muscle-groups/legs').expect(200);
       const { machines, exercises } = res.body.data;
-      expect(machines.map((m: { id: string }) => m.id)).toEqual(expect.arrayContaining(['m1', 'm7', 'm9']));
+      // Bacak grubundaki makineler: Koşu Bandı (m1), Kıvrık Deadlift (m7), Leg Press (m13)
+      expect(machines.map((m: { id: string }) => m.id)).toEqual(expect.arrayContaining(['m1', 'm7', 'm13']));
       expect(exercises.warmup.length).toBeGreaterThan(0);
       expect(exercises.cooldown.length).toBeGreaterThan(0);
       expect(exercises.free.length).toBeGreaterThan(0);
