@@ -9,6 +9,7 @@ const NAV = [
   { to: "/admin/matrix", label: "Tercih × Memnuniyet", icon: "target" },
   { to: "/admin/faults", label: "Arıza Bildirimleri", icon: "wrench" },
   { to: "/admin/feedback", label: "Geri Bildirim", icon: "message" },
+  { to: "/admin/announcements", label: "Duyurular", icon: "bell" },
   { to: "/admin/inventory", label: "Makine Envanteri", icon: "clipboard" },
 ];
 

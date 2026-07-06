@@ -50,10 +50,7 @@ export default function MachineDetail() {
 
   const submitRating = async () => {
     if (!requireAuth()) return;
-    if (ratingTags.length === 0) {
-      toast("En az bir deneyim etiketi seç", "error");
-      return;
-    }
+    if (rating === 0) return;
     setSubmitting(true);
     try {
       await createRating(m.id, rating, ratingTags);
@@ -162,7 +159,7 @@ export default function MachineDetail() {
                 size="sm"
                 full
                 className="mt-4"
-                disabled={submitting || ratingTags.length === 0}
+                disabled={submitting || rating === 0}
                 onClick={submitRating}
               >
                 {submitting ? "Kaydediliyor…" : "Gönder"}

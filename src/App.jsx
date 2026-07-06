@@ -18,7 +18,9 @@ import Alternatives from "./pages/user/Alternatives.jsx";
 import Warmup from "./pages/user/Warmup.jsx";
 import Feedback from "./pages/user/Feedback.jsx";
 import Appointments from "./pages/user/Appointments.jsx";
+import EditAppointment from "./pages/user/EditAppointment.jsx";
 import Profile from "./pages/user/Profile.jsx";
+import Notifications from "./pages/user/Notifications.jsx";
 
 // Admin pages
 import AdminLogin from "./pages/admin/AdminLogin.jsx";
@@ -28,6 +30,7 @@ import Quality from "./pages/admin/Quality.jsx";
 import Matrix from "./pages/admin/Matrix.jsx";
 import Faults from "./pages/admin/Faults.jsx";
 import FeedbackAdmin from "./pages/admin/FeedbackAdmin.jsx";
+import AnnouncementsAdmin from "./pages/admin/AnnouncementsAdmin.jsx";
 import Inventory from "./pages/admin/Inventory.jsx";
 
 // Reception pages
@@ -57,7 +60,9 @@ export default function App() {
         <Route path="/warmup/:group" element={<Warmup />} />
         <Route path="/feedback" element={<Feedback />} />
         <Route path="/appointments" element={<Appointments />} />
+        <Route path="/appointments/:id/edit" element={<EditAppointment />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/notifications" element={<Notifications />} />
       </Route>
 
       {/* B. Yönetici paneli (masaüstü) */}
@@ -76,6 +81,7 @@ export default function App() {
         <Route path="matrix" element={<Matrix />} />
         <Route path="faults" element={<Faults />} />
         <Route path="feedback" element={<FeedbackAdmin />} />
+        <Route path="announcements" element={<AnnouncementsAdmin />} />
         <Route path="inventory" element={<Inventory />} />
       </Route>
 

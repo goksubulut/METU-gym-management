@@ -26,6 +26,7 @@ type AppointmentRecord = Prisma.AppointmentGetPayload<{ include: typeof APPOINTM
 
 export interface AppointmentView {
   id: string;
+  slotId: string;
   date: string;
   startTime: string;
   endTime: string;
@@ -94,8 +95,25 @@ export class AppointmentsService {
     await this.assertCatalogIdsExist(dto.machineIds, dto.muscleGroupIds);
 
     const updated = await this.runSlotTransaction(async (tx) => {
-      if (dto.slotId && dto.slotId !== record.slotId) {
+      const rescheduleNoShow = record.status === AppointmentStatus.NO_SHOW;
+      const slotChanged = Boolean(dto.slotId && dto.slotId !== record.slotId);
+
+      if (dto.slotId && (slotChanged || rescheduleNoShow)) {
         const slot = await this.getBookableSlot(tx, dto.slotId);
+        if (rescheduleNoShow && dto.slotId === record.slotId) {
+          throw new BadRequestException('Gelmedi randevusu için yeni bir tarih veya saat seçin');
+        }
+        const duplicate = await tx.appointment.findFirst({
+          where: {
+            userId: record.userId,
+            slotId: slot.id,
+            status: { in: ACTIVE_STATUSES },
+            id: { not: id },
+          },
+        });
+        if (duplicate) {
+          throw new ConflictException('Bu slotta zaten aktif bir randevunuz var');
+        }
         await this.assertSlotHasCapacity(tx, slot.id, slot.capacity);
       }
 
@@ -112,6 +130,7 @@ export class AppointmentsService {
         data: {
           slotId: dto.slotId,
           note: dto.note,
+          status: record.status === AppointmentStatus.NO_SHOW ? AppointmentStatus.BOOKED : undefined,
           machines: this.machinesCreate(dto.machineIds),
           muscleGroups: this.muscleGroupsCreate(dto.muscleGroupIds),
         },
@@ -184,8 +203,11 @@ export class AppointmentsService {
     return record;
   }
 
-  /** Yalnızca gelecekteki BOOKED randevular değiştirilebilir/iptal edilebilir. */
+  /** BOOKED (gelecek) veya NO_SHOW (gelmedi — yeniden planlanabilir) randevular güncellenebilir. */
   private assertModifiable(record: AppointmentRecord): void {
+    if (record.status === AppointmentStatus.NO_SHOW) {
+      return;
+    }
     if (record.status !== AppointmentStatus.BOOKED) {
       throw new BadRequestException('Yalnızca aktif (BOOKED) randevular değiştirilebilir');
     }
@@ -221,6 +243,7 @@ export class AppointmentsService {
   private toView(record: AppointmentRecord): AppointmentView {
     return {
       id: record.id,
+      slotId: record.slotId,
       date: toDateKey(record.slot.date),
       startTime: record.slot.startTime,
       endTime: record.slot.endTime,

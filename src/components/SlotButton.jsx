@@ -8,20 +8,33 @@ function fill(ratio) {
   return { tone: "green", label: "Müsait", disabled: false };
 }
 
-export default function SlotButton({ slot, selected, onSelect }) {
-  const disabled = slot.isFull || slot.isPast || slot.booked >= slot.capacity;
+export default function SlotButton({
+  slot,
+  selected,
+  onSelect,
+  reservedSlotId,
+  selectedVariant = "primary",
+}) {
+  const isReserved = reservedSlotId && slot.id === reservedSlotId;
+  const disabled =
+    !isReserved && (slot.isFull || slot.isPast || slot.booked >= slot.capacity);
   const info = disabled
     ? { tone: "gray", label: slot.isPast ? "Geçti" : "Dolu", disabled: true }
     : fill(slot.booked / slot.capacity);
+  const selectedClass =
+    selectedVariant === "green"
+      ? "border-emerald-600 bg-emerald-600 text-white shadow-sm"
+      : "border-primary-600 bg-primary-600 text-white shadow-sm";
   return (
     <button
+      type="button"
       disabled={info.disabled}
       onClick={() => onSelect(slot)}
       className={`flex flex-col items-center rounded-xl border p-2.5 transition-all ${
         info.disabled
           ? "cursor-not-allowed border-gray-100 bg-gray-50 opacity-60"
           : selected
-            ? "border-primary-600 bg-primary-600 text-white shadow-sm"
+            ? selectedClass
             : "border-gray-200 bg-white hover:border-primary-300"
       }`}
     >

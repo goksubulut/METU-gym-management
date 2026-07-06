@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { AdminModule } from './admin/admin.module';
+import { AnnouncementsModule } from './announcements/announcements.module';
 import { AppointmentsModule } from './appointments/appointments.module';
 import { AuthModule } from './auth/auth.module';
 import { CatalogModule } from './catalog/catalog.module';
@@ -31,6 +32,7 @@ import { SlotsModule } from './slots/slots.module';
     SlotsModule,
     AppointmentsModule,
     FeedbackModule,
+    AnnouncementsModule,
     AdminModule,
     ReceptionModule,
     QrModule,

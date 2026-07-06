@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Button from "./Button.jsx";
 import Card from "./Card.jsx";
 import Badge from "./Badge.jsx";
@@ -20,12 +20,16 @@ import {
 const labelOf = (id) => MUSCLE_GROUPS.find((m) => m.id === id)?.label || id;
 const STATUS = {
   upcoming: { tone: "green", label: "Yaklaşan" },
+  "no-show": { tone: "red", label: "Gelmedi" },
   completed: { tone: "gray", label: "Tamamlandı" },
   cancelled: { tone: "red", label: "İptal" },
 };
 
+const isEditable = (status) => status === "upcoming" || status === "no-show";
+
 export default function MyAppointmentsSection({ className = "" }) {
   const nav = useNavigate();
+  const location = useLocation();
   const toast = useToast();
   const [tab, setTab] = useState("upcoming");
   const [list, setList] = useState([]);
@@ -52,10 +56,12 @@ export default function MyAppointmentsSection({ className = "" }) {
 
   useEffect(() => {
     load();
-  }, [load]);
+  }, [load, location.key]);
 
   const filtered = list.filter((a) =>
-    tab === "upcoming" ? a.status === "upcoming" : a.status !== "upcoming"
+    tab === "upcoming"
+      ? a.status === "upcoming" || a.status === "no-show"
+      : a.status !== "upcoming" && a.status !== "no-show"
   );
 
   const doCancel = async () => {
@@ -79,7 +85,7 @@ export default function MyAppointmentsSection({ className = "" }) {
       <div className="mb-3 grid grid-cols-3 gap-2">
         {[
           ["Toplam", list.length],
-          ["Yaklaşan", list.filter((a) => a.status === "upcoming").length],
+          ["Yaklaşan", list.filter((a) => a.status === "upcoming" || a.status === "no-show").length],
           ["Tamamlanan", list.filter((a) => a.status === "completed").length],
         ].map(([l, v]) => (
           <Card key={l} soft className="p-3 text-center">
@@ -144,9 +150,20 @@ export default function MyAppointmentsSection({ className = "" }) {
                   </Badge>
                 ))}
               </div>
-              {a.status === "upcoming" && (
+              {isEditable(a.status) && (
                 <div className="mt-3 flex gap-2">
-                  <Button variant="outline" size="sm" full onClick={() => nav("/book")}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    full
+                    onClick={() => {
+                      if (!a.fromApi) {
+                        toast("Demo randevu düzenlenemez", "error");
+                        return;
+                      }
+                      nav(`/appointments/${a.id}/edit`);
+                    }}
+                  >
                     Düzenle
                   </Button>
                   <Button variant="danger" size="sm" full onClick={() => setCancelId(a.id)}>

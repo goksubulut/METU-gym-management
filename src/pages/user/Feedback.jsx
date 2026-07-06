@@ -38,8 +38,8 @@ export default function Feedback() {
     try {
       if (tab === "rate") {
         const machineId = form.machineId.value;
-        if (!machineId || rating === 0 || ratingTags.length === 0) {
-          toast("Makine, puan ve en az bir etiket gerekli", "error");
+        if (!machineId || rating === 0) {
+          toast("Makine ve puan gerekli", "error");
           return;
         }
         await createRating(machineId, rating, ratingTags);
@@ -115,7 +115,7 @@ export default function Feedback() {
           <Button
             full
             type="submit"
-            disabled={submitting || (tab === "rate" && (rating === 0 || ratingTags.length === 0))}
+            disabled={submitting || (tab === "rate" && rating === 0)}
           >
             {submitting ? "Gönderiliyor…" : "Gönder"}
           </Button>

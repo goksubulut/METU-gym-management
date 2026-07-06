@@ -328,6 +328,27 @@ async function seedFeedback() {
   console.log(`Geri bildirim: ${faults.length} arıza, ${suggestions.length} öneri/şikayet, ${ratingCount} puan`);
 }
 
+async function seedAnnouncements() {
+  await prisma.announcement.deleteMany();
+  await prisma.announcement.createMany({
+    data: [
+      {
+        title: 'Aylık üyelik fiyat güncellemesi',
+        body: '1 Ağustos 2026 itibarıyla aylık üyelik ücreti 450 TL olacaktır. Mevcut üyeler için geçiş dönemi 31 Temmuz’a kadar geçerlidir.',
+        category: 'PRICE',
+        createdAt: new Date(dateKey(-5)),
+      },
+      {
+        title: 'Yaz dönemi çalışma saatleri',
+        body: 'Temmuz–Ağustos arasında salon hafta içi ve hafta sonu 07:00–23:00 saatleri arasında hizmet verecektir.',
+        category: 'GENERAL',
+        createdAt: new Date(dateKey(-2)),
+      },
+    ],
+  });
+  console.log('Duyurular: 2 kayıt');
+}
+
 // ---------------------------------------------------------------------------
 
 async function main() {
@@ -337,6 +358,7 @@ async function main() {
   await seedSlots();
   await seedAppointments();
   await seedFeedback();
+  await seedAnnouncements();
   console.log('Seed tamamlandı.');
 }
 

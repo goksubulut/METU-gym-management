@@ -15,6 +15,17 @@ export function fetchMyAppointments() {
   return apiFetch("/appointments/me");
 }
 
+export function fetchAppointment(id) {
+  return apiFetch(`/appointments/${id}`);
+}
+
+export function updateAppointment(id, payload) {
+  return apiFetch(`/appointments/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+}
+
 export function cancelAppointment(id) {
   return apiFetch(`/appointments/${id}`, { method: "DELETE" });
 }
@@ -26,16 +37,19 @@ export function mapAppointmentFromApi(a) {
 
   let status = "completed";
   if (a.status === "CANCELLED") status = "cancelled";
-  else if (a.status === "NO_SHOW") status = "cancelled";
+  else if (a.status === "NO_SHOW") status = "no-show";
   else if ((a.status === "BOOKED" || a.status === "CHECKED_IN") && isFuture) status = "upcoming";
 
   return {
     id: a.id,
+    slotId: a.slotId,
     date: a.date,
     time: a.startTime,
     status,
     muscleGroups: a.muscleGroups.map((mg) => mg.id),
     machines: a.machines.map((m) => m.id),
+    machineDetails: a.machines.map((m) => ({ id: m.id, name: m.name })),
+    muscleGroupDetails: a.muscleGroups.map((mg) => ({ id: mg.id, name: mg.name })),
     note: a.note ?? "",
     fromApi: true,
   };

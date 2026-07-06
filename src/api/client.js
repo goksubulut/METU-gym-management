@@ -44,7 +44,7 @@ export async function apiFetch(path, options = {}) {
 
 /** Mock satırları (f1, s1, c1…) API kayıtlarından ayırır. */
 export function isMockRowId(id) {
-  return /^(f|s|c)\d+$/.test(id);
+  return /^(f|s|c|a)\d+$/.test(id);
 }
 
 /** Mock + API listelerini birleştirir; API kayıtları önce gelir. */

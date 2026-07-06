@@ -1,7 +1,11 @@
+import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation, Link } from "react-router-dom";
 import Icon from "../components/Icon.jsx";
 import Logo from "../components/Logo.jsx";
+import { getAccessToken } from "../api/client.js";
+import { loadActiveAnnouncements } from "../api/announcements.js";
 import { getAuthUser, initialsFromName } from "../utils/authUser.js";
+import { hasUnreadAnnouncements } from "../utils/announcementRead.js";
 
 const NAV = [
   { to: "/home", label: "Ana Sayfa", icon: "home" },
@@ -16,6 +20,28 @@ export default function UserLayout() {
   const bare = pathname === "/" || pathname === "/auth" || pathname === "/qr-info";
   const profile = getAuthUser();
   const avatar = initialsFromName(profile?.name);
+  const [hasUnread, setHasUnread] = useState(false);
+
+  useEffect(() => {
+    if (bare || !getAccessToken()) {
+      setHasUnread(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    const refresh = async () => {
+      const rows = await loadActiveAnnouncements();
+      if (!cancelled) setHasUnread(hasUnreadAnnouncements(rows));
+    };
+
+    refresh();
+    window.addEventListener("announcements-read", refresh);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("announcements-read", refresh);
+    };
+  }, [bare, pathname]);
 
   if (bare) return <Outlet />;
 
@@ -24,15 +50,20 @@ export default function UserLayout() {
       {/* Mobil çerçeve: geniş ekranda ortada telefon görünümü */}
       <div className="relative mx-auto flex min-h-screen max-w-[430px] flex-col bg-[#f7f7f8] shadow-xl">
         <header className="sticky top-0 z-20 flex items-center justify-between border-b border-gray-100/80 bg-white/85 px-4 py-3 backdrop-blur-md">
-          <Logo size={24} />
+          <Link to="/home" aria-label="Ana sayfa" className="transition-opacity hover:opacity-80">
+            <Logo size={24} />
+          </Link>
           <div className="flex items-center gap-2.5">
-            <button
-              className="relative grid h-9 w-9 place-items-center rounded-full text-gray-500 transition-colors hover:bg-gray-100"
+            <Link
+              to="/notifications"
               aria-label="Bildirimler"
+              className="relative grid h-9 w-9 place-items-center rounded-full text-gray-500 transition-colors hover:bg-gray-100"
             >
               <Icon name="bell" size={19} />
-              <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-primary-600 ring-2 ring-white" />
-            </button>
+              {hasUnread && (
+                <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-primary-600 ring-2 ring-white" />
+              )}
+            </Link>
             <Link
               to="/profile"
               aria-label="Profil"

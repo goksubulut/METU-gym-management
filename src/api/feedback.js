@@ -1,9 +1,13 @@
 import { apiFetch } from "./client.js";
 
-export function createRating(machineId, score, tags) {
+export function createRating(machineId, score, tags = []) {
   return apiFetch("/feedback/ratings", {
     method: "POST",
-    body: JSON.stringify({ machineId, score, tags }),
+    body: JSON.stringify({
+      machineId,
+      score,
+      ...(tags.length > 0 ? { tags } : {}),
+    }),
   });
 }
 
