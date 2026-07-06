@@ -5,6 +5,7 @@ import Logo from "../../components/Logo.jsx";
 import { Input } from "../../components/Input.jsx";
 import { useToast } from "../../components/Toast.jsx";
 import { login } from "../../api/auth.js";
+import { homePathForRole } from "../../utils/authUser.js";
 
 export default function AdminLogin() {
   const nav = useNavigate();
@@ -16,7 +17,12 @@ export default function AdminLogin() {
     const form = e.target;
     setLoading(true);
     try {
-      await login(form.email.value, form.password.value);
+      const { user } = await login(form.email.value, form.password.value);
+      if (user.role !== "ADMIN") {
+        toast("Bu hesabın yönetici yetkisi yok", "error");
+        nav(homePathForRole(user.role));
+        return;
+      }
       nav("/admin");
     } catch (err) {
       toast(err.message ?? "Giriş başarısız", "error");

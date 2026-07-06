@@ -35,6 +35,8 @@ import ReceptionLogin from "./pages/reception/ReceptionLogin.jsx";
 import CheckIn from "./pages/reception/CheckIn.jsx";
 import AppointmentDetail from "./pages/reception/AppointmentDetail.jsx";
 
+import RequireRole from "./components/RequireRole.jsx";
+
 export default function App() {
   return (
     <Routes>
@@ -60,7 +62,14 @@ export default function App() {
 
       {/* B. Yönetici paneli (masaüstü) */}
       <Route path="/admin/login" element={<AdminLogin />} />
-      <Route path="/admin" element={<AdminLayout />}>
+      <Route
+        path="/admin"
+        element={
+          <RequireRole roles={["ADMIN"]} loginPath="/admin/login">
+            <AdminLayout />
+          </RequireRole>
+        }
+      >
         <Route index element={<AdminDashboard />} />
         <Route path="preferences" element={<Preferences />} />
         <Route path="quality" element={<Quality />} />
@@ -72,7 +81,14 @@ export default function App() {
 
       {/* C. Resepsiyon / Check-in paneli (masaüstü/tablet) */}
       <Route path="/reception/login" element={<ReceptionLogin />} />
-      <Route path="/reception" element={<ReceptionLayout />}>
+      <Route
+        path="/reception"
+        element={
+          <RequireRole roles={["RECEPTION", "ADMIN"]} loginPath="/reception/login">
+            <ReceptionLayout />
+          </RequireRole>
+        }
+      >
         <Route index element={<CheckIn />} />
         <Route path="appointment/:id" element={<AppointmentDetail />} />
       </Route>

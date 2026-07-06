@@ -55,7 +55,14 @@ export default function AdminLayout() {
         <header className="flex items-center justify-between border-b border-gray-100 bg-white px-8 py-4">
           <div>
             <p className="text-xs text-gray-400">METU GYM Merkez Şube</p>
-            <p className="text-sm font-semibold text-gray-800">2 Temmuz 2026, Perşembe</p>
+            <p className="text-sm font-semibold text-gray-800">
+              {new Date().toLocaleDateString("tr-TR", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+                weekday: "long",
+              })}
+            </p>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-gray-500">Admin</span>

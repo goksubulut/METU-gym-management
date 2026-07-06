@@ -5,6 +5,7 @@ import Logo from "../../components/Logo.jsx";
 import { Input } from "../../components/Input.jsx";
 import { useToast } from "../../components/Toast.jsx";
 import { login, register } from "../../api/auth.js";
+import { homePathForRole } from "../../utils/authUser.js";
 
 export default function Auth() {
   const [mode, setMode] = useState("login");
@@ -17,14 +18,16 @@ export default function Auth() {
     const form = e.target;
     setLoading(true);
     try {
+      let user;
       if (mode === "login") {
-        await login(form.email.value, form.password.value);
+        ({ user } = await login(form.email.value, form.password.value));
         toast("Giriş başarılı", "success");
       } else {
-        await register(form.name.value, form.email.value, form.phone?.value, form.password.value);
+        ({ user } = await register(form.name.value, form.email.value, form.phone?.value, form.password.value));
         toast("Kayıt tamamlandı", "success");
       }
-      nav("/home");
+      // Personel hesabıyla girilirse kendi paneline yönlendirilir
+      nav(homePathForRole(user.role));
     } catch (err) {
       toast(err.message ?? "İşlem başarısız", "error");
     } finally {

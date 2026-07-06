@@ -12,6 +12,13 @@ export function setAuthUser(user) {
   if (user) localStorage.setItem("authUser", JSON.stringify(user));
 }
 
+/** Rolün varsayılan giriş sonrası sayfası. */
+export function homePathForRole(role) {
+  if (role === "ADMIN") return "/admin";
+  if (role === "RECEPTION") return "/reception";
+  return "/home";
+}
+
 export function initialsFromName(name) {
   if (!name) return "?";
   return name
