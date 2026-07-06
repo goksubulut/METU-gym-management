@@ -1,5 +1,11 @@
-# METU Gym Management System — geliştirme ve taşınabilir kurulum (NFR-5: Docker ile paketleme)
-# Şimdilik yalnızca PostgreSQL; API ve Nginx servisleri DevOps adımında eklenecek.
+# METU Gym Management System — tam yığın (NFR-5: Docker ile paketleme)
+#
+# Geliştirme (sadece veritabanı):  docker compose up -d db
+# Tam yığın (okul sunucusu vb.):   docker compose up -d --build
+#   → Uygulama: http://localhost:8080  (Nginx: SPA + /api + /media + /docs)
+#
+# Üretimde JWT_ACCESS_SECRET / JWT_REFRESH_SECRET ortam değişkenlerini
+# mutlaka rastgele değerlerle verin; aşağıdaki varsayımlar yalnızca geliştirme içindir.
 services:
   db:
     image: postgres:16-alpine
@@ -19,6 +25,44 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+
+  api:
+    build: ./backend
+    container_name: metugym-api
+    environment:
+      DATABASE_URL: postgresql://metugym:metugym_dev_password@db:5432/metugym?schema=public
+      PORT: 3000
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:8080}
+      APP_BASE_URL: ${APP_BASE_URL:-http://localhost:8080}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-dev_access_secret_change_me}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-dev_refresh_secret_change_me}
+      JWT_ACCESS_EXPIRES: 15m
+      JWT_REFRESH_EXPIRES: 7d
+      SLOT_DURATION_MINUTES: 30
+      SLOT_CAPACITY: 10
+      GYM_OPEN_HOUR: 8
+      GYM_CLOSE_HOUR: 22
+      BOOKING_WINDOW_DAYS: 14
+    volumes:
+      # Videolar imaja gömülmez; host klasörü paylaşılır (nginx da okur)
+      - ./backend/media:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    container_name: metugym-web
+    volumes:
+      - ./backend/media:/srv/media:ro
+    depends_on:
+      - api
+    ports:
+      - "8080:80"
 
 volumes:
   db-data:

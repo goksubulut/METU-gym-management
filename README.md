@@ -31,6 +31,22 @@ Detaylı gereksinimler için SRS dokümanına bakın (`SRS-ve-Mimari-v1.md`).
 
 ## Kurulum
 
+### Seçenek A — Tek komutla tam yığın (Docker, okul sunucusu / demo)
+
+```bash
+docker compose up -d --build
+# Uygulama:  http://localhost:8080   (Nginx: SPA + /api + /media + /docs)
+# İlk kurulumda içerik/demo verisi için (host'tan, bir kez):
+cd backend && npm install && npx prisma db seed
+```
+
+Migration'lar API konteyneri açılırken otomatik uygulanır. Üretimde
+`JWT_ACCESS_SECRET` ve `JWT_REFRESH_SECRET` ortam değişkenlerini mutlaka
+rastgele değerlerle verin. Videolar `backend/media/videos/` klasörüne konur;
+Nginx bunları `/media` altından range destekli sunar.
+
+### Seçenek B — Geliştirme (frontend + backend ayrı)
+
 ### 1. Backend
 
 ```bash
@@ -105,4 +121,4 @@ npm run test:e2e         # e2e testler (Postgres ayakta olmalı)
 - [x] Admin raporları + resepsiyon check-in uçları
 - [x] QR üretimi (`GET /qr/door`, `GET /qr/machines/:id`) ve video sunumu (`/media`, üretimde Nginx)
 - [x] Frontend'in mock'tan gerçek API'ye geçirilmesi (tüm ekranlar; backend kapalıyken mock'a düşer)
-- [ ] Docker ile tam paket (API + Nginx) ve CI
+- [x] Docker ile tam paket (db + API + Nginx; `docker compose up -d --build`) ve GitHub Actions CI

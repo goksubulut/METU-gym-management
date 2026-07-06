@@ -1,0 +1,6 @@
+node_modules
+dist
+coverage
+.env
+media/videos/*
+!media/videos/.gitkeep
