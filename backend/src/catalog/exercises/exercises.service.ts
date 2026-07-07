@@ -55,6 +55,7 @@ export class ExercisesService {
       instructions: exercise.instructions,
       duration: exercise.duration,
       videoUrl: exercise.videoUrl,
+      targetMuscles: exercise.targetMuscles,
       muscleGroups: exercise.muscleGroups.map((mg) => mg.muscleGroup),
     };
   }
