@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Patch, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import type { AccessTokenPayload, AuthResult, UserView } from './auth.types';
 import { CurrentUser } from './decorators/current-user.decorator';
@@ -10,12 +11,16 @@ import { RefreshDto } from './dto/refresh.dto';
 import { RegisterDto } from './dto/register.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 
+/** Kimlik uçları için sıkı limit: kaba kuvvet/spam'e karşı dk'da 5 deneme. */
+const AUTH_THROTTLE = { default: { limit: 5, ttl: 60_000 } } as const;
+
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Public()
+  @Throttle(AUTH_THROTTLE)
   @Post('register')
   @ApiOperation({ summary: 'Hesap oluştur (FR-AUTH-1)' })
   register(@Body() dto: RegisterDto): Promise<AuthResult> {
@@ -23,6 +28,7 @@ export class AuthController {
   }
 
   @Public()
+  @Throttle(AUTH_THROTTLE)
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Giriş yap — access + refresh token döner' })
@@ -31,6 +37,7 @@ export class AuthController {
   }
 
   @Public()
+  @Throttle(AUTH_THROTTLE)
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Token yenile (FR-AUTH-3, rotasyonlu)' })
