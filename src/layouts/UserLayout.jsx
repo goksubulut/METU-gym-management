@@ -4,6 +4,7 @@ import Icon from "../components/Icon.jsx";
 import Logo from "../components/Logo.jsx";
 import { getAccessToken } from "../api/client.js";
 import { loadActiveAnnouncements } from "../api/announcements.js";
+import { loadMyNotifications, hasUnreadNotifications, NOTIFICATIONS_READ_EVENT } from "../api/notifications.js";
 import { getAuthUser, initialsFromName } from "../utils/authUser.js";
 import { hasUnreadAnnouncements } from "../utils/announcementRead.js";
 
@@ -31,15 +32,22 @@ export default function UserLayout() {
     let cancelled = false;
 
     const refresh = async () => {
-      const rows = await loadActiveAnnouncements();
-      if (!cancelled) setHasUnread(hasUnreadAnnouncements(rows));
+      const [announcements, personal] = await Promise.all([
+        loadActiveAnnouncements(),
+        loadMyNotifications(),
+      ]);
+      if (!cancelled) {
+        setHasUnread(hasUnreadAnnouncements(announcements) || hasUnreadNotifications(personal));
+      }
     };
 
     refresh();
     window.addEventListener("announcements-read", refresh);
+    window.addEventListener(NOTIFICATIONS_READ_EVENT, refresh);
     return () => {
       cancelled = true;
       window.removeEventListener("announcements-read", refresh);
+      window.removeEventListener(NOTIFICATIONS_READ_EVENT, refresh);
     };
   }, [bare, pathname]);
 

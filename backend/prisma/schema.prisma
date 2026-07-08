@@ -65,6 +65,11 @@ enum AnnouncementCategory {
   EVENT
 }
 
+// Kişisel (kullanıcıya özel) bildirim tipleri. İlk kapsam: randevu hatırlatma.
+enum NotificationType {
+  APPOINTMENT_REMINDER
+}
+
 // ---------------------------------------------------------------------------
 // Kimlik
 // ---------------------------------------------------------------------------
@@ -85,10 +90,11 @@ model User {
   passwordResetExpiresAt DateTime?
   createdAt    DateTime @default(now())
 
-  appointments Appointment[]
-  faultReports FaultReport[]
-  ratings      Rating[]
-  suggestions  Suggestion[]
+  appointments  Appointment[]
+  faultReports  FaultReport[]
+  ratings       Rating[]
+  suggestions   Suggestion[]
+  notifications Notification[]
 }
 
 // ---------------------------------------------------------------------------
@@ -192,8 +198,28 @@ model Appointment {
   user User @relation(fields: [userId], references: [id])
   slot Slot @relation(fields: [slotId], references: [id])
 
-  machines     AppointmentMachine[]
-  muscleGroups AppointmentMuscleGroup[]
+  machines      AppointmentMachine[]
+  muscleGroups  AppointmentMuscleGroup[]
+  notifications Notification[]
+}
+
+// FR (öneri): randevu hatırlatma. Kişiye özel, sistem üretimi bildirim.
+// @@unique([appointmentId, type]): aynı randevu için aynı tip bildirim iki kez
+// üretilmez. Cascade: kullanıcı/randevu silinince bildirimleri de gider.
+model Notification {
+  id            String           @id @default(cuid())
+  userId        String
+  appointmentId String
+  type          NotificationType @default(APPOINTMENT_REMINDER)
+  title         String
+  body          String
+  isRead        Boolean          @default(false)
+  createdAt     DateTime         @default(now())
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  @@unique([appointmentId, type])
 }
 
 // Yol A: randevuya opsiyonel makine planı (SRS AppointmentMachine)
