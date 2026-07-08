@@ -45,7 +45,7 @@ export async function fetchAlternatives(id, slotId) {
     machine: data.machine,
     noDirectMatch: data.noDirectMatch ?? false,
     alternativeMachines: data.alternativeMachines.map(mapMachineFromApi),
-    alternativeExercises: data.alternativeExercises,
+    alternativeExercises: data.alternativeExercises.map(mapExerciseFromApi),
   };
 }
 
@@ -68,6 +68,7 @@ export function mapExerciseFromApi(e) {
     instructions: e.instructions ?? "",
     duration: e.duration ?? null,
     videoUrl: e.videoUrl ?? null,
+    targetMuscles: e.targetMuscles ?? [],
     muscles: (e.muscleGroups ?? []).map((g) => g.id),
   };
 }

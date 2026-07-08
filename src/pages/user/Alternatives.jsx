@@ -3,7 +3,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import Card from "../../components/Card.jsx";
 import Badge from "../../components/Badge.jsx";
 import Icon from "../../components/Icon.jsx";
+import { ExerciseMatchListCard } from "../../components/ExerciseCard.jsx";
 import { machineById, machines, MUSCLE_GROUPS } from "../../mock/machines.js";
+import { mockAlternativeExercises } from "../../mock/exercises.js";
 import { fetchAlternatives } from "../../api/catalog.js";
 
 /** Backend kapalıysa mock'tan aynı mantıkla hesaplanır: kardiyo/kuvvet ayrımı +
@@ -32,11 +34,7 @@ function mockAlternatives(source) {
   return {
     noDirectMatch,
     alternativeMachines,
-    alternativeExercises: [
-      { id: "x1", name: "Vücut ağırlığı varyasyonu", instructions: "Ekipmansız, aynı kas grubu" },
-      { id: "x2", name: "Dambıl alternatifi", instructions: "Serbest ağırlık rafından" },
-      { id: "x3", name: "Kablolu varyasyon", instructions: "Cable istasyonunda" },
-    ],
+    alternativeExercises: mockAlternativeExercises(source.muscles),
   };
 }
 
@@ -127,19 +125,19 @@ export default function Alternatives() {
       </ul>
 
       <h2 className="mb-2 text-base font-bold text-gray-900">Egzersiz alternatifleri</h2>
-      <ul className="divide-y divide-gray-100 rounded-2xl border border-gray-100 bg-white">
-        {exercises.map((e) => (
-          <li key={e.id ?? e.name} className="flex items-center gap-3 px-4 py-3">
-            <span className="grid h-9 w-9 place-items-center rounded-lg bg-gray-100 text-gray-600">
-              <Icon name="body" size={16} />
-            </span>
-            <div>
-              <p className="text-sm font-semibold text-gray-900">{e.name}</p>
-              <p className="text-xs text-gray-400">{e.instructions ?? e.note}</p>
-            </div>
-          </li>
-        ))}
-      </ul>
+      {exercises.length === 0 ? (
+        <p className="text-sm text-gray-400">Bu makine için egzersiz alternatifi bulunamadı.</p>
+      ) : (
+        <div className="space-y-2">
+          {exercises.map((e) => (
+            <ExerciseMatchListCard
+              key={e.id}
+              exercise={e}
+              onClick={() => nav(`/exercises/${e.id}`)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

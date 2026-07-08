@@ -5,8 +5,10 @@ import Badge from "../../components/Badge.jsx";
 import Button from "../../components/Button.jsx";
 import EmptyState from "../../components/EmptyState.jsx";
 import Icon from "../../components/Icon.jsx";
+import { ExerciseMatchListCard } from "../../components/ExerciseCard.jsx";
 import BodyDiagram, { MUSCLES } from "../../components/BodyDiagram.jsx";
 import { machinesByMuscle } from "../../mock/machines.js";
+import { MOCK_EXERCISES } from "../../mock/exercises.js";
 import { fetchMachines, fetchExercises } from "../../api/catalog.js";
 
 // Panel bölümleri: ana grup başlığı altında o gruba ait ince kaslar.
@@ -23,6 +25,24 @@ const SECTIONS = [
 
 const muscleEntries = Object.entries(MUSCLES); // [slug, {label, group, color}]
 
+/** Seçilen ince kaslara göre isabet sıralaması (alternatifler motoru ile aynı mantık). */
+function sortByTargetMatch(items, selectedSlugs, { useRating = false } = {}) {
+  if (selectedSlugs.length === 0) return items;
+  const shared = (item) => (item.targetMuscles ?? []).filter((t) => selectedSlugs.includes(t));
+  const ratio = (item) => {
+    const count = shared(item).length;
+    const total = (item.targetMuscles ?? []).length;
+    return total > 0 ? count / total : 0;
+  };
+  return [...items].sort(
+    (a, b) =>
+      shared(b).length - shared(a).length ||
+      ratio(b) - ratio(a) ||
+      (useRating ? (b.rating ?? 0) - (a.rating ?? 0) : 0) ||
+      a.name.localeCompare(b.name, "tr"),
+  );
+}
+
 export default function MuscleGroups() {
   const nav = useNavigate();
   const [selected, setSelected] = useState([]); // ince kas slug'ları
@@ -30,14 +50,18 @@ export default function MuscleGroups() {
   const [cardio, setCardio] = useState(false);
   const [apiMachines, setApiMachines] = useState(null); // null = API henüz gelmedi
   const [apiExercises, setApiExercises] = useState([]);
+  const [exercisesFromApi, setExercisesFromApi] = useState(false);
 
   useEffect(() => {
     fetchMachines()
       .then(setApiMachines)
       .catch(() => {});
-    fetchExercises({ type: "FREE" })
-      .then(setApiExercises)
-      .catch(() => {});
+    fetchExercises()
+      .then((rows) => {
+        setApiExercises(rows.filter((e) => e.type === "FREE" || e.type === "MACHINE"));
+        setExercisesFromApi(true);
+      })
+      .catch(() => setExercisesFromApi(false));
   }, []);
 
   const toggle = (slug) =>
@@ -69,18 +93,24 @@ export default function MuscleGroups() {
         }
       }),
     );
-    // Hibrit öneri: seçilen ince kasları (biceps, quadriceps...) doğrudan hedefleyen
-    // makineler üste sıralanır; kalanlar puana göre gelir.
-    const targeting = (m) => (m.targetMuscles ?? []).filter((t) => selected.includes(t)).length;
-    return out.sort((a, b) => targeting(b) - targeting(a) || (b.rating ?? 0) - (a.rating ?? 0));
+    // Hibrit öneri: önce ince hedef örtüşmesi, sonra hedef paylaşma oranı
+    // (biceps seçilince Biceps Curl, Pull Down'dan önce; Functional Trainer en altta).
+    return sortByTargetMatch(out, selected, { useRating: true });
   }, [activeGroups, apiMachines, selected]);
 
-  const exercises = useMemo(
-    () => apiExercises.filter((e) => e.muscles.some((g) => activeGroups.includes(g))),
-    [activeGroups, apiExercises],
-  );
-
   const hasSelection = selected.length > 0 || cardio;
+
+  const exercises = useMemo(() => {
+    if (!hasSelection) return [];
+    let pool;
+    if (exercisesFromApi) {
+      pool = apiExercises.filter((e) => e.muscles.some((g) => activeGroups.includes(g)));
+    } else {
+      const matched = MOCK_EXERCISES.filter((e) => e.muscles.some((g) => activeGroups.includes(g)));
+      pool = (matched.length > 0 ? matched : MOCK_EXERCISES).slice(0, 2);
+    }
+    return sortByTargetMatch(pool, selected);
+  }, [activeGroups, apiExercises, exercisesFromApi, hasSelection, selected]);
 
   return (
     <div className="pb-4">
@@ -263,20 +293,11 @@ export default function MuscleGroups() {
           ) : (
             <div className="space-y-2">
               {exercises.map((e) => (
-                <Card
+                <ExerciseMatchListCard
                   key={e.id}
+                  exercise={e}
                   onClick={() => nav(`/exercises/${e.id}`)}
-                  className="flex items-center gap-3 p-3"
-                >
-                  <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gray-900 text-white">
-                    <Icon name="dumbbell" size={20} />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-bold text-gray-900">{e.name}</p>
-                    <p className="truncate text-xs text-gray-400">{e.instructions}</p>
-                  </div>
-                  <Icon name="chevronRight" size={16} className="shrink-0 text-gray-300" />
-                </Card>
+                />
               ))}
             </div>
           )}

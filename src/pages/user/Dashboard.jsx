@@ -172,7 +172,7 @@ export default function Dashboard() {
       <div className="animate-rise-late mt-6">
         <div className="mb-2 flex items-center justify-between">
           <h2 className="text-base font-bold text-gray-900">İpuçları</h2>
-          <Link to="/muscle-groups" className="text-xs font-semibold text-primary-600">
+          <Link to="/exercises" className="text-xs font-semibold text-primary-600">
             Tümü
           </Link>
         </div>
@@ -182,7 +182,7 @@ export default function Dashboard() {
           </div>
           <p className="text-sm text-gray-600">
             Antrenmandan önce 5-10 dk ısınmayı unutma. Kas grubuna özel ısınma listeni
-            kas grubu ekranından görebilirsin.
+            egzersizler ekranından görebilirsin.
           </p>
         </Card>
       </div>

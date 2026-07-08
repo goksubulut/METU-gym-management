@@ -52,6 +52,7 @@
     ],
     "location": "Kardiyo Alanı — C3",
     "hasVideo": false,
+    "photoUrl": "/media/photos/m3.jpg",
     "description": "Yatay/dikey pedal bisikleti. Alt vücut dayanıklılığı ve düşük etkili kardiyo. Salonda 2 adet bulunur.",
     "tips": "Sele yüksekliğini diz hafif bükülü kalacak şekilde ayarla."
   },
@@ -71,7 +72,7 @@
     "hasVideo": false,
     "description": "Dik oturuşlu spinning tarzı bisiklet. Yüksek tempolu kardiyo için uygundur. Salonda 2 adet bulunur.",
     "tips": "Direnç seviyesini kademeli artır, tempoyu koru.",
-    "photoUrl": "/media/photos/m4.avif"
+    "photoUrl": "/media/photos/m4.jpg"
   },
   {
     "id": "m5",
@@ -131,6 +132,7 @@
     ],
     "location": "Serbest Ağırlık — B2",
     "hasVideo": false,
+    "photoUrl": "/media/photos/m7.jpg",
     "description": "Trap/hex bar ile deadlift. Bele daha az yük bindirir, quadriceps katkısı yüksektir. Salonda 1 adet bulunur.",
     "tips": "Göğsü yukarıda tut, itişi topuktan başlat."
   },
@@ -153,6 +155,7 @@
     ],
     "location": "Fonksiyonel Alan — F1",
     "hasVideo": false,
+    "photoUrl": "/media/photos/m8.jpg",
     "description": "Birden çok üst vücut hareketine izin veren çok istasyonlu kule. Göğüs, sırt, omuz ve kol çalışması. Salonda 1 adet bulunur.",
     "tips": "İstasyonlar arası ağırlık pimini doğru seç, formu koru."
   },
@@ -177,6 +180,7 @@
     ],
     "location": "Fonksiyonel Alan — F2",
     "hasVideo": true,
+    "photoUrl": "/media/photos/m9.jpg",
     "description": "Çift ayarlı kablo makinesi; sonsuz varyasyonla tüm vücudu çalıştırır. Salonda 1 adet bulunur.",
     "tips": "Makara yüksekliğini harekete göre ayarla, gövdeyi sabitle."
   },
@@ -231,6 +235,7 @@
     ],
     "location": "Kablolu Alan — A3",
     "hasVideo": false,
+    "photoUrl": "/media/photos/m12.jpg",
     "description": "Yüksek makara istasyonu; triceps pushdown ve sırt izolasyonu için kullanılır. Salonda 1 adet bulunur.",
     "tips": "Dirsekleri gövdeye sabitle, hareketi kontrollü yap."
   },
@@ -284,6 +289,7 @@
     ],
     "location": "Alt Vücut — L3",
     "hasVideo": false,
+    "photoUrl": "/media/photos/m15.jpg",
     "description": "İç (adduktor) ve dış (abduktor) bacak kaslarını çalıştıran çift yönlü makine. Salonda 2 adet bulunur.",
     "tips": "Hareketi sonuna kadar götür, dönüşte kontrolü bırakma."
   },
@@ -299,6 +305,7 @@
     ],
     "location": "Alt Vücut — L4",
     "hasVideo": false,
+    "photoUrl": "/media/photos/m16.jpg",
     "description": "Yatık hamstring bükme makinesi. Arka bacak kaslarını izole eder. Salonda 1 adet bulunur.",
     "tips": "Kalçayı mindere sabitle, tepede 1 sn sık."
   },
@@ -336,6 +343,7 @@
     ],
     "location": "Üst Vücut — U2",
     "hasVideo": false,
+    "photoUrl": "/media/photos/m18.jpg",
     "description": "Eğimli göğüs presi; üst göğüs bölgesini hedefler. Salonda 1 adet bulunur.",
     "tips": "Dirsekleri omuz hizasında tut, hareketi kontrollü it."
   },
@@ -391,6 +399,7 @@
     ],
     "location": "Üst Vücut — U5",
     "hasVideo": false,
+    "photoUrl": "/media/photos/m21.jpg",
     "description": "Oturarak kürek çekiş makinesi. Orta sırt ve kürek kemiği kaslarını hedefler. Salonda 1 adet bulunur.",
     "tips": "Gövdeyi sabit tut, kolları geriye çekerken sırtı sık."
   },
@@ -422,6 +431,7 @@
     ],
     "location": "Kol Alanı — K2",
     "hasVideo": false,
+    "photoUrl": "/media/photos/m23.jpg",
     "description": "Triceps izolasyon makinesi. Kol arka yüzünü hedefler. Salonda 1 adet bulunur.",
     "tips": "Dirsekleri gövdeye sabitle, tam uzatmada sık."
   },
@@ -437,6 +447,7 @@
     ],
     "location": "Kol Alanı — K3",
     "hasVideo": false,
+    "photoUrl": "/media/photos/m24.jpg",
     "description": "Destekli biceps curl (preacher). Kolu yalıtarak tam biceps kasılması sağlar. Salonda 2 adet bulunur.",
     "tips": "Kolu tam uzat, sallanmadan kaldır."
   },
