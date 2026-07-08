@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { AdminModule } from './admin/admin.module';
@@ -18,6 +19,8 @@ import { SlotsModule } from './slots/slots.module';
   imports: [
     // .env dosyasını yükler; ConfigService her modülde kullanılabilir
     ConfigModule.forRoot({ isGlobal: true }),
+    // Zamanlanmış işler (randevu otomatik sonuçlandırma vb.) için @Cron desteği
+    ScheduleModule.forRoot(),
     // FR-VD-1: video/fotoğraf dosyaları geliştirmede buradan sunulur
     // (/media/videos/m1.mp4). Üretimde aynı klasörü Nginx sunar (SRS 8.5) —
     // URL sözleşmesi değişmez.

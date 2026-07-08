@@ -28,3 +28,8 @@ export function addMinutes(time: string, minutes: number): string {
 export function slotStartDate(dateKey: string, startTime: string): Date {
   return new Date(`${dateKey}T${startTime}:00`);
 }
+
+/** Slotun gerçek bitiş anı (yerel saat) — otomatik sonuçlandırma için. */
+export function slotEndDate(dateKey: string, endTime: string): Date {
+  return new Date(`${dateKey}T${endTime}:00`);
+}
