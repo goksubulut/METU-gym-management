@@ -50,6 +50,22 @@ export async function changePassword(currentPassword, newPassword) {
   });
 }
 
+/** Parola sıfırlama bağlantısı iste. Kayıtlı olsun olmasın aynı yanıt döner. */
+export async function requestPasswordReset(email) {
+  return apiFetch("/auth/password-reset/request", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+/** E-postadaki token ile yeni parola belirle. */
+export async function resetPassword(token, newPassword) {
+  return apiFetch("/auth/password-reset/confirm", {
+    method: "POST",
+    body: JSON.stringify({ token, newPassword }),
+  });
+}
+
 export async function deleteAccount() {
   await apiFetch("/auth/me", { method: "DELETE" });
   clearSession();

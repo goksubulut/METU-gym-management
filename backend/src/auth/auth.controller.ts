@@ -9,6 +9,8 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshDto } from './dto/refresh.dto';
 import { RegisterDto } from './dto/register.dto';
+import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 
 /** Kimlik uçları için sıkı limit: kaba kuvvet/spam'e karşı dk'da 5 deneme. */
@@ -43,6 +45,27 @@ export class AuthController {
   @ApiOperation({ summary: 'Token yenile (FR-AUTH-3, rotasyonlu)' })
   refresh(@Body() dto: RefreshDto): Promise<AuthResult> {
     return this.authService.refresh(dto.refreshToken);
+  }
+
+  @Public()
+  @Throttle(AUTH_THROTTLE)
+  @Post('password-reset/request')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Parola sıfırlama bağlantısı iste (e-posta ile)' })
+  async requestPasswordReset(@Body() dto: RequestPasswordResetDto): Promise<{ sent: true }> {
+    // Kullanıcı olsa da olmasa da tek tip yanıt (bilgi sızmaması).
+    await this.authService.requestPasswordReset(dto.email);
+    return { sent: true };
+  }
+
+  @Public()
+  @Throttle(AUTH_THROTTLE)
+  @Post('password-reset/confirm')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Token ile yeni parola belirle' })
+  async confirmPasswordReset(@Body() dto: ResetPasswordDto): Promise<{ success: true }> {
+    await this.authService.resetPassword(dto.token, dto.newPassword);
+    return { success: true };
   }
 
   @Post('logout')

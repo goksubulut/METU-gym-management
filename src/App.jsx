@@ -9,6 +9,8 @@ import ReceptionLayout from "./layouts/ReceptionLayout.jsx";
 import Splash from "./pages/user/Splash.jsx";
 import QRInfo from "./pages/user/QRInfo.jsx";
 import Auth from "./pages/user/Auth.jsx";
+import ForgotPassword from "./pages/user/ForgotPassword.jsx";
+import ResetPassword from "./pages/user/ResetPassword.jsx";
 import Dashboard from "./pages/user/Dashboard.jsx";
 import Book from "./pages/user/Book.jsx";
 import MuscleGroups from "./pages/user/MuscleGroups.jsx";
@@ -50,6 +52,8 @@ export default function App() {
         <Route path="/" element={<Splash />} />
         <Route path="/qr-info" element={<QRInfo />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/home" element={<Dashboard />} />
         <Route path="/book" element={<Book />} />
         <Route path="/muscle-groups" element={<MuscleGroups />} />

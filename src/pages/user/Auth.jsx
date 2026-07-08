@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Button from "../../components/Button.jsx";
 import Logo from "../../components/Logo.jsx";
 import { Input } from "../../components/Input.jsx";
@@ -86,9 +86,14 @@ export default function Auth() {
         <Input name="password" label="Şifre" placeholder="••••••••" type="password" required />
 
         {mode === "login" && (
-          <p className="text-xs text-gray-400">
-            Demo: <b>gyeduernest@gmail.com</b> / <b>user1234</b>
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-gray-400">
+              Demo: <b>gyeduernest@gmail.com</b> / <b>user1234</b>
+            </p>
+            <Link to="/forgot-password" className="text-xs font-semibold text-primary-600">
+              Şifremi unuttum?
+            </Link>
+          </div>
         )}
 
         <Button full size="lg" type="submit" disabled={loading}>

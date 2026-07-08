@@ -79,6 +79,10 @@ model User {
   // Aktif refresh token'ın argon2 hash'i; null = oturum yok.
   // Ham token asla saklanmaz; çalınan/sızan oturum logout ile iptal edilebilir.
   refreshTokenHash String?
+  // Parola sıfırlama: e-postayla giden ham token'ın argon2 hash'i + son
+  // kullanma anı. Aynı "ham token saklanmaz" prensibi (refreshTokenHash gibi).
+  passwordResetTokenHash String?
+  passwordResetExpiresAt DateTime?
   createdAt    DateTime @default(now())
 
   appointments Appointment[]

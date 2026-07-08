@@ -13,8 +13,12 @@ import { PrismaService } from '../prisma/prisma.service';
 import { AccessTokenPayload, AuthResult, RefreshTokenPayload, UserView } from './auth.types';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { LoginDto } from './dto/login.dto';
+import { MailService } from './mail.service';
 import { RegisterDto } from './dto/register.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+
+/** Parola sıfırlama token'ı geçerlilik süresi (dakika). */
+const PASSWORD_RESET_TTL_MINUTES = 30;
 
 @Injectable()
 export class AuthService {
@@ -22,6 +26,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly config: ConfigService,
+    private readonly mailService: MailService,
   ) {}
 
   /** FR-AUTH-1: hesap oluşturma. Kayıt olan herkes USER rolündedir;
@@ -134,6 +139,72 @@ export class AuthService {
         refreshTokenHash: null,
       },
     });
+  }
+
+  /**
+   * Parola sıfırlama isteği. Kullanıcı yoksa da sessizce başarı döner —
+   * hangi e-postaların kayıtlı olduğu bilgisini sızdırmamak için (login'deki
+   * aynı prensip). Ham token e-postayla gider; DB'de yalnızca argon2 hash'i
+   * ve son kullanma anı saklanır.
+   */
+  async requestPasswordReset(email: string): Promise<void> {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      return;
+    }
+
+    const rawToken = randomUUID() + randomUUID();
+    const expiresAt = new Date(Date.now() + PASSWORD_RESET_TTL_MINUTES * 60 * 1000);
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        passwordResetTokenHash: await argon2.hash(rawToken),
+        passwordResetExpiresAt: expiresAt,
+      },
+    });
+
+    await this.mailService.sendPasswordResetEmail(user.email, rawToken);
+  }
+
+  /**
+   * E-postadaki token ile yeni parola belirle. Token hash'lenerek saklandığı
+   * için (tek yönlü) doğrudan sorgulayamayız; süresi geçmemiş tüm sıfırlama
+   * kayıtlarını çekip argon2.verify ile eşleştiririz (küçük kullanıcı
+   * sayısında sorun değil). Başarıda tüm oturumlar sonlanır ve token tek
+   * kullanımlık olur (null'lanır).
+   */
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    const candidates = await this.prisma.user.findMany({
+      where: {
+        passwordResetTokenHash: { not: null },
+        passwordResetExpiresAt: { gt: new Date() },
+      },
+    });
+
+    const match = await this.findMatchingResetUser(candidates, token);
+    if (!match) {
+      throw new BadRequestException('Bağlantı geçersiz veya süresi dolmuş');
+    }
+
+    await this.prisma.user.update({
+      where: { id: match.id },
+      data: {
+        passwordHash: await argon2.hash(newPassword),
+        passwordResetTokenHash: null,
+        passwordResetExpiresAt: null,
+        refreshTokenHash: null, // tüm oturumlar sonlanır
+      },
+    });
+  }
+
+  private async findMatchingResetUser(users: User[], rawToken: string): Promise<User | null> {
+    for (const user of users) {
+      if (user.passwordResetTokenHash && (await argon2.verify(user.passwordResetTokenHash, rawToken))) {
+        return user;
+      }
+    }
+    return null;
   }
 
   async deleteAccount(userId: string): Promise<void> {
