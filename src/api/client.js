@@ -1,19 +1,33 @@
 const API_BASE = import.meta.env.VITE_API_URL ?? "/api";
 
+/**
+ * Panel bazlı oturum ayrımı: admin, resepsiyon ve üye girişleri ayrı
+ * localStorage anahtarlarında tutulur (alan, geçerli URL yoluna göre
+ * otomatik seçilir). Böylece aynı tarayıcıda üç paneli farklı sekmelerde
+ * açık tutmak mümkündür — biri diğerinin oturumunun üzerine yazmaz.
+ * (Önceden üçü de aynı "accessToken" anahtarını paylaşıyordu; son giriş
+ * yapan diğerini eziyor, RequireRole de o yüzden yanlış panele atıyordu.)
+ */
+function sessionKey(base) {
+  const path = window.location.pathname;
+  const area = path.startsWith("/admin") ? "admin" : path.startsWith("/reception") ? "reception" : "user";
+  return area === "user" ? base : `${area}:${base}`;
+}
+
 export function getAccessToken() {
-  return localStorage.getItem("accessToken");
+  return localStorage.getItem(sessionKey("accessToken"));
 }
 
 export function setSession({ accessToken, refreshToken, user }) {
-  localStorage.setItem("accessToken", accessToken);
-  if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
-  if (user) localStorage.setItem("authUser", JSON.stringify(user));
+  localStorage.setItem(sessionKey("accessToken"), accessToken);
+  if (refreshToken) localStorage.setItem(sessionKey("refreshToken"), refreshToken);
+  if (user) localStorage.setItem(sessionKey("authUser"), JSON.stringify(user));
 }
 
 export function clearSession() {
-  localStorage.removeItem("accessToken");
-  localStorage.removeItem("refreshToken");
-  localStorage.removeItem("authUser");
+  localStorage.removeItem(sessionKey("accessToken"));
+  localStorage.removeItem(sessionKey("refreshToken"));
+  localStorage.removeItem(sessionKey("authUser"));
 }
 
 export async function apiFetch(path, options = {}) {
@@ -54,3 +68,5 @@ export function mergeById(mockRows, apiRows) {
   const apiIds = new Set(apiRows.map((r) => r.id));
   return [...apiRows, ...mockRows.filter((r) => !apiIds.has(r.id))];
 }
+
+export { sessionKey };

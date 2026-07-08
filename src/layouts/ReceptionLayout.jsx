@@ -1,7 +1,15 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import Logo from "../components/Logo.jsx";
+import { logout } from "../api/auth.js";
 
 export default function ReceptionLayout() {
+  const nav = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    nav("/reception/login", { replace: true });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="sticky top-0 z-20 flex items-center justify-between border-b border-gray-100 bg-white px-6 py-3">
@@ -27,9 +35,9 @@ export default function ReceptionLayout() {
             </div>
             <div className="leading-tight">
               <p className="text-sm font-semibold text-gray-800">Resepsiyon</p>
-              <NavLink to="/reception/login" className="text-xs text-primary-600">
+              <button type="button" onClick={handleLogout} className="text-xs text-primary-600">
                 Çıkış
-              </NavLink>
+              </button>
             </div>
           </div>
         </nav>

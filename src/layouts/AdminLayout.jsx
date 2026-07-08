@@ -1,6 +1,7 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import Icon from "../components/Icon.jsx";
 import Logo from "../components/Logo.jsx";
+import { logout } from "../api/auth.js";
 
 const NAV = [
   { to: "/admin", label: "Dashboard", icon: "chart", end: true },
@@ -14,6 +15,13 @@ const NAV = [
 ];
 
 export default function AdminLayout() {
+  const nav = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    nav("/admin/login", { replace: true });
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-50">
       <aside className="fixed inset-y-0 left-0 flex w-64 flex-col border-r border-gray-100 bg-white">
@@ -43,12 +51,13 @@ export default function AdminLayout() {
           ))}
         </nav>
         <div className="border-t border-gray-100 p-3">
-          <NavLink
-            to="/admin/login"
-            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-500 hover:bg-gray-100"
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-gray-500 hover:bg-gray-100"
           >
             <Icon name="logout" size={17} /> Çıkış Yap
-          </NavLink>
+          </button>
         </div>
       </aside>
 

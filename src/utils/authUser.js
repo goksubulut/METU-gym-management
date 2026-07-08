@@ -1,6 +1,8 @@
+import { sessionKey } from "../api/client.js";
+
 export function getAuthUser() {
   try {
-    const raw = localStorage.getItem("authUser");
+    const raw = localStorage.getItem(sessionKey("authUser"));
     if (raw) return JSON.parse(raw);
   } catch {
     /* ignore */
@@ -9,7 +11,7 @@ export function getAuthUser() {
 }
 
 export function setAuthUser(user) {
-  if (user) localStorage.setItem("authUser", JSON.stringify(user));
+  if (user) localStorage.setItem(sessionKey("authUser"), JSON.stringify(user));
 }
 
 /** Rolün varsayılan giriş sonrası sayfası. */
