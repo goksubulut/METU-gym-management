@@ -92,6 +92,7 @@ export class AppointmentsService {
   async update(userId: string, role: Role, id: string, dto: UpdateAppointmentDto): Promise<AppointmentView> {
     const record = await this.getOwnedRecord(userId, role, id);
     this.assertModifiable(record);
+    this.assertNoShowReschedule(record, dto);
     await this.assertCatalogIdsExist(dto.machineIds, dto.muscleGroupIds);
 
     const updated = await this.runSlotTransaction(async (tx) => {
@@ -213,6 +214,25 @@ export class AppointmentsService {
     }
     if (slotStartDate(toDateKey(record.slot.date), record.slot.startTime) < new Date()) {
       throw new BadRequestException('Saati geçmiş randevu değiştirilemez');
+    }
+  }
+
+  /**
+   * NO_SHOW randevusu yalnızca yeni bir slot (farklı tarih/saat) seçilerek
+   * güncellenebilir. Aksi halde (slotId gönderilmemiş veya aynı slot) kayıt,
+   * geçmişte kalmış eski slotuyla sessizce BOOKED'a döner — bu bir veri
+   * bütünlüğü hatasıdır (update() içindeki koşulsuz status yeniden atamasına
+   * karşı sınır seviyesinde savunma). UI zaten bunu engeller; bu kontrol API
+   * doğrudan çağrıldığında (Swagger/curl/mobil) da kuralı zorlar.
+   */
+  private assertNoShowReschedule(record: AppointmentRecord, dto: UpdateAppointmentDto): void {
+    if (record.status !== AppointmentStatus.NO_SHOW) {
+      return;
+    }
+    if (!dto.slotId || dto.slotId === record.slotId) {
+      throw new BadRequestException(
+        'Gelmedi randevusu yalnızca yeni bir tarih/saat seçilerek düzenlenebilir',
+      );
     }
   }
 

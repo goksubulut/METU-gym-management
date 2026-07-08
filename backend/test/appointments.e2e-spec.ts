@@ -206,4 +206,67 @@ describe('Slots & Appointments (e2e)', () => {
         .expect(400);
     });
   });
+
+  /**
+   * Bug 1.1: NO_SHOW randevusu yalnızca yeni bir slot seçilerek düzenlenebilir.
+   * slotId gönderilmeden yapılan güncelleme, kaydı geçmiş slotuyla sessizce
+   * BOOKED'a çevirmemeli (hayalet randevu). API sınırında zorlanır.
+   */
+  describe('NO_SHOW randevu yeniden planlama doğrulaması (bug 1.1)', () => {
+    let noShowId: string;
+    let firstSlotId: string;
+    let otherSlotId: string;
+
+    beforeAll(async () => {
+      const res = await request(app.getHttpServer())
+        .get(`/api/slots?date=${tomorrowKey()}`)
+        .set('Authorization', `Bearer ${token}`);
+      const empties = res.body.data.slots.filter((s: { booked: number }) => s.booked === 0);
+      firstSlotId = empties[0].id;
+      otherSlotId = empties[1].id;
+
+      const created = await request(app.getHttpServer())
+        .post('/api/appointments')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ slotId: firstSlotId })
+        .expect(201);
+      noShowId = created.body.data.id;
+
+      // Resepsiyonun "Gelmedi" işaretlemesini simüle et (kullanıcı ucu yok).
+      await prisma.appointment.update({
+        where: { id: noShowId },
+        data: { status: 'NO_SHOW' },
+      });
+    });
+
+    it('slotId gönderilmeden yalnızca note ile PATCH → 400 (hayalet randevu engellenir)', async () => {
+      await request(app.getHttpServer())
+        .patch(`/api/appointments/${noShowId}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ note: 'sadece not' })
+        .expect(400);
+
+      // Durum NO_SHOW olarak kalmalı, sessizce BOOKED'a dönmemeli
+      const record = await prisma.appointment.findUnique({ where: { id: noShowId } });
+      expect(record?.status).toBe('NO_SHOW');
+    });
+
+    it('aynı slotId ile PATCH → 400 (yeni tarih/saat zorunlu)', async () => {
+      await request(app.getHttpServer())
+        .patch(`/api/appointments/${noShowId}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ slotId: firstSlotId })
+        .expect(400);
+    });
+
+    it('farklı ve geçerli slotId ile PATCH → 200 ve status BOOKED', async () => {
+      const res = await request(app.getHttpServer())
+        .patch(`/api/appointments/${noShowId}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ slotId: otherSlotId })
+        .expect(200);
+      expect(res.body.data.status).toBe('BOOKED');
+      expect(res.body.data.slotId).toBe(otherSlotId);
+    });
+  });
 });
