@@ -46,6 +46,7 @@ export function mapAppointmentFromApi(a) {
     date: a.date,
     time: a.startTime,
     status,
+    isPast: !isFuture,
     muscleGroups: a.muscleGroups.map((mg) => mg.id),
     machines: a.machines.map((m) => m.id),
     machineDetails: a.machines.map((m) => ({ id: m.id, name: m.name })),

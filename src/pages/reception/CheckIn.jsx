@@ -9,7 +9,7 @@ import { useToast } from "../../components/Toast.jsx";
 import { todaysCheckins as mockRows } from "../../mock/appointments.js";
 import { machineById, MUSCLE_GROUPS } from "../../mock/machines.js";
 import { fetchTodayAppointments, updateReceptionStatus } from "../../api/reception.js";
-import { isMockRowId } from "../../api/client.js";
+import { isMockRowId, mergeById } from "../../api/client.js";
 
 const ST = {
   pending: { tone: "yellow", label: "Bekliyor" },
@@ -38,10 +38,9 @@ export default function CheckIn() {
 
   const load = useCallback(async () => {
     try {
-      // API çağrısı başarılıysa gerçek veriyi tek kaynak kabul et; mock demo
-      // satırlarıyla birleştirmek her randevunun iki kez görünmesine yol açıyordu.
       const apiRows = await fetchTodayAppointments();
-      setRows(sortByTime(apiRows ?? []));
+      // Gerçek kayıtlar önce; mock demo satırları (c1, c2…) aynı id yoksa eklenir.
+      setRows(sortByTime(mergeById(mockRows, apiRows ?? [])));
     } catch {
       setRows(sortByTime(mockRows));
     }

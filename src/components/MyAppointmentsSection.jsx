@@ -26,6 +26,12 @@ const STATUS = {
   cancelled: { tone: "red", label: "İptal" },
 };
 
+const isAppointmentPast = (a) => new Date(`${a.date}T${a.time}:00`) < new Date();
+
+/** Yaklaşan sekme: gelecek BOOKED + henüz slotu gelmemiş NO_SHOW. Geçmiş no-show → Geçmiş. */
+const isUpcomingTab = (a) =>
+  a.status === "upcoming" || (a.status === "no-show" && !isAppointmentPast(a));
+
 const isEditable = (status) => status === "upcoming" || status === "no-show";
 
 export default function MyAppointmentsSection({ className = "" }) {
@@ -60,9 +66,7 @@ export default function MyAppointmentsSection({ className = "" }) {
   }, [load, location.key]);
 
   const filtered = list.filter((a) =>
-    tab === "upcoming"
-      ? a.status === "upcoming" || a.status === "no-show"
-      : a.status !== "upcoming" && a.status !== "no-show"
+    tab === "upcoming" ? isUpcomingTab(a) : !isUpcomingTab(a),
   );
 
   const doCancel = async () => {
@@ -86,7 +90,7 @@ export default function MyAppointmentsSection({ className = "" }) {
       <div className="mb-3 grid grid-cols-3 gap-2">
         {[
           ["Toplam", list.length],
-          ["Yaklaşan", list.filter((a) => a.status === "upcoming" || a.status === "no-show").length],
+          ["Yaklaşan", list.filter(isUpcomingTab).length],
           ["Tamamlanan", list.filter((a) => a.status === "completed").length],
         ].map(([l, v]) => (
           <Card key={l} soft className="p-3 text-center">

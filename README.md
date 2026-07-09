@@ -87,7 +87,7 @@ npm run dev              # http://localhost:5173
 
 Tüm uçlar varsayılan olarak korumalıdır (JWT Bearer). Akış:
 
-1. `POST /api/auth/register` veya `POST /api/auth/login` → `accessToken` (15 dk) + `refreshToken` (7 gün)
+1. `POST /api/auth/register` veya `POST /api/auth/login` → `accessToken` (30 dk) + `refreshToken` (7 gün)
 2. İsteklerde `Authorization: Bearer <accessToken>` başlığı
 3. Access token dolunca `POST /api/auth/refresh` → yeni çift (rotasyonlu; eski refresh geçersizleşir)
 4. `POST /api/auth/logout` → refresh token iptal edilir
