@@ -51,6 +51,8 @@ export default function MuscleGroups() {
   const [apiMachines, setApiMachines] = useState(null); // null = API henüz gelmedi
   const [apiExercises, setApiExercises] = useState([]);
   const [exercisesFromApi, setExercisesFromApi] = useState(false);
+  const [expandedMachineGroups, setExpandedMachineGroups] = useState(new Set());
+  const [expandedExerciseGroups, setExpandedExerciseGroups] = useState(new Set());
 
   useEffect(() => {
     fetchMachines()
@@ -70,6 +72,8 @@ export default function MuscleGroups() {
   const clearAll = () => {
     setSelected([]);
     setCardio(false);
+    setExpandedMachineGroups(new Set());
+    setExpandedExerciseGroups(new Set());
   };
 
   // Seçili kaslardan ana gruplar türetilir; makine eşleşmesi grup bazlıdır.
@@ -253,7 +257,7 @@ export default function MuscleGroups() {
                     <Badge tone="primary">{list.length}</Badge>
                   </div>
                   <div className="space-y-2">
-                    {list.slice(0, 4).map((m) => (
+                    {(expandedMachineGroups.has(id) ? list : list.slice(0, 4)).map((m) => (
                       <Card
                         key={m.id}
                         onClick={() => nav(`/machines/${m.id}`)}
@@ -279,13 +283,13 @@ export default function MuscleGroups() {
                         </span>
                       </Card>
                     ))}
-                    {list.length > 4 && (
+                    {list.length > 4 && !expandedMachineGroups.has(id) && (
                       <button
                         type="button"
-                        onClick={() => nav("/machines")}
+                        onClick={() => setExpandedMachineGroups((s) => new Set([...s, id]))}
                         className="w-full py-1.5 text-center text-xs font-semibold text-primary-600"
                       >
-                        +{list.length - 4} makine daha →
+                        +{list.length - 4} makine daha göster
                       </button>
                     )}
                   </div>
@@ -315,20 +319,20 @@ export default function MuscleGroups() {
                     <Badge tone="primary">{list.length}</Badge>
                   </div>
                   <div className="space-y-2">
-                    {list.slice(0, 4).map((e) => (
+                    {(expandedExerciseGroups.has(id) ? list : list.slice(0, 4)).map((e) => (
                       <ExerciseMatchListCard
                         key={e.id}
                         exercise={e}
                         onClick={() => nav(`/exercises/${e.id}`)}
                       />
                     ))}
-                    {list.length > 4 && (
+                    {list.length > 4 && !expandedExerciseGroups.has(id) && (
                       <button
                         type="button"
-                        onClick={() => nav("/exercises")}
+                        onClick={() => setExpandedExerciseGroups((s) => new Set([...s, id]))}
                         className="w-full py-1.5 text-center text-xs font-semibold text-primary-600"
                       >
-                        +{list.length - 4} egzersiz daha →
+                        +{list.length - 4} egzersiz daha göster
                       </button>
                     )}
                   </div>
