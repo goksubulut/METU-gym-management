@@ -115,7 +115,7 @@ export default function MuscleGroups() {
   return (
     <div className="pb-4">
       {/* Üst bar */}
-      <div className="hero-sheen flex items-center justify-between bg-gray-900 bg-gradient-to-r from-ink-900 to-ink-800 px-4 py-4 text-white">
+      <div className="flex items-center justify-between bg-gray-900 px-4 py-4 text-white">
         <div>
           <h1 className="font-display text-lg font-bold tracking-tight">Kas Haritası</h1>
           <p className="text-[11px] text-white/50">Çalıştırmak istediğin kasa dokun</p>
@@ -222,7 +222,7 @@ export default function MuscleGroups() {
               onClick={() => setCardio((c) => !c)}
               className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all ${
                 cardio
-                  ? "border-transparent bg-primary-600 text-white shadow-glow"
+                  ? "border-transparent bg-primary-600 text-white"
                   : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
               }`}
             >

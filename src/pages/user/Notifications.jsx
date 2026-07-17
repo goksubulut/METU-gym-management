@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Card from "../../components/Card.jsx";
 import Badge from "../../components/Badge.jsx";
 import EmptyState from "../../components/EmptyState.jsx";
-import Spinner from "../../components/Spinner.jsx";
+import Skeleton from "../../components/Skeleton.jsx";
 import Icon from "../../components/Icon.jsx";
 import { CATEGORY_LABELS, CATEGORY_TONES } from "../../mock/announcements.js";
 import { getAccessToken } from "../../api/client.js";
@@ -72,8 +72,23 @@ export default function Notifications() {
       <p className="mb-5 text-sm text-gray-500">Randevu hatırlatmaları ve salon duyuruları</p>
 
       {loading ? (
-        <div className="grid place-items-center py-20">
-          <Spinner />
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="p-4">
+              <div className="mb-2 flex items-start justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-9 w-9 rounded-full" />
+                  <div className="space-y-1.5">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-3 w-24" />
+                  </div>
+                </div>
+                <Skeleton className="h-5 w-16 rounded-full" />
+              </div>
+              <Skeleton className="h-3 w-full" />
+              <Skeleton className="mt-1.5 h-3 w-4/5" />
+            </Card>
+          ))}
         </div>
       ) : items.length === 0 ? (
         <EmptyState icon="bell" title="Henüz bildirim yok" />

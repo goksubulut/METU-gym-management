@@ -4,7 +4,7 @@ import Button from "../../components/Button.jsx";
 import Card from "../../components/Card.jsx";
 import Badge from "../../components/Badge.jsx";
 import Icon from "../../components/Icon.jsx";
-import Spinner from "../../components/Spinner.jsx";
+import Skeleton from "../../components/Skeleton.jsx";
 import { appointments as mockAppointments } from "../../mock/appointments.js";
 import { machineById, MUSCLE_GROUPS } from "../../mock/machines.js";
 import { getAccessToken } from "../../api/client.js";
@@ -13,10 +13,9 @@ import { fetchMyAppointments, mapAppointmentFromApi } from "../../api/bookings.j
 const labelOf = (id) => MUSCLE_GROUPS.find((m) => m.id === id)?.label || id;
 
 const QUICK_ACTIONS = [
-  { to: "/book", icon: "plus", title: "Randevu Al", desc: "Slot seç, hemen ayır", tone: "bg-gradient-to-br from-primary-500 to-primary-700 shadow-glow" },
   { to: "/machines", icon: "dumbbell", title: "Makineler", desc: "Katalog & videolar", tone: "bg-gray-900" },
-  { to: "/exercises", icon: "flame", title: "Egzersizler", desc: "Serbest, ısınma & soğuma", tone: "bg-gray-900" },
   { to: "/muscle-groups", icon: "body", title: "Kas Haritası", desc: "Anatomiden seç", tone: "bg-gray-900" },
+  { to: "/exercises", icon: "flame", title: "Egzersizler", desc: "Serbest & ısınma", tone: "bg-gray-900" },
   { to: "/feedback", icon: "message", title: "Geri Bildirim", desc: "Arıza & öneri", tone: "bg-gray-900" },
 ];
 
@@ -79,8 +78,25 @@ export default function Dashboard() {
       </div>
 
       {loading ? (
-        <Card soft className="animate-rise p-8">
-          <Spinner label="Randevular yükleniyor…" />
+        <Card className="animate-rise overflow-hidden border-0">
+          <div className="bg-gray-900 px-5 py-5">
+            <Skeleton className="h-2.5 w-24 bg-white/10" />
+            <div className="mt-4 flex items-baseline gap-2">
+              <Skeleton className="h-9 w-20 bg-white/10" />
+              <Skeleton className="h-4 w-28 bg-white/10" />
+            </div>
+          </div>
+          <div className="px-5 py-4">
+            <Skeleton className="mb-2 h-2.5 w-20" />
+            <div className="mb-3 flex gap-1.5">
+              <Skeleton className="h-5 w-14 rounded-full" />
+              <Skeleton className="h-5 w-18 rounded-full" />
+            </div>
+            <div className="mt-4 flex gap-2">
+              <Skeleton className="h-9 flex-1 rounded-xl" />
+              <Skeleton className="h-9 flex-1 rounded-xl" />
+            </div>
+          </div>
         </Card>
       ) : active ? (
         <Card className="animate-rise overflow-hidden border-0">
@@ -89,9 +105,6 @@ export default function Dashboard() {
               <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-300">
                 <Icon name="calendar" size={13} />
                 Yaklaşan Randevu
-              </span>
-              <span className="rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-semibold text-white/70">
-                Onaylı
               </span>
             </div>
             <div className="mt-3 flex items-baseline gap-2">

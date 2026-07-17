@@ -58,9 +58,7 @@ export default function UserLayout() {
       {/* Mobil çerçeve: geniş ekranda ortada telefon görünümü */}
       <div className="relative mx-auto flex min-h-screen max-w-[430px] flex-col bg-[#f7f7f8] shadow-xl">
         <header className="sticky top-0 z-20 flex items-center justify-between border-b border-gray-100/80 bg-white/85 px-4 py-3 backdrop-blur-md">
-          <Link to="/home" aria-label="Ana sayfa" className="transition-opacity hover:opacity-80">
-            <Logo size={24} />
-          </Link>
+          <Logo size={24} />
           <div className="flex items-center gap-2.5">
             <Link
               to="/notifications"
@@ -91,7 +89,7 @@ export default function UserLayout() {
           {NAV.map((n) =>
             n.primary ? (
               <NavLink key={n.to} to={n.to} className="relative -mt-8 flex flex-col items-center">
-                <span className="grid h-14 w-14 place-items-center rounded-full bg-gradient-to-b from-primary-500 to-primary-700 text-white shadow-glow ring-4 ring-[#f7f7f8] transition-transform active:scale-95">
+                <span className="grid h-14 w-14 place-items-center rounded-full bg-primary-600 text-white ring-4 ring-[#f7f7f8] transition-transform active:scale-95">
                   <Icon name={n.icon} size={24} strokeWidth={2.2} />
                 </span>
                 <span className="mt-1 text-[10px] font-semibold text-primary-600">{n.label}</span>

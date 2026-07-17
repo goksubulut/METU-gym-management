@@ -6,7 +6,7 @@ import Badge from "./Badge.jsx";
 import Tabs from "./Tabs.jsx";
 import Modal from "./Modal.jsx";
 import EmptyState from "./EmptyState.jsx";
-import Spinner from "./Spinner.jsx";
+import Skeleton from "./Skeleton.jsx";
 import Icon from "./Icon.jsx";
 import { useToast } from "./Toast.jsx";
 import { appointments as mockSeed } from "../mock/appointments.js";
@@ -112,8 +112,22 @@ export default function MyAppointmentsSection({ className = "" }) {
       />
 
       {loading ? (
-        <div className="grid place-items-center py-16">
-          <Spinner />
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="p-4">
+              <div className="mb-2 flex items-center justify-between">
+                <div className="flex items-baseline gap-2">
+                  <Skeleton className="h-6 w-14" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+                <Skeleton className="h-5 w-16 rounded-full" />
+              </div>
+              <div className="flex gap-1.5">
+                <Skeleton className="h-5 w-14 rounded-full" />
+                <Skeleton className="h-5 w-16 rounded-full" />
+              </div>
+            </Card>
+          ))}
         </div>
       ) : filtered.length === 0 ? (
         <EmptyState

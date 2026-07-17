@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Card from "../../components/Card.jsx";
 import Badge from "../../components/Badge.jsx";
 import Icon from "../../components/Icon.jsx";
-import Spinner from "../../components/Spinner.jsx";
+import Skeleton from "../../components/Skeleton.jsx";
 import { MUSCLE_GROUPS } from "../../mock/machines.js";
 import { fetchExercise } from "../../api/catalog.js";
 
@@ -28,8 +28,17 @@ export default function ExerciseDetail() {
 
   if (loading)
     return (
-      <div className="grid h-64 place-items-center">
-        <Spinner label="Egzersiz yükleniyor…" />
+      <div className="pb-6">
+        <Skeleton className="h-56 rounded-none" />
+        <div className="space-y-3 px-4 py-4">
+          <Skeleton className="h-6 w-48" />
+          <Skeleton className="h-4 w-24" />
+          <div className="flex gap-1.5 pt-1">
+            <Skeleton className="h-5 w-16 rounded-full" />
+            <Skeleton className="h-5 w-14 rounded-full" />
+          </div>
+          <Skeleton className="mt-2 h-24 rounded-2xl" />
+        </div>
       </div>
     );
 

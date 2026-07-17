@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Button from "../../components/Button.jsx";
 import Card from "../../components/Card.jsx";
 import Badge from "../../components/Badge.jsx";
-import SlotButton from "../../components/SlotButton.jsx";
-import Spinner from "../../components/Spinner.jsx";
+import Icon from "../../components/Icon.jsx";
+import Skeleton from "../../components/Skeleton.jsx";
 import { useToast } from "../../components/Toast.jsx";
 import { MUSCLE_GROUPS, machinesByMuscle } from "../../mock/machines.js";
 import { upcomingDates } from "../../utils/dates.js";
@@ -15,7 +15,80 @@ import {
   mapSlotFromApi,
 } from "../../api/bookings.js";
 
-const STEPS = ["Tarih & Saat", "Kas Grubu / Makine", "Özet"];
+const STEPS = ["Tarih & Saat", "Kas Grubu", "Özet"];
+
+const MUSCLE_ICONS = {
+  chest: "body",
+  back: "body",
+  shoulders: "body",
+  arms: "dumbbell",
+  legs: "body",
+  core: "body",
+  glutes: "body",
+  cardio: "flame",
+};
+
+function SlotItem({ slot, selected, onSelect }) {
+  const ratio = slot.booked / slot.capacity;
+  const isPast = slot.isPast;
+  const isFull = slot.isFull || slot.booked >= slot.capacity;
+  const disabled = isPast || isFull;
+
+  let statusLabel = "Müsait";
+  let statusColor = "text-emerald-600";
+  if (isPast) { statusLabel = "Geçti"; statusColor = "text-gray-400"; }
+  else if (isFull) { statusLabel = "Dolu"; statusColor = "text-gray-400"; }
+  else if (ratio >= 0.7) { statusLabel = "Yoğun"; statusColor = "text-amber-600"; }
+  else if (ratio >= 0.4) { statusLabel = "Orta"; statusColor = "text-amber-500"; }
+
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={() => onSelect(slot)}
+      className={`flex items-center justify-between rounded-xl border px-4 py-3 text-left transition-all ${
+        disabled
+          ? "cursor-not-allowed border-gray-100 bg-gray-50 opacity-50"
+          : selected
+            ? "border-primary-600 bg-primary-600 text-white"
+            : "border-gray-200 bg-white hover:border-primary-300"
+      }`}
+    >
+      <span className={`text-sm font-bold ${selected ? "text-white" : "text-gray-900"}`}>
+        {slot.time}
+      </span>
+      <span className={`text-xs font-semibold ${selected ? "text-white/80" : statusColor}`}>
+        {disabled ? statusLabel : selected ? `${slot.capacity - slot.booked} yer` : statusLabel}
+      </span>
+    </button>
+  );
+}
+
+function MachineRow({ machine, checked, onToggle }) {
+  return (
+    <label className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition-colors ${
+      checked ? "border-primary-600 bg-primary-50" : "border-gray-200 bg-white"
+    }`}>
+      <div className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-lg bg-gray-900 text-white">
+        {machine.photoUrl ? (
+          <img src={machine.photoUrl} alt={machine.name} className="h-full w-full object-cover" />
+        ) : (
+          <Icon name="dumbbell" size={16} />
+        )}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-semibold text-gray-900">{machine.name}</p>
+        <p className="text-xs text-gray-400">{machine.location}</p>
+      </div>
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={onToggle}
+        className="h-4 w-4 accent-primary-600"
+      />
+    </label>
+  );
+}
 
 export default function Book() {
   const nav = useNavigate();
@@ -43,9 +116,7 @@ export default function Book() {
     setSlot(null);
     fetchSlots(dateKey)
       .then((data) => {
-        if (!cancelled) {
-          setSlots(data.slots.map(mapSlotFromApi));
-        }
+        if (!cancelled) setSlots(data.slots.map(mapSlotFromApi));
       })
       .catch((err) => {
         if (!cancelled) {
@@ -53,21 +124,32 @@ export default function Book() {
           setSlots([]);
         }
       })
-      .finally(() => {
-        if (!cancelled) setLoadingSlots(false);
-      });
-    return () => {
-      cancelled = true;
-    };
+      .finally(() => { if (!cancelled) setLoadingSlots(false); });
+    return () => { cancelled = true; };
   }, [dateKey, toast]);
 
-  const suggested = useMemo(
-    () => [...new Set(groups.flatMap((g) => machinesByMuscle(g)))],
+  const suggestedByGroup = useMemo(
+    () =>
+      groups
+        .map((gid) => ({
+          id: gid,
+          label: MUSCLE_GROUPS.find((g) => g.id === gid)?.label ?? gid,
+          list: machinesByMuscle(gid),
+        }))
+        .filter((g) => g.list.length > 0),
     [groups]
   );
 
-  const toggle = (arr, set, val) =>
-    set(arr.includes(val) ? arr.filter((x) => x !== val) : [...arr, val]);
+  const allSuggested = useMemo(
+    () => [...new Map(suggestedByGroup.flatMap((g) => g.list).map((m) => [m.id, m])).values()],
+    [suggestedByGroup]
+  );
+
+  const toggleGroup = (id) =>
+    setGroups((g) => g.includes(id) ? g.filter((x) => x !== id) : [...g, id]);
+
+  const toggleMachine = (id) =>
+    setMachines((m) => m.includes(id) ? m.filter((x) => x !== id) : [...m, id]);
 
   const confirm = async () => {
     if (!slot?.id) return;
@@ -89,65 +171,90 @@ export default function Book() {
 
   return (
     <div className="px-4 py-5">
-      <div className="mb-5 flex items-center gap-2">
-        {STEPS.map((s, i) => (
+      {/* Adım göstergesi */}
+      <div className="mb-6 flex items-center gap-1">
+        {STEPS.map((s, idx) => (
           <div key={s} className="flex flex-1 flex-col items-center">
             <div className="flex w-full items-center">
-              <div
-                className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-xs font-bold ${
-                  i <= step ? "bg-primary-600 text-white" : "bg-gray-200 text-gray-400"
-                }`}
-              >
-                {i + 1}
+              <div className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-[11px] font-bold ${
+                idx < step
+                  ? "bg-primary-600 text-white"
+                  : idx === step
+                    ? "bg-primary-600 text-white"
+                    : "bg-gray-100 text-gray-400"
+              }`}>
+                {idx < step ? <Icon name="check" size={12} /> : idx + 1}
               </div>
-              {i < STEPS.length - 1 && (
-                <div className={`h-0.5 flex-1 ${i < step ? "bg-primary-600" : "bg-gray-200"}`} />
+              {idx < STEPS.length - 1 && (
+                <div className={`h-px flex-1 ${idx < step ? "bg-primary-600" : "bg-gray-200"}`} />
               )}
             </div>
-            <span className="mt-1 text-[10px] font-semibold text-gray-500">{s}</span>
+            <span className="mt-1 text-[10px] font-medium text-gray-400">{s}</span>
           </div>
         ))}
       </div>
 
+      {/* ─── Adım 0: Tarih & Saat ─── */}
       {step === 0 && (
         <div>
-          <h2 className="mb-3 text-lg font-bold text-gray-900">Tarih seç</h2>
-          <div className="mb-5 flex gap-2 overflow-x-auto no-scrollbar">
+          {/* Tarih seçimi */}
+          <h2 className="mb-3 text-base font-bold text-gray-900">Tarih</h2>
+          <div className="mb-5 grid grid-cols-7 gap-1.5">
             {dates.map((d) => (
               <button
                 key={d.key}
                 type="button"
                 onClick={() => setDateKey(d.key)}
-                className={`flex min-w-[56px] flex-col items-center rounded-xl border px-3 py-2 ${
+                className={`flex flex-col items-center rounded-xl border px-1 py-2 transition-colors ${
                   dateKey === d.key
                     ? "border-primary-600 bg-primary-600 text-white"
-                    : "border-gray-200 bg-white text-gray-600"
+                    : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
                 }`}
               >
-                <span className="text-[11px] font-semibold">{d.day}</span>
-                <span className="text-lg font-extrabold">{d.date}</span>
-                <span className="text-[10px]">{d.month}</span>
+                <span className={`text-[10px] font-semibold ${dateKey === d.key ? "text-white/80" : "text-gray-400"}`}>
+                  {d.day}
+                </span>
+                <span className="text-base font-extrabold leading-tight">{d.date}</span>
+                <span className={`text-[9px] ${dateKey === d.key ? "text-white/70" : "text-gray-400"}`}>
+                  {d.month}
+                </span>
+                {d.isToday && (
+                  <span className={`mt-0.5 h-1 w-1 rounded-full ${dateKey === d.key ? "bg-white/60" : "bg-primary-600"}`} />
+                )}
               </button>
             ))}
           </div>
 
+          {/* Saat seçimi */}
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-lg font-bold text-gray-900">Saat seç</h2>
-            <div className="flex items-center gap-2 text-[10px] text-gray-400">
-              <span className="flex items-center gap-1"><i className="inline-block h-2 w-2 rounded-full bg-emerald-500" />Müsait</span>
-              <span className="flex items-center gap-1"><i className="inline-block h-2 w-2 rounded-full bg-amber-500" />Orta</span>
-              <span className="flex items-center gap-1"><i className="inline-block h-2 w-2 rounded-full bg-red-500" />Yoğun</span>
+            <h2 className="text-base font-bold text-gray-900">Saat</h2>
+            <div className="flex items-center gap-3 text-[10px] text-gray-400">
+              <span className="flex items-center gap-1">
+                <i className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />Müsait
+              </span>
+              <span className="flex items-center gap-1">
+                <i className="inline-block h-1.5 w-1.5 rounded-full bg-amber-400" />Orta
+              </span>
+              <span className="flex items-center gap-1">
+                <i className="inline-block h-1.5 w-1.5 rounded-full bg-amber-600" />Yoğun
+              </span>
             </div>
           </div>
 
           {loadingSlots ? (
-            <div className="grid place-items-center py-10">
-              <Spinner />
+            <div className="grid grid-cols-3 gap-2">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Skeleton key={i} className="h-14 rounded-xl" />
+              ))}
+            </div>
+          ) : slots.length === 0 ? (
+            <div className="rounded-xl border border-gray-100 bg-gray-50 py-8 text-center">
+              <p className="text-sm text-gray-400">Bu tarih için uygun slot yok.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {slots.map((s) => (
-                <SlotButton
+                <SlotItem
                   key={s.id ?? s.time}
                   slot={s}
                   selected={slot?.id === s.id || slot?.time === s.time}
@@ -163,60 +270,66 @@ export default function Book() {
         </div>
       )}
 
+      {/* ─── Adım 1: Kas Grubu & Makine ─── */}
       {step === 1 && (
         <div>
-          <h2 className="text-lg font-bold text-gray-900">Kas grubu (opsiyonel)</h2>
-          <p className="mb-3 text-sm text-gray-500">
-            Çalışmak istediğin kas gruplarını seç ya da bu adımı atla.
-          </p>
-          <div className="mb-5 flex flex-wrap gap-2">
-            {MUSCLE_GROUPS.map((g) => (
-              <button
-                key={g.id}
-                type="button"
-                onClick={() => toggle(groups, setGroups, g.id)}
-                className={`rounded-xl border px-4 py-2 text-sm font-semibold ${
-                  groups.includes(g.id)
-                    ? "border-primary-600 bg-primary-50 text-primary-700"
-                    : "border-gray-200 text-gray-600"
-                }`}
-              >
-                {g.label}
-              </button>
-            ))}
+          <div className="mb-4">
+            <h2 className="text-base font-bold text-gray-900">Çalışacağın kas grubunu seç</h2>
+            <p className="mt-0.5 text-xs text-gray-400">
+              İstersen bu adımı geçebilirsin — seçim opsiyoneldir.
+            </p>
           </div>
 
-          {suggested.length > 0 && (
-            <>
-              <h3 className="mb-2 text-sm font-bold text-gray-900">Önerilen makineler</h3>
-              <div className="mb-5 space-y-2">
-                {suggested.map((m) => (
-                  <label
-                    key={m.id}
-                    className={`flex items-center gap-3 rounded-xl border p-3 ${
-                      machines.includes(m.id)
-                        ? "border-primary-600 bg-primary-50"
-                        : "border-gray-200 bg-white"
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={machines.includes(m.id)}
-                      onChange={() => toggle(machines, setMachines, m.id)}
-                      className="h-4 w-4 accent-primary-600"
-                    />
-                    <div>
-                      <p className="text-sm font-semibold text-gray-900">{m.name}</p>
-                      <p className="text-xs text-gray-400">{m.location}</p>
-                    </div>
-                  </label>
-                ))}
-              </div>
-            </>
+          {/* Kas grubu grid */}
+          <div className="mb-6 grid grid-cols-4 gap-2">
+            {MUSCLE_GROUPS.map((g) => {
+              const on = groups.includes(g.id);
+              return (
+                <button
+                  key={g.id}
+                  type="button"
+                  onClick={() => toggleGroup(g.id)}
+                  className={`flex flex-col items-center gap-1.5 rounded-xl border py-3 transition-colors ${
+                    on
+                      ? "border-primary-600 bg-primary-50 text-primary-700"
+                      : "border-gray-200 bg-white text-gray-500 hover:border-gray-300"
+                  }`}
+                >
+                  <Icon name={MUSCLE_ICONS[g.id] ?? "dumbbell"} size={18} strokeWidth={on ? 2.2 : 1.8} />
+                  <span className="text-[11px] font-semibold leading-tight text-center px-1">
+                    {g.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Önerilen makineler — kas grubuna göre ayrı bölümler */}
+          {suggestedByGroup.length > 0 && (
+            <div className="space-y-5">
+              {suggestedByGroup.map(({ id, label, list }) => (
+                <div key={id}>
+                  <div className="mb-2 flex items-center gap-2">
+                    <span className="text-xs font-bold text-gray-700">{label} için önerilen</span>
+                    <div className="h-px flex-1 bg-gray-100" />
+                  </div>
+                  <div className="space-y-2">
+                    {list.map((m) => (
+                      <MachineRow
+                        key={m.id}
+                        machine={m}
+                        checked={machines.includes(m.id)}
+                        onToggle={() => toggleMachine(m.id)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
 
-          <div className="flex gap-2">
-            <Button variant="ghost" full onClick={() => setStep(2)}>
+          <div className="mt-6 flex gap-2">
+            <Button variant="outline" full onClick={() => setStep(2)}>
               Atla
             </Button>
             <Button full onClick={() => setStep(2)}>
@@ -226,19 +339,20 @@ export default function Book() {
         </div>
       )}
 
+      {/* ─── Adım 2: Özet ─── */}
       {step === 2 && (
         <div>
-          <h2 className="mb-4 text-lg font-bold text-gray-900">Özet & Onay</h2>
+          <h2 className="mb-4 text-base font-bold text-gray-900">Özet & Onay</h2>
           <Card className="divide-y divide-gray-100">
-            <Row label="Tarih">
+            <SummaryRow label="Tarih">
               {new Date(`${dateKey}T12:00:00`).toLocaleDateString("tr-TR", {
                 weekday: "long",
                 day: "numeric",
                 month: "long",
               })}
-            </Row>
-            <Row label="Saat">{slot?.time}</Row>
-            <Row label="Kas Grupları">
+            </SummaryRow>
+            <SummaryRow label="Saat">{slot?.time}</SummaryRow>
+            <SummaryRow label="Kas Grupları">
               {groups.length ? (
                 <div className="flex flex-wrap justify-end gap-1">
                   {groups.map((g) => (
@@ -250,24 +364,24 @@ export default function Book() {
               ) : (
                 <span className="text-gray-400">Belirtilmedi</span>
               )}
-            </Row>
-            <Row label="Makineler">
+            </SummaryRow>
+            <SummaryRow label="Makineler">
               {machines.length ? (
                 <div className="flex flex-wrap justify-end gap-1">
                   {machines.map((m) => (
                     <Badge key={m} tone="gray">
-                      {suggested.find((x) => x.id === m)?.name}
+                      {allSuggested.find((x) => x.id === m)?.name}
                     </Badge>
                   ))}
                 </div>
               ) : (
                 <span className="text-gray-400">Belirtilmedi</span>
               )}
-            </Row>
+            </SummaryRow>
           </Card>
 
           <div className="mt-6 flex gap-2">
-            <Button variant="ghost" full onClick={() => setStep(1)}>
+            <Button variant="outline" full onClick={() => setStep(1)}>
               Geri
             </Button>
             <Button full onClick={confirm} disabled={submitting}>
@@ -280,10 +394,10 @@ export default function Book() {
   );
 }
 
-function Row({ label, children }) {
+function SummaryRow({ label, children }) {
   return (
-    <div className="flex items-center justify-between px-4 py-3.5">
-      <span className="text-sm text-gray-500">{label}</span>
+    <div className="flex items-start justify-between gap-4 px-4 py-3.5">
+      <span className="shrink-0 text-sm text-gray-500">{label}</span>
       <span className="text-right text-sm font-semibold text-gray-900">{children}</span>
     </div>
   );

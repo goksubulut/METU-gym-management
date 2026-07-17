@@ -1,6 +1,6 @@
 const VARIANTS = {
   primary:
-    "bg-gradient-to-b from-primary-500 to-primary-700 text-white shadow-glow hover:from-primary-600 hover:to-primary-800 active:shadow-none",
+    "bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800",
   secondary:
     "bg-primary-50 text-primary-700 hover:bg-primary-100 border border-primary-100",
   outline:
@@ -26,7 +26,7 @@ export default function Button({
 }) {
   return (
     <button
-      className={`inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-all duration-150 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 ${VARIANTS[variant]} ${SIZES[size]} ${full ? "w-full" : ""} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-all duration-150 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 ${VARIANTS[variant]} ${SIZES[size]} ${full ? "w-full" : ""} ${className}`}
       {...props}
     >
       {children}

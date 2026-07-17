@@ -4,7 +4,7 @@ import Button from "../../components/Button.jsx";
 import Badge from "../../components/Badge.jsx";
 import Modal from "../../components/Modal.jsx";
 import SlotButton from "../../components/SlotButton.jsx";
-import Spinner from "../../components/Spinner.jsx";
+import Skeleton from "../../components/Skeleton.jsx";
 import Icon from "../../components/Icon.jsx";
 import { useToast } from "../../components/Toast.jsx";
 import { MUSCLE_GROUPS, machinesByMuscle, machineById } from "../../mock/machines.js";
@@ -166,16 +166,25 @@ export default function EditAppointment() {
 
   if (loading) {
     return (
-      <div className="grid place-items-center py-24">
-        <Spinner />
+      <div className="px-4 py-5 space-y-4">
+        <Skeleton className="h-5 w-16" />
+        <Skeleton className="h-7 w-48" />
+        <Skeleton className="h-4 w-64" />
+        <div className="grid grid-cols-7 gap-1 pt-2">
+          {Array.from({ length: 14 }).map((_, i) => <Skeleton key={i} className="h-14 rounded-xl" />)}
+        </div>
+        <div className="grid grid-cols-3 gap-2 pt-2">
+          {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-14 rounded-xl" />)}
+        </div>
       </div>
     );
   }
 
   return (
     <div className="px-4 py-5 pb-8">
-      <button type="button" onClick={requestBack} className="mb-3 text-sm text-gray-400">
-        ← Geri
+      <button type="button" onClick={requestBack} className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-700">
+        <Icon name="chevronLeft" size={16} />
+        Geri
       </button>
       <h1 className="mb-1 text-xl font-extrabold text-gray-900">Randevuyu Düzenle</h1>
       <p className="mb-5 text-sm text-gray-500">
@@ -185,7 +194,7 @@ export default function EditAppointment() {
       </p>
 
       <h2 className="mb-3 text-base font-bold text-gray-900">Tarih</h2>
-      <div className="mb-5 flex gap-2 overflow-x-auto no-scrollbar">
+      <div className="mb-5 grid grid-cols-7 gap-1">
         {dates.map((d) => (
           <button
             key={d.key}
@@ -194,15 +203,18 @@ export default function EditAppointment() {
               setDateKey(d.key);
               if (d.key !== original?.date) setSlot(null);
             }}
-            className={`flex min-w-[56px] flex-col items-center rounded-xl border px-3 py-2 transition-colors ${
+            className={`flex flex-col items-center rounded-xl border px-1 py-2 transition-colors ${
               dateKey === d.key
                 ? "border-emerald-600 bg-emerald-600 text-white"
-                : "border-gray-200 bg-white text-gray-600"
+                : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
             }`}
           >
-            <span className="text-[11px] font-semibold">{d.day}</span>
-            <span className="text-lg font-extrabold">{d.date}</span>
-            <span className="text-[10px]">{d.month}</span>
+            <span className={`text-[10px] font-semibold ${dateKey === d.key ? "text-white/80" : "text-gray-400"}`}>{d.day}</span>
+            <span className="text-sm font-extrabold leading-tight">{d.date}</span>
+            <span className={`text-[9px] ${dateKey === d.key ? "text-white/70" : "text-gray-400"}`}>{d.month}</span>
+            {d.isToday && (
+              <span className={`mt-0.5 h-1 w-1 rounded-full ${dateKey === d.key ? "bg-white/60" : "bg-emerald-500"}`} />
+            )}
           </button>
         ))}
       </div>
@@ -222,11 +234,13 @@ export default function EditAppointment() {
       </div>
 
       {loadingSlots ? (
-        <div className="grid place-items-center py-10">
-          <Spinner />
+        <div className="mb-6 grid grid-cols-3 gap-2">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-14 rounded-xl" />
+          ))}
         </div>
       ) : (
-        <div className="mb-6 grid grid-cols-4 gap-2">
+        <div className="mb-6 grid grid-cols-3 gap-2">
           {slots.map((s) => (
             <SlotButton
               key={s.id ?? s.time}

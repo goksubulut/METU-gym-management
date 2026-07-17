@@ -44,8 +44,9 @@ export default function Warmup() {
 
   return (
     <div className="px-4 py-5">
-      <button onClick={() => nav(-1)} className="mb-3 text-sm text-gray-400">
-        ← Geri
+      <button onClick={() => nav(-1)} className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-700">
+        <Icon name="chevronLeft" size={16} />
+        Geri
       </button>
       <h1 className="text-xl font-extrabold text-gray-900">Isınma & Soğuma</h1>
       <p className="mb-4 text-sm text-gray-500">

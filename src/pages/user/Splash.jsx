@@ -12,25 +12,38 @@ const SLIDES = [
   },
   {
     icon: "body",
-    title: "Kas Grubunu Planla",
-    text: "Çalışacağın kas grubunu vücut şeması üzerinden seç, sana uygun makineleri gör.",
+    title: "Hedef Kasını Belirle",
+    text: "Vücut şeması üzerinden çalışacağın kası seç, sana en uygun makineleri ve egzersizleri gör.",
   },
   {
     icon: "qr",
     title: "QR ile Keşfet",
-    text: "Makine üzerindeki QR'ı okut; kullanım videosuna ve arıza/öneri bildirme sayfasına anında ulaş.",
+    text: "Her makinenin üzerindeki QR'ı okut; kullanım videosuna ve arıza bildirimine anında ulaş.",
   },
   {
     icon: "star",
     title: "Deneyimini Paylaş",
     text: "Makineleri puanla, arıza bildir, öneride bulun. Salonu birlikte geliştirelim.",
+    cta: "Başlayalım",
+    next: "/qr-info",
   },
 ];
 
 export default function Splash() {
   const [i, setI] = useState(0);
   const nav = useNavigate();
+  const slide = SLIDES[i];
   const last = i === SLIDES.length - 1;
+
+  const handleNext = () => {
+    if (last && slide.next) {
+      nav(slide.next);
+    } else if (last) {
+      nav("/auth");
+    } else {
+      setI(i + 1);
+    }
+  };
 
   return (
     <div className="mx-auto flex min-h-screen max-w-[430px] flex-col bg-white px-6 py-10">
@@ -45,12 +58,14 @@ export default function Splash() {
       </div>
 
       <div className="flex flex-1 flex-col items-center justify-center text-center">
-        <div className="hero-sheen mb-8 grid h-40 w-40 place-items-center rounded-[2.5rem] bg-gradient-to-br from-primary-500 to-primary-700 text-white shadow-glow">
-          <Icon name={SLIDES[i].icon} size={64} strokeWidth={1.4} />
+        <div className="mb-8 grid h-36 w-36 place-items-center rounded-3xl bg-primary-600 text-white">
+          <Icon name={slide.icon} size={60} strokeWidth={1.5} />
         </div>
-        <h1 className="font-display text-2xl font-bold tracking-tight text-gray-900">{SLIDES[i].title}</h1>
+        <h1 className="font-display text-2xl font-bold tracking-tight text-gray-900">
+          {slide.title}
+        </h1>
         <p className="mt-3 max-w-xs text-sm leading-relaxed text-gray-500">
-          {SLIDES[i].text}
+          {slide.text}
         </p>
       </div>
 
@@ -58,19 +73,15 @@ export default function Splash() {
         {SLIDES.map((_, idx) => (
           <span
             key={idx}
-            className={`h-2 rounded-full transition-all ${
-              idx === i ? "w-6 bg-primary-600" : "w-2 bg-gray-200"
+            className={`h-1.5 rounded-full transition-all duration-300 ${
+              idx === i ? "w-6 bg-primary-600" : "w-1.5 bg-gray-200"
             }`}
           />
         ))}
       </div>
 
-      <Button
-        full
-        size="lg"
-        onClick={() => (last ? nav("/qr-info") : setI(i + 1))}
-      >
-        {last ? "Başlayalım" : "Devam"}
+      <Button full size="lg" onClick={handleNext}>
+        {last && slide.cta ? slide.cta : last ? "Başlayalım" : "Devam"}
       </Button>
     </div>
   );
