@@ -97,12 +97,15 @@ export default function Book() {
     return () => { cancelled = true; };
   }, [dateKey, toast]);
 
-  const suggestedMachines = useMemo(
-    () => [
-      ...new Map(
-        groups.flatMap((g) => machinesByMuscle(g)).map((m) => [m.id, m]),
-      ).values(),
-    ],
+  const machinesByGroup = useMemo(
+    () =>
+      groups
+        .map((g) => ({
+          id: g,
+          label: MUSCLE_GROUPS.find((x) => x.id === g)?.label ?? g,
+          list: machinesByMuscle(g),
+        }))
+        .filter((grp) => grp.list.length > 0),
     [groups],
   );
 
@@ -182,29 +185,38 @@ export default function Book() {
           ))}
         </div>
 
-        {suggestedMachines.length > 0 && (
-          <div className="mt-5 space-y-2">
+        {machinesByGroup.length > 0 && (
+          <div className="mt-5 space-y-4">
             <p className="text-xs font-bold text-gray-400">Makine ekle</p>
-            {suggestedMachines.map((m) => (
-              <label
-                key={m.id}
-                className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition-colors ${
-                  machines.includes(m.id)
-                    ? "border-primary-600 bg-primary-50"
-                    : "border-gray-100 bg-white"
-                }`}
-              >
-                <input
-                  type="checkbox"
-                  checked={machines.includes(m.id)}
-                  onChange={() => toggleMachine(m.id)}
-                  className="h-4 w-4 accent-primary-600"
-                />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-gray-900">{m.name}</p>
-                  <p className="text-xs text-gray-400">{m.location}</p>
+            {machinesByGroup.map(({ id, label, list }) => (
+              <div key={id}>
+                <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-gray-400">
+                  {label}
+                </p>
+                <div className="space-y-2">
+                  {list.map((m) => (
+                    <label
+                      key={m.id}
+                      className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition-colors ${
+                        machines.includes(m.id)
+                          ? "border-primary-600 bg-primary-50"
+                          : "border-gray-100 bg-white"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={machines.includes(m.id)}
+                        onChange={() => toggleMachine(m.id)}
+                        className="h-4 w-4 accent-primary-600"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold text-gray-900">{m.name}</p>
+                        <p className="text-xs text-gray-400">{m.location}</p>
+                      </div>
+                    </label>
+                  ))}
                 </div>
-              </label>
+              </div>
             ))}
           </div>
         )}
