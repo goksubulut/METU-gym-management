@@ -79,37 +79,38 @@ export default function MuscleGroups() {
     return [...groups];
   }, [selected, cardio]);
 
-  const machines = useMemo(() => {
-    // API geldiyse gerçek katalog, gelmediyse mock ile eşleştir.
-    const byGroup = (g) =>
-      apiMachines ? apiMachines.filter((m) => m.muscles.includes(g)) : machinesByMuscle(g);
-    const seen = new Set();
-    const out = [];
-    activeGroups.forEach((g) =>
-      byGroup(g).forEach((m) => {
-        if (!seen.has(m.id)) {
-          seen.add(m.id);
-          out.push(m);
-        }
-      }),
-    );
-    // Hibrit öneri: önce ince hedef örtüşmesi, sonra hedef paylaşma oranı
-    // (biceps seçilince Biceps Curl, Pull Down'dan önce; Functional Trainer en altta).
-    return sortByTargetMatch(out, selected, { useRating: true });
-  }, [activeGroups, apiMachines, selected]);
-
   const hasSelection = selected.length > 0 || cardio;
 
-  const exercises = useMemo(() => {
+  const machinesByGroup = useMemo(() => {
+    const byGroup = (g) =>
+      apiMachines ? apiMachines.filter((m) => m.muscles.includes(g)) : machinesByMuscle(g);
+    return activeGroups
+      .map((g) => ({
+        id: g,
+        label: MUSCLE_GROUPS.find((x) => x.id === g)?.label ?? g,
+        list: sortByTargetMatch(byGroup(g), selected, { useRating: true }),
+      }))
+      .filter((grp) => grp.list.length > 0);
+  }, [activeGroups, apiMachines, selected]);
+
+  const exercisesByGroup = useMemo(() => {
     if (!hasSelection) return [];
-    let pool;
-    if (exercisesFromApi) {
-      pool = apiExercises.filter((e) => e.muscles.some((g) => activeGroups.includes(g)));
-    } else {
-      const matched = MOCK_EXERCISES.filter((e) => e.muscles.some((g) => activeGroups.includes(g)));
-      pool = (matched.length > 0 ? matched : MOCK_EXERCISES).slice(0, 2);
-    }
-    return sortByTargetMatch(pool, selected);
+    return activeGroups
+      .map((g) => {
+        let pool;
+        if (exercisesFromApi) {
+          pool = apiExercises.filter((e) => e.muscles.includes(g));
+        } else {
+          const matched = MOCK_EXERCISES.filter((e) => e.muscles.includes(g));
+          pool = matched.length > 0 ? matched : MOCK_EXERCISES.slice(0, 2);
+        }
+        return {
+          id: g,
+          label: MUSCLE_GROUPS.find((x) => x.id === g)?.label ?? g,
+          list: sortByTargetMatch(pool, selected),
+        };
+      })
+      .filter((grp) => grp.list.length > 0);
   }, [activeGroups, apiExercises, exercisesFromApi, hasSelection, selected]);
 
   return (
@@ -232,72 +233,106 @@ export default function MuscleGroups() {
           </div>
         </div>
 
-        {/* Eşleşen makineler — canlı güncellenir */}
+        {/* Eşleşen makineler — kas grubuna göre gruplandırılmış */}
         <div className="mt-6">
-          <div className="mb-2 flex items-center justify-between">
-            <h2 className="text-sm font-bold text-gray-900">Eşleşen Makineler</h2>
-            <Badge tone="primary">{machines.length}</Badge>
-          </div>
+          <h2 className="mb-3 text-sm font-bold text-gray-900">Eşleşen Makineler</h2>
 
-          {machines.length === 0 ? (
+          {machinesByGroup.length === 0 ? (
             <EmptyState
               icon="body"
               title="Kas seç"
               description="Seçtiğin kasları çalıştıran makineler burada listelenir."
             />
           ) : (
-            <div className="space-y-2">
-              {machines.map((m) => (
-                <Card
-                  key={m.id}
-                  onClick={() => nav(`/machines/${m.id}`)}
-                  className="flex items-center gap-3 p-3"
-                >
-                  <div className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-xl bg-gray-900 text-white">
-                    {m.photoUrl ? (
-                      <img src={m.photoUrl} alt={m.name} className="h-full w-full object-cover" />
-                    ) : (
-                      <Icon name="dumbbell" size={20} />
+            <div className="space-y-5">
+              {machinesByGroup.map(({ id, label, list }) => (
+                <div key={id}>
+                  <div className="mb-2 flex items-center gap-2">
+                    <span className="text-xs font-bold text-gray-600">{label} için</span>
+                    <div className="h-px flex-1 bg-gray-100" />
+                    <Badge tone="primary">{list.length}</Badge>
+                  </div>
+                  <div className="space-y-2">
+                    {list.slice(0, 4).map((m) => (
+                      <Card
+                        key={m.id}
+                        onClick={() => nav(`/machines/${m.id}`)}
+                        className="flex items-center gap-3 p-3"
+                      >
+                        <div className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-xl bg-gray-900 text-white">
+                          {m.photoUrl ? (
+                            <img src={m.photoUrl} alt={m.name} className="h-full w-full object-cover" />
+                          ) : (
+                            <Icon name="dumbbell" size={20} />
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-bold text-gray-900">{m.name}</p>
+                          <p className="flex items-center gap-1 text-xs text-gray-400">
+                            <Icon name="mapPin" size={11} />
+                            {m.location}
+                          </p>
+                        </div>
+                        <span className="flex items-center gap-1 text-sm font-bold text-primary-600">
+                          <Icon name="star" size={14} className="fill-primary-600" />
+                          {m.rating}
+                        </span>
+                      </Card>
+                    ))}
+                    {list.length > 4 && (
+                      <button
+                        type="button"
+                        onClick={() => nav("/machines")}
+                        className="w-full py-1.5 text-center text-xs font-semibold text-primary-600"
+                      >
+                        +{list.length - 4} makine daha →
+                      </button>
                     )}
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-bold text-gray-900">{m.name}</p>
-                    <p className="flex items-center gap-1 text-xs text-gray-400">
-                      <Icon name="mapPin" size={11} />
-                      {m.location}
-                    </p>
-                  </div>
-                  <span className="flex items-center gap-1 text-sm font-bold text-primary-600">
-                    <Icon name="star" size={14} className="fill-primary-600" />
-                    {m.rating}
-                  </span>
-                </Card>
+                </div>
               ))}
             </div>
           )}
         </div>
 
-        {/* Eşleşen egzersizler — aynı kas gruplarını çalıştıran serbest hareketler */}
+        {/* Eşleşen egzersizler — kas grubuna göre gruplandırılmış */}
         <div className="mt-6">
-          <div className="mb-2 flex items-center justify-between">
-            <h2 className="text-sm font-bold text-gray-900">Eşleşen Egzersizler</h2>
-            <Badge tone="primary">{exercises.length}</Badge>
-          </div>
+          <h2 className="mb-3 text-sm font-bold text-gray-900">Eşleşen Egzersizler</h2>
 
-          {exercises.length === 0 ? (
+          {exercisesByGroup.length === 0 ? (
             <EmptyState
               icon="body"
               title="Kas seç"
               description="Seçtiğin kasları çalıştıran serbest egzersizler burada listelenir."
             />
           ) : (
-            <div className="space-y-2">
-              {exercises.map((e) => (
-                <ExerciseMatchListCard
-                  key={e.id}
-                  exercise={e}
-                  onClick={() => nav(`/exercises/${e.id}`)}
-                />
+            <div className="space-y-5">
+              {exercisesByGroup.map(({ id, label, list }) => (
+                <div key={id}>
+                  <div className="mb-2 flex items-center gap-2">
+                    <span className="text-xs font-bold text-gray-600">{label} için</span>
+                    <div className="h-px flex-1 bg-gray-100" />
+                    <Badge tone="primary">{list.length}</Badge>
+                  </div>
+                  <div className="space-y-2">
+                    {list.slice(0, 4).map((e) => (
+                      <ExerciseMatchListCard
+                        key={e.id}
+                        exercise={e}
+                        onClick={() => nav(`/exercises/${e.id}`)}
+                      />
+                    ))}
+                    {list.length > 4 && (
+                      <button
+                        type="button"
+                        onClick={() => nav("/exercises")}
+                        className="w-full py-1.5 text-center text-xs font-semibold text-primary-600"
+                      >
+                        +{list.length - 4} egzersiz daha →
+                      </button>
+                    )}
+                  </div>
+                </div>
               ))}
             </div>
           )}
