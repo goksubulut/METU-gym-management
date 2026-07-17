@@ -1,4 +1,4 @@
-// Sabit 30 dakikalık slotlar. Serbest saat girişi yok.
+// Saatlik slotlar.
 function gen(times) {
   return times.map(([time, booked, capacity]) => ({ time, booked, capacity }));
 }
@@ -6,21 +6,13 @@ function gen(times) {
 export const slotsByDate = {
   today: gen([
     ["08:00", 8, 10],
-    ["08:30", 10, 10],
     ["09:00", 6, 10],
-    ["09:30", 4, 10],
     ["10:00", 9, 10],
-    ["10:30", 3, 10],
     ["11:00", 2, 10],
-    ["11:30", 7, 10],
     ["17:00", 10, 10],
-    ["17:30", 9, 10],
     ["18:00", 8, 10],
-    ["18:30", 5, 10],
     ["19:00", 3, 10],
-    ["19:30", 1, 10],
     ["20:00", 2, 10],
-    ["20:30", 0, 10],
   ]),
 };
 

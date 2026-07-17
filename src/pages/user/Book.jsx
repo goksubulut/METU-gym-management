@@ -243,13 +243,13 @@ export default function Book() {
       {/* Tarih şeridi */}
       <section>
         <h2 className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400">Tarih</h2>
-        <div className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="grid grid-cols-4 gap-2">
           {dates.map((d) => (
             <button
               key={d.key}
               type="button"
               onClick={() => setDateKey(d.key)}
-              className={`flex shrink-0 flex-col items-center rounded-2xl border px-3.5 py-3 transition-colors active:scale-[0.95] ${
+              className={`flex flex-col items-center rounded-2xl border py-3 transition-colors active:scale-[0.95] ${
                 dateKey === d.key
                   ? "border-primary-600 bg-primary-600 text-white"
                   : d.isToday
