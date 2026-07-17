@@ -89,7 +89,7 @@ export default function UserLayout() {
           {NAV.map((n) =>
             n.primary ? (
               <NavLink key={n.to} to={n.to} className="relative -mt-8 flex flex-col items-center">
-                <span className="grid h-14 w-14 place-items-center rounded-full bg-primary-600 text-white ring-4 ring-[#f7f7f8] transition-transform active:scale-95">
+                <span className="grid h-14 w-14 place-items-center rounded-full bg-primary-600 text-white ring-4 ring-[#f7f7f8] transition-transform active:scale-[0.92]">
                   <Icon name={n.icon} size={24} strokeWidth={2.2} />
                 </span>
                 <span className="mt-1 text-[10px] font-semibold text-primary-600">{n.label}</span>
@@ -99,20 +99,21 @@ export default function UserLayout() {
                 key={n.to}
                 to={n.to}
                 className={({ isActive }) =>
-                  `flex flex-1 flex-col items-center gap-1 rounded-2xl py-1.5 text-[10px] font-semibold transition-colors ${
+                  `flex flex-1 flex-col items-center gap-1 py-1 text-[10px] font-semibold transition-colors ${
                     isActive ? "text-primary-600" : "text-gray-400 hover:text-gray-600"
                   }`
                 }
               >
                 {({ isActive }) => (
                   <>
-                    <Icon name={n.icon} size={21} strokeWidth={isActive ? 2.2 : 1.8} />
-                    <span>{n.label}</span>
                     <span
-                      className={`h-1 w-1 rounded-full transition-opacity ${
-                        isActive ? "bg-primary-600 opacity-100" : "opacity-0"
+                      className={`grid h-9 w-9 place-items-center rounded-xl transition-[background-color,transform] duration-200 active:scale-[0.88] ${
+                        isActive ? "bg-primary-50" : ""
                       }`}
-                    />
+                    >
+                      <Icon name={n.icon} size={20} strokeWidth={isActive ? 2.2 : 1.8} />
+                    </span>
+                    <span className={isActive ? "font-bold" : ""}>{n.label}</span>
                   </>
                 )}
               </NavLink>

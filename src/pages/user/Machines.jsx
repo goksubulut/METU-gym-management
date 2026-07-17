@@ -86,7 +86,10 @@ export default function Machines() {
               <Card key={m.id} soft onClick={() => nav(`/machines/${m.id}`)} className="overflow-hidden">
                 <div className="relative grid h-40 place-items-center overflow-hidden bg-gray-900 text-white/85">
                   {m.photoUrl ? (
-                    <img src={m.photoUrl} alt={m.name} className="absolute inset-0 h-full w-full object-cover" />
+                    <>
+                      <img src={m.photoUrl} alt={m.name} className="absolute inset-0 h-full w-full object-cover" />
+                      <span className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-black/10" aria-hidden="true" />
+                    </>
                   ) : (
                     <Icon name="dumbbell" size={34} strokeWidth={1.4} />
                   )}

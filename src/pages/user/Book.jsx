@@ -17,6 +17,18 @@ import {
 
 const STEPS = ["Tarih & Saat", "Kas Grubu", "Özet"];
 
+// Zaman dilimi grupları (dakika cinsinden)
+const TIME_PERIODS = [
+  { id: "morning", label: "Sabah", from: 6 * 60, to: 12 * 60 },
+  { id: "afternoon", label: "Öğleden Sonra", from: 12 * 60, to: 17 * 60 },
+  { id: "evening", label: "Akşam", from: 17 * 60, to: 24 * 60 },
+];
+
+function toMin(t) {
+  const [h, m] = t.split(":").map(Number);
+  return h * 60 + m;
+}
+
 const MUSCLE_ICONS = {
   chest: "body",
   back: "body",
@@ -28,38 +40,38 @@ const MUSCLE_ICONS = {
   cardio: "flame",
 };
 
-function SlotItem({ slot, selected, onSelect }) {
-  const ratio = slot.booked / slot.capacity;
+function SlotChip({ slot, selected, onSelect }) {
   const isPast = slot.isPast;
   const isFull = slot.isFull || slot.booked >= slot.capacity;
   const disabled = isPast || isFull;
-
-  let statusLabel = "Müsait";
-  let statusColor = "text-emerald-600";
-  if (isPast) { statusLabel = "Geçti"; statusColor = "text-gray-400"; }
-  else if (isFull) { statusLabel = "Dolu"; statusColor = "text-gray-400"; }
-  else if (ratio >= 0.7) { statusLabel = "Yoğun"; statusColor = "text-amber-600"; }
-  else if (ratio >= 0.4) { statusLabel = "Orta"; statusColor = "text-amber-500"; }
+  const remaining = slot.capacity - slot.booked;
+  const tight = !disabled && remaining <= Math.ceil(slot.capacity * 0.3);
 
   return (
     <button
       type="button"
       disabled={disabled}
       onClick={() => onSelect(slot)}
-      className={`flex items-center justify-between rounded-xl border px-4 py-3 text-left transition-all ${
+      className={`flex flex-col items-center justify-center rounded-xl py-2.5 text-xs font-bold transition-[background-color,border-color,color,transform] duration-150 active:scale-[0.93] ${
         disabled
-          ? "cursor-not-allowed border-gray-100 bg-gray-50 opacity-50"
+          ? "cursor-not-allowed bg-gray-100 text-gray-300"
           : selected
-            ? "border-primary-600 bg-primary-600 text-white"
-            : "border-gray-200 bg-white hover:border-primary-300"
+          ? "bg-primary-600 text-white shadow-glow"
+          : tight
+          ? "border border-amber-200 bg-amber-50 text-amber-800"
+          : "border border-gray-200 bg-white text-gray-900 hover:border-emerald-300 hover:bg-emerald-50"
       }`}
     >
-      <span className={`text-sm font-bold ${selected ? "text-white" : "text-gray-900"}`}>
-        {slot.time}
-      </span>
-      <span className={`text-xs font-semibold ${selected ? "text-white/80" : statusColor}`}>
-        {disabled ? statusLabel : selected ? `${slot.capacity - slot.booked} yer` : statusLabel}
-      </span>
+      <span className="tabular-nums leading-tight">{slot.time}</span>
+      {disabled ? (
+        <span className="mt-0.5 text-[9px] font-semibold opacity-60">
+          {isPast ? "geçti" : "dolu"}
+        </span>
+      ) : (
+        <span className={`mt-0.5 text-[9px] font-semibold ${selected ? "text-white/70" : tight ? "text-amber-500" : "text-emerald-500"}`}>
+          {remaining} yer
+        </span>
+      )}
     </button>
   );
 }
@@ -233,18 +245,22 @@ export default function Book() {
                 <i className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />Müsait
               </span>
               <span className="flex items-center gap-1">
-                <i className="inline-block h-1.5 w-1.5 rounded-full bg-amber-400" />Orta
-              </span>
-              <span className="flex items-center gap-1">
-                <i className="inline-block h-1.5 w-1.5 rounded-full bg-amber-600" />Yoğun
+                <i className="inline-block h-1.5 w-1.5 rounded-full bg-amber-400" />Yoğun
               </span>
             </div>
           </div>
 
           {loadingSlots ? (
-            <div className="grid grid-cols-3 gap-2">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <Skeleton key={i} className="h-14 rounded-xl" />
+            <div className="space-y-4">
+              {[4, 3].map((count, gi) => (
+                <div key={gi}>
+                  <Skeleton className="mb-2.5 h-3 w-24" />
+                  <div className="grid grid-cols-4 gap-2">
+                    {Array.from({ length: count }).map((_, i) => (
+                      <Skeleton key={i} className="h-14 rounded-xl" />
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
           ) : slots.length === 0 ? (
@@ -252,15 +268,31 @@ export default function Book() {
               <p className="text-sm text-gray-400">Bu tarih için uygun slot yok.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-3 gap-2">
-              {slots.map((s) => (
-                <SlotItem
-                  key={s.id ?? s.time}
-                  slot={s}
-                  selected={slot?.id === s.id || slot?.time === s.time}
-                  onSelect={setSlot}
-                />
-              ))}
+            <div className="space-y-5">
+              {TIME_PERIODS.map((period) => {
+                const periodSlots = slots.filter(
+                  (s) => toMin(s.time) >= period.from && toMin(s.time) < period.to,
+                );
+                if (periodSlots.length === 0) return null;
+                return (
+                  <div key={period.id}>
+                    <div className="mb-2.5 flex items-center gap-2">
+                      <span className="text-xs font-bold text-gray-500">{period.label}</span>
+                      <div className="h-px flex-1 bg-gray-100" />
+                    </div>
+                    <div className="grid grid-cols-4 gap-2">
+                      {periodSlots.map((s) => (
+                        <SlotChip
+                          key={s.id ?? s.time}
+                          slot={s}
+                          selected={slot?.id === s.id || slot?.time === s.time}
+                          onSelect={setSlot}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
 

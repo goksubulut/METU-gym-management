@@ -12,11 +12,12 @@ import { fetchMyAppointments, mapAppointmentFromApi } from "../../api/bookings.j
 
 const labelOf = (id) => MUSCLE_GROUPS.find((m) => m.id === id)?.label || id;
 
+// Navbar'da zaten olan (Makineler, Kas Grubu, Randevu) burada gösterilmez.
 const QUICK_ACTIONS = [
-  { to: "/machines", icon: "dumbbell", title: "Makineler", desc: "Katalog & videolar", tone: "bg-gray-900" },
-  { to: "/muscle-groups", icon: "body", title: "Kas Haritası", desc: "Anatomiden seç", tone: "bg-gray-900" },
-  { to: "/exercises", icon: "flame", title: "Egzersizler", desc: "Serbest & ısınma", tone: "bg-gray-900" },
-  { to: "/feedback", icon: "message", title: "Geri Bildirim", desc: "Arıza & öneri", tone: "bg-gray-900" },
+  { to: "/appointments", icon: "calendar", title: "Randevularım", desc: "Geçmiş & gelecek", iconBg: "bg-ink-900", iconFg: "text-white" },
+  { to: "/exercises", icon: "flame", title: "Egzersizler", desc: "Serbest & ısınma", iconBg: "bg-primary-600", iconFg: "text-white" },
+  { to: "/notifications", icon: "bell", title: "Bildirimler", desc: "Duyuru & hatırlatma", iconBg: "bg-primary-50", iconFg: "text-primary-700" },
+  { to: "/feedback", icon: "message", title: "Geri Bildirim", desc: "Arıza & öneri", iconBg: "bg-gray-100", iconFg: "text-gray-500" },
 ];
 
 function getProfile() {
@@ -70,10 +71,10 @@ export default function Dashboard() {
 
   return (
     <div className="px-4 py-5">
-      <div className="animate-rise mb-5">
-        <p className="text-sm text-gray-400">Merhaba,</p>
-        <h1 className="font-display text-2xl font-bold tracking-tight text-gray-900">
-          {profile.name}
+      <div className="animate-rise mb-6">
+        <p className="text-[11px] font-semibold text-gray-400">Merhaba,</p>
+        <h1 className="font-display text-3xl font-bold tracking-tight text-gray-900 leading-tight">
+          {profile.name.split(" ")[0]}
         </h1>
       </div>
 
@@ -102,13 +103,16 @@ export default function Dashboard() {
         <Card className="animate-rise overflow-hidden border-0">
           <div className="hero-sheen bg-gray-900 bg-gradient-to-br from-ink-800 via-ink-900 to-ink-950 px-5 py-5 text-white">
             <div className="flex items-center justify-between">
-              <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-300">
-                <Icon name="calendar" size={13} />
+              <span className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-300">
+                <span className="relative flex h-2 w-2 shrink-0">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-60" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-primary-500" />
+                </span>
                 Yaklaşan Randevu
               </span>
             </div>
             <div className="mt-3 flex items-baseline gap-2">
-              <span className="font-display text-4xl font-bold tracking-tight">{active.time}</span>
+              <span className="tabular-nums font-display text-4xl font-bold tracking-tight">{active.time}</span>
               <span className="text-sm text-white/60">
                 {new Date(`${active.date}T12:00:00`).toLocaleDateString("tr-TR", {
                   day: "numeric",
@@ -168,11 +172,11 @@ export default function Dashboard() {
         </Card>
       )}
 
-      <div className="animate-rise-late mt-5 grid grid-cols-2 gap-3">
-        {QUICK_ACTIONS.map((a) => (
-          <Card key={a.to} onClick={() => nav(a.to)} className="p-4">
+      <div className="mt-5 grid grid-cols-2 gap-3">
+        {QUICK_ACTIONS.map((a, i) => (
+          <Card key={a.to} onClick={() => nav(a.to)} className={`animate-rise stagger-${i + 1} p-4`}>
             <div
-              className={`mb-3 grid h-11 w-11 place-items-center rounded-xl text-white ${a.tone}`}
+              className={`mb-3 grid h-11 w-11 place-items-center rounded-xl ${a.iconBg} ${a.iconFg}`}
             >
               <Icon name={a.icon} size={20} />
             </div>

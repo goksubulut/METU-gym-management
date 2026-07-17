@@ -106,9 +106,12 @@ export default function Alternatives() {
             onClick={() => nav(`/machines/${m.id}`)}
             className="flex cursor-pointer items-center gap-3 px-4 py-3 hover:bg-gray-50"
           >
-            <span className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-lg bg-gray-900 text-white">
+            <span className="relative grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-lg bg-gray-900 text-white">
               {m.photoUrl ? (
-                <img src={m.photoUrl} alt={m.name} className="h-full w-full object-cover" />
+                <>
+                  <img src={m.photoUrl} alt={m.name} className="h-full w-full object-cover" />
+                  <span className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-black/10" aria-hidden="true" />
+                </>
               ) : (
                 <Icon name="dumbbell" size={16} />
               )}

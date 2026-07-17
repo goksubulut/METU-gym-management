@@ -23,7 +23,19 @@ body {
 h1, h2, h3 {
   font-family: "Space Grotesk", "Inter", sans-serif;
   letter-spacing: -0.02em;
+  text-wrap: balance;
 }
+
+/* Zamanlı sayılar için layout shift önleme */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Kademeli giriş — her çocuk için ayrı delay */
+.stagger-1 { animation-delay: 60ms; }
+.stagger-2 { animation-delay: 120ms; }
+.stagger-3 { animation-delay: 180ms; }
+.stagger-4 { animation-delay: 240ms; }
 
 /* İnce scrollbar (yatay filtre şeritleri için) */
 .no-scrollbar::-webkit-scrollbar {
