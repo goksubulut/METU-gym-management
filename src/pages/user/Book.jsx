@@ -21,39 +21,8 @@ function toMin(t) {
   return h * 60 + m;
 }
 
-function SlotRow({ slot, selected, onSelect }) {
-  const isPast = slot.isPast;
-  const isFull = slot.isFull || slot.booked >= slot.capacity;
-  const disabled = isPast || isFull;
-
-  return (
-    <button
-      type="button"
-      disabled={disabled}
-      onClick={() => onSelect(slot)}
-      className={`flex w-full items-center gap-3 rounded-xl px-4 py-3.5 text-left transition-[background-color,border-color,transform] duration-150 active:scale-[0.97] ${
-        disabled
-          ? "cursor-not-allowed bg-gray-50 text-gray-300"
-          : selected
-          ? "bg-primary-600 text-white shadow-glow"
-          : "border border-gray-100 bg-white text-gray-900 hover:border-primary-200 hover:bg-primary-50"
-      }`}
-    >
-      <span
-        className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 transition-colors ${
-          disabled ? "border-gray-200" : selected ? "border-white" : "border-gray-300"
-        }`}
-      >
-        {selected && <span className="h-2.5 w-2.5 rounded-full bg-white" />}
-      </span>
-      <span className="tabular-nums text-sm font-bold">{slot.time}</span>
-      {disabled && (
-        <span className="ml-auto text-xs font-semibold opacity-60">
-          {isPast ? "Geçti" : "Dolu"}
-        </span>
-      )}
-    </button>
-  );
+function isAvailable(s) {
+  return !s.isPast && !(s.isFull || s.booked >= s.capacity);
 }
 
 export default function Book() {
@@ -96,6 +65,20 @@ export default function Book() {
       .finally(() => { if (!cancelled) setLoadingSlots(false); });
     return () => { cancelled = true; };
   }, [dateKey, toast]);
+
+  // Sadece rezerve edilebilir slotlar, dönemlere göre gruplandırılmış
+  const availablePeriods = useMemo(
+    () =>
+      TIME_PERIODS.map((p) => ({
+        ...p,
+        slots: slots.filter(
+          (s) => isAvailable(s) && toMin(s.time) >= p.from && toMin(s.time) < p.to,
+        ),
+      })).filter((p) => p.slots.length > 0),
+    [slots],
+  );
+
+  const hasAnyAvailable = availablePeriods.length > 0;
 
   const machinesByGroup = useMemo(
     () =>
@@ -153,7 +136,6 @@ export default function Book() {
           Geri
         </button>
 
-        {/* Seçilen saat özeti */}
         <div className="mb-6 flex items-center gap-2 rounded-xl bg-gray-50 px-4 py-3">
           <Icon name="calendar" size={16} className="shrink-0 text-primary-600" />
           <span className="text-sm font-semibold text-gray-900">
@@ -258,29 +240,34 @@ export default function Book() {
         Randevu Al
       </h1>
 
+      {/* Tarih şeridi */}
       <section>
-        <h2 className="mb-3 text-sm font-bold text-gray-900">Tarih</h2>
-        <div className="grid grid-cols-7 gap-1">
+        <h2 className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400">Tarih</h2>
+        <div className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {dates.map((d) => (
             <button
               key={d.key}
               type="button"
               onClick={() => setDateKey(d.key)}
-              className={`flex flex-col items-center rounded-xl border px-1 py-2 transition-colors active:scale-[0.95] ${
+              className={`flex shrink-0 flex-col items-center rounded-2xl border px-3.5 py-3 transition-colors active:scale-[0.95] ${
                 dateKey === d.key
                   ? "border-primary-600 bg-primary-600 text-white"
-                  : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
+                  : d.isToday
+                  ? "border-primary-200 bg-primary-50 text-gray-900"
+                  : "border-gray-100 bg-white text-gray-600"
               }`}
             >
-              <span className={`text-[10px] font-semibold ${dateKey === d.key ? "text-white/80" : "text-gray-400"}`}>
+              <span className={`text-[10px] font-semibold uppercase tracking-wide ${
+                dateKey === d.key ? "text-white/70" : "text-gray-400"
+              }`}>
                 {d.day}
               </span>
-              <span className="text-base font-extrabold leading-tight">{d.date}</span>
-              <span className={`text-[9px] ${dateKey === d.key ? "text-white/70" : "text-gray-400"}`}>
+              <span className="mt-0.5 text-lg font-extrabold leading-none">{d.date}</span>
+              <span className={`mt-0.5 text-[10px] ${dateKey === d.key ? "text-white/60" : "text-gray-400"}`}>
                 {d.month}
               </span>
-              {d.isToday && (
-                <span className={`mt-0.5 h-1 w-1 rounded-full ${dateKey === d.key ? "bg-white/60" : "bg-primary-600"}`} />
+              {d.isToday && dateKey !== d.key && (
+                <span className="mt-1 h-1 w-1 rounded-full bg-primary-600" />
               )}
             </button>
           ))}
@@ -288,65 +275,60 @@ export default function Book() {
       </section>
 
       {!dateKey && (
-        <p className="mt-8 text-center text-sm text-gray-400">
-          Yukarıdan bir tarih seçerek başla.
+        <p className="mt-10 text-center text-sm text-gray-400">
+          Bir tarih seçerek müsait saatleri gör.
         </p>
       )}
 
+      {/* Saat grid — sadece müsait slotlar */}
       {dateKey && (
         <section className="animate-rise mt-8">
-          <h2 className="mb-3 text-sm font-bold text-gray-900">
-            Saat
-            {selectedDate && (
-              <span className="ml-2 font-normal text-gray-400">
-                — {selectedDate.day} {selectedDate.date} {selectedDate.month}
-              </span>
-            )}
-          </h2>
+          <h2 className="mb-4 text-xs font-bold uppercase tracking-wider text-gray-400">Saat</h2>
 
           {loadingSlots ? (
             <div className="space-y-5">
-              {[3, 2].map((count, gi) => (
+              {[4, 3].map((count, gi) => (
                 <div key={gi}>
-                  <Skeleton className="mb-2 h-3 w-28" />
-                  <div className="space-y-2">
+                  <Skeleton className="mb-3 h-3 w-20" />
+                  <div className="grid grid-cols-4 gap-2">
                     {Array.from({ length: count }).map((_, i) => (
-                      <Skeleton key={i} className="h-14 rounded-xl" />
+                      <Skeleton key={i} className="h-10 rounded-xl" />
                     ))}
                   </div>
                 </div>
               ))}
             </div>
-          ) : slots.length === 0 ? (
-            <div className="rounded-xl border border-gray-100 bg-gray-50 py-8 text-center">
-              <p className="text-sm text-gray-400">Bu tarih için uygun slot yok.</p>
+          ) : !hasAnyAvailable ? (
+            <div className="rounded-2xl border border-gray-100 bg-gray-50 py-10 text-center">
+              <p className="text-sm font-medium text-gray-400">Bu gün için müsait saat kalmadı.</p>
+              <p className="mt-1 text-xs text-gray-300">Başka bir tarih seçmeyi dene.</p>
             </div>
           ) : (
-            <div className="space-y-5">
-              {TIME_PERIODS.map((period) => {
-                const periodSlots = slots.filter(
-                  (s) => toMin(s.time) >= period.from && toMin(s.time) < period.to,
-                );
-                if (periodSlots.length === 0) return null;
-                return (
-                  <div key={period.id}>
-                    <div className="mb-2 flex items-center gap-2">
-                      <span className="text-xs font-bold text-gray-400">{period.label}</span>
-                      <div className="h-px flex-1 bg-gray-100" />
-                    </div>
-                    <div className="space-y-2">
-                      {periodSlots.map((s) => (
-                        <SlotRow
+            <div className="space-y-6">
+              {availablePeriods.map((period) => (
+                <div key={period.id}>
+                  <p className="mb-2.5 text-xs font-semibold text-gray-400">{period.label}</p>
+                  <div className="grid grid-cols-4 gap-2">
+                    {period.slots.map((s) => {
+                      const isSelected = slot?.id === s.id || slot?.time === s.time;
+                      return (
+                        <button
                           key={s.id ?? s.time}
-                          slot={s}
-                          selected={slot?.id === s.id || slot?.time === s.time}
-                          onSelect={setSlot}
-                        />
-                      ))}
-                    </div>
+                          type="button"
+                          onClick={() => setSlot(isSelected ? null : s)}
+                          className={`rounded-xl py-2.5 text-sm font-bold tabular-nums transition-[background-color,border-color,transform,box-shadow] duration-150 active:scale-[0.94] ${
+                            isSelected
+                              ? "bg-primary-600 text-white shadow-glow"
+                              : "border border-gray-200 bg-white text-gray-800 hover:border-primary-300 hover:bg-primary-50"
+                          }`}
+                        >
+                          {s.time}
+                        </button>
+                      );
+                    })}
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           )}
         </section>
@@ -354,6 +336,12 @@ export default function Book() {
 
       {slot && (
         <div className="animate-rise mt-8">
+          <div className="mb-3 flex items-center justify-between rounded-xl bg-gray-50 px-4 py-2.5">
+            <span className="text-xs text-gray-500">Seçilen saat</span>
+            <span className="tabular-nums text-sm font-bold text-gray-900">
+              {selectedDate?.day} {selectedDate?.date} {selectedDate?.month} · {slot.time}
+            </span>
+          </div>
           <Button full size="lg" onClick={goToStep2}>
             Devam Et
             <Icon name="chevronRight" size={18} />
