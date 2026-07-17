@@ -7,7 +7,7 @@ import EmptyState from "../../components/EmptyState.jsx";
 import Icon from "../../components/Icon.jsx";
 import { ExerciseMatchListCard } from "../../components/ExerciseCard.jsx";
 import BodyDiagram, { MUSCLES } from "../../components/BodyDiagram.jsx";
-import { machinesByMuscle } from "../../mock/machines.js";
+import { machinesByMuscle, MUSCLE_GROUPS } from "../../mock/machines.js";
 import { MOCK_EXERCISES } from "../../mock/exercises.js";
 import { fetchMachines, fetchExercises } from "../../api/catalog.js";
 
