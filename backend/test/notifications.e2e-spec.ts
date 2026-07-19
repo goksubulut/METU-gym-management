@@ -9,6 +9,36 @@ import { TransformInterceptor } from './../src/common/interceptors/transform.int
 import { ReminderService } from './../src/notifications/reminder.service';
 import { PrismaService } from './../src/prisma/prisma.service';
 
+const GYM_TIMEZONE = 'Europe/Istanbul';
+
+/** offsetMinutes sonra başlayan slot — salon saat diliminde (CI UTC olsa da tutarlı). */
+function slotAt(offsetMinutes: number): { dateKey: string; startTime: string; endTime: string } {
+  const target = new Date(Date.now() + offsetMinutes * 60_000);
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat('en-GB', {
+      timeZone: GYM_TIMEZONE,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    })
+      .formatToParts(target)
+      .map(({ type, value }) => [type, value]),
+  ) as Record<string, string>;
+
+  let hh = Number(parts.hour);
+  let mm = Number(parts.minute);
+  if (mm % 30 === 0) mm += 7;
+
+  const dateKey = `${parts.year}-${parts.month}-${parts.day}`;
+  const startTime = `${String(hh).padStart(2, '0')}:${String(mm % 60).padStart(2, '0')}`;
+  const endTotal = hh * 60 + mm + 5;
+  const endTime = `${String(Math.floor(endTotal / 60) % 24).padStart(2, '0')}:${String(endTotal % 60).padStart(2, '0')}`;
+  return { dateKey, startTime, endTime };
+}
+
 /**
  * Ürün eksiği 3 (Faz 1): randevu hatırlatma bildirimi. Pencere içinde
  * (REMINDER_LEAD_MINUTES) başlayacak BOOKED randevu için bir kez bildirim
@@ -28,19 +58,6 @@ describe('Appointment reminder notifications (e2e)', () => {
   let otherToken = '';
   let userId = '';
   const slotIds: string[] = [];
-
-  /** offsetMinutes sonra başlayan bir slot için tarih/saat (ızgara dışı dakika). */
-  function slotAt(offsetMinutes: number): { dateKey: string; startTime: string; endTime: string } {
-    const start = new Date(Date.now() + offsetMinutes * 60_000);
-    let mm = start.getMinutes();
-    if (mm % 30 === 0) mm += 7; // seed'in 30 dk ızgarasıyla çakışmayı önle
-    const startTime = `${String(start.getHours()).padStart(2, '0')}:${String(mm % 60).padStart(2, '0')}`;
-    const endMm = (mm + 5) % 60;
-    const endHh = start.getHours() + (mm + 5 >= 60 ? 1 : 0);
-    const endTime = `${String(endHh % 24).padStart(2, '0')}:${String(endMm).padStart(2, '0')}`;
-    const dateKey = start.toISOString().slice(0, 10);
-    return { dateKey, startTime, endTime };
-  }
 
   async function makeBookedAppointment(offsetMinutes: number): Promise<string> {
     const { dateKey, startTime, endTime } = slotAt(offsetMinutes);

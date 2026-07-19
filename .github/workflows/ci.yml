@@ -37,6 +37,7 @@ jobs:
       GYM_OPEN_HOUR: 8
       GYM_CLOSE_HOUR: 22
       BOOKING_WINDOW_DAYS: 14
+      GYM_UTC_OFFSET: "+03:00"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
