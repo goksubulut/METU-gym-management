@@ -7,7 +7,7 @@ export const summary = {
   openFaults: 4,
 };
 
-// Haftalık doluluk trendi
+// Haftalık doluluk trendi (gün bazlı)
 export const occupancyTrend = [
   { day: "Pzt", occupancy: 62 },
   { day: "Sal", occupancy: 71 },
@@ -16,6 +16,14 @@ export const occupancyTrend = [
   { day: "Cum", occupancy: 91 },
   { day: "Cmt", occupancy: 76 },
   { day: "Paz", occupancy: 58 },
+];
+
+// Aylık doluluk trendi (hafta bazlı)
+export const occupancyTrendMonthly = [
+  { day: "1. Hafta", occupancy: 72 },
+  { day: "2. Hafta", occupancy: 68 },
+  { day: "3. Hafta", occupancy: 81 },
+  { day: "4. Hafta", occupancy: 76 },
 ];
 
 // Makine türü bazlı tercih (bar chart)
@@ -73,13 +81,19 @@ export const matrixData = [
   { name: "Chest Press", uses: 152, rating: 4.7 },
   { name: "Kıvrık Deadlift", uses: 143, rating: 4.9 },
   { name: "Leg Press", uses: 128, rating: 4.6 },
+  { name: "Eliptik Bisiklet", uses: 156, rating: 4.1 },
   { name: "Pull Down", uses: 96, rating: 4.4 },
   { name: "Hip Thrust", uses: 98, rating: 4.7 },
-  { name: "Eliptik Bisiklet", uses: 89, rating: 4.3 },
   { name: "Horizontal Leg Curl", uses: 67, rating: 4.1 },
   { name: "Low Row", uses: 55, rating: 4.6 },
   { name: "Abdominal Crunch", uses: 41, rating: 4.0 },
   { name: "Pec Fly & Rear Delt", uses: 74, rating: 4.5 },
+];
+
+/** Bakım önceliği (yüksek kullanım + düşük puan) demo — matris ekranında görünürlük için. */
+export const maintenancePriorityDemo = [
+  { name: "Koşu Bandı", uses: 210, rating: 4.2 },
+  { name: "Eliptik Bisiklet", uses: 156, rating: 4.1 },
 ];
 
 // Geri bildirim etiket dağılımı (pie)

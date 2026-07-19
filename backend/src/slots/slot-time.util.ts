@@ -24,12 +24,17 @@ export function addMinutes(time: string, minutes: number): string {
   return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
 }
 
-/** Slotun gerçek başlangıç anı (yerel saat) — geçmiş slot kontrolü için. */
-export function slotStartDate(dateKey: string, startTime: string): Date {
-  return new Date(`${dateKey}T${startTime}:00`);
+/** Salon saat dilimi ofseti (varsayılan: Türkiye UTC+3). Slot saatleri salon yerel saatidir. */
+export function gymUtcOffset(): string {
+  return process.env.GYM_UTC_OFFSET ?? '+03:00';
 }
 
-/** Slotun gerçek bitiş anı (yerel saat) — otomatik sonuçlandırma için. */
+/** Slotun gerçek başlangıç anı (salon yerel saati) — geçmiş slot kontrolü için. */
+export function slotStartDate(dateKey: string, startTime: string): Date {
+  return new Date(`${dateKey}T${startTime}:00${gymUtcOffset()}`);
+}
+
+/** Slotun gerçek bitiş anı (salon yerel saati) — otomatik sonuçlandırma için. */
 export function slotEndDate(dateKey: string, endTime: string): Date {
-  return new Date(`${dateKey}T${endTime}:00`);
+  return new Date(`${dateKey}T${endTime}:00${gymUtcOffset()}`);
 }

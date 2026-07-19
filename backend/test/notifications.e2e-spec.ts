@@ -98,6 +98,7 @@ describe('Appointment reminder notifications (e2e)', () => {
     const withinId = await makeBookedAppointment(45); // pencere içi (< 120 dk)
     await makeBookedAppointment(5 * 24 * 60); // çok ileri → üretilmez
     await makeBookedAppointment(-2 * 24 * 60); // geçmiş → üretilmez
+    await makeBookedAppointment(-36); // az önce geçti → üretilmez
 
     await reminder.generateUpcomingReminders();
 

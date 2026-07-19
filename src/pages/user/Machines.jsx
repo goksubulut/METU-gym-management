@@ -7,11 +7,28 @@ import EmptyState from "../../components/EmptyState.jsx";
 import Icon from "../../components/Icon.jsx";
 import Pagination from "../../components/Pagination.jsx";
 import { Input } from "../../components/Input.jsx";
-import { machines as mockMachines, CATEGORIES } from "../../mock/machines.js";
+import { machines as mockMachines, CATEGORIES, MUSCLE_GROUPS } from "../../mock/machines.js";
+import { MUSCLES } from "../../components/BodyDiagram.jsx";
 import { fetchMachines } from "../../api/catalog.js";
 
 const PAGE_SIZE_GRID = 12;
 const PAGE_SIZE_LIST = 15;
+
+/** Makine adı, kategori, konum ve kas grubu/hedef kas etiketlerinde arama. */
+function machineMatchesQuery(machine, query) {
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+  const groupLabels = (machine.muscles ?? []).map(
+    (id) => MUSCLE_GROUPS.find((g) => g.id === id)?.label ?? id,
+  );
+  const targetLabels = (machine.targetMuscles ?? []).map(
+    (id) => MUSCLES[id]?.label ?? id,
+  );
+  const haystack = [machine.name, machine.category, machine.location, ...groupLabels, ...targetLabels]
+    .join(" ")
+    .toLocaleLowerCase("tr-TR");
+  return haystack.includes(q);
+}
 
 export default function Machines() {
   const nav = useNavigate();
@@ -33,9 +50,7 @@ export default function Machines() {
   const filtered = useMemo(
     () =>
       machines.filter(
-        (m) =>
-          (cat === "Tümü" || m.category === cat) &&
-          m.name.toLowerCase().includes(q.toLowerCase()),
+        (m) => (cat === "Tümü" || m.category === cat) && machineMatchesQuery(m, q),
       ),
     [machines, cat, q],
   );
@@ -65,7 +80,7 @@ export default function Machines() {
 
       <div className="mb-3">
         <Input
-          placeholder="Makine ara..."
+          placeholder="Makine veya kas grubu ara (örn. göğüs, bacak)..."
           value={q}
           onChange={(e) => setQ(e.target.value)}
         />

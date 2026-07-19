@@ -32,19 +32,13 @@ export default function Quality() {
         <p className="text-sm text-gray-400">Puan, arıza ve şikayet göstergeleri</p>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <StatCard label="Ortalama Puan" value={summary.avgRating} icon="star" tone="amber" />
         <StatCard
           label="Toplam Değerlendirme"
           value={summary.totalReviews?.toLocaleString("tr-TR") ?? "—"}
           icon="clipboard"
           tone="blue"
-        />
-        <StatCard
-          label="Çözüm Oranı"
-          value={`%${summary.resolutionRate ?? 0}`}
-          icon="check"
-          tone="green"
         />
       </div>
 

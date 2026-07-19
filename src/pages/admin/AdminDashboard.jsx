@@ -11,15 +11,36 @@ import {
 import Card from "../../components/Card.jsx";
 import StatCard from "../../components/StatCard.jsx";
 import StarRating from "../../components/StarRating.jsx";
+import Tabs from "../../components/Tabs.jsx";
 import {
   summary as mockSummary,
   occupancyTrend as mockTrend,
+  occupancyTrendMonthly as mockTrendMonthly,
   topMachines as mockTop,
 } from "../../mock/analytics.js";
-import { fetchAdminDashboard } from "../../api/admin.js";
+import { fetchAdminDashboard, fetchAdminOccupancy } from "../../api/admin.js";
+
+const OCCUPANCY_TABS = [
+  { value: "weekly", label: "Haftalık" },
+  { value: "monthly", label: "Aylık" },
+];
+
+function averageOccupancy(points) {
+  if (!points?.length) return 0;
+  return Math.round(points.reduce((sum, p) => sum + p.occupancy, 0) / points.length);
+}
+
+function mapOccupancyTrend(data, period) {
+  return data.map((p, i) => ({
+    day: period === "monthly" ? `${i + 1}. Hafta` : p.label,
+    occupancy: p.occupancy,
+  }));
+}
 
 export default function AdminDashboard() {
   const [summary, setSummary] = useState(mockSummary);
+  const [occupancyPeriod, setOccupancyPeriod] = useState("weekly");
+  const [periodOccupancy, setPeriodOccupancy] = useState(averageOccupancy(mockTrend));
   const [occupancyTrend, setOccupancyTrend] = useState(mockTrend);
   const [topMachines, setTopMachines] = useState(mockTop);
 
@@ -27,31 +48,65 @@ export default function AdminDashboard() {
     fetchAdminDashboard()
       .then((data) => {
         if (data.summary?.todayAppointments > 0 || data.topMachines?.length) {
-          setSummary(data.summary);
-          if (data.occupancyTrend?.length) setOccupancyTrend(data.occupancyTrend);
+          setSummary((prev) => ({
+            ...prev,
+            todayAppointments: data.summary.todayAppointments,
+            avgRating: data.summary.avgRating,
+            openFaults: data.summary.openFaults,
+          }));
           if (data.topMachines?.length) setTopMachines(data.topMachines);
         }
       })
       .catch(() => {});
   }, []);
 
+  useEffect(() => {
+    const apiPeriod = occupancyPeriod === "weekly" ? "daily" : "weekly";
+    const mockData = occupancyPeriod === "weekly" ? mockTrend : mockTrendMonthly;
+
+    fetchAdminOccupancy(apiPeriod)
+      .then((data) => {
+        if (data?.length) {
+          const trend = mapOccupancyTrend(data, occupancyPeriod);
+          setOccupancyTrend(trend);
+          setPeriodOccupancy(averageOccupancy(trend));
+        }
+      })
+      .catch(() => {
+        setOccupancyTrend(mockData);
+        setPeriodOccupancy(averageOccupancy(mockData));
+      });
+  }, [occupancyPeriod]);
+
+  const trendTitle =
+    occupancyPeriod === "weekly" ? "Haftalık Doluluk Trendi" : "Aylık Doluluk Trendi";
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-extrabold text-gray-900">Genel Bakış</h1>
-        <p className="text-sm text-gray-400">Salonun bugünkü durumu ve haftalık trendler</p>
+        <p className="text-sm text-gray-400">Salonun bugünkü durumu ve doluluk trendleri</p>
       </div>
 
       <div className="grid grid-cols-4 gap-4">
         <StatCard label="Bugünkü Randevu" value={summary.todayAppointments} delta="+12%" icon="calendar" />
-        <StatCard label="Doluluk Oranı" value={`%${summary.occupancy}`} delta="+5%" icon="users" tone="blue" />
+        <StatCard
+          label={`Doluluk Oranı (${occupancyPeriod === "weekly" ? "Haftalık" : "Aylık"})`}
+          value={`%${periodOccupancy}`}
+          delta="+5%"
+          icon="users"
+          tone="blue"
+        />
         <StatCard label="Ortalama Puan" value={summary.avgRating} delta="+0.2" icon="star" tone="amber" />
-        <StatCard label="Açık Arıza" value={summary.openFaults} delta="-2" icon="wrench" tone="green" />
+        <StatCard label="Açık Arıza" value={summary.openFaults} delta="-2" icon="wrench" tone="green" to="/admin/faults" />
       </div>
 
       <div className="grid grid-cols-3 gap-6">
         <Card className="col-span-2 p-6">
-          <h2 className="mb-4 text-base font-bold text-gray-900">Haftalık Doluluk Trendi</h2>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-base font-bold text-gray-900">{trendTitle}</h2>
+            <Tabs tabs={OCCUPANCY_TABS} active={occupancyPeriod} onChange={setOccupancyPeriod} />
+          </div>
           <ResponsiveContainer width="100%" height={280}>
             <AreaChart data={occupancyTrend}>
               <defs>

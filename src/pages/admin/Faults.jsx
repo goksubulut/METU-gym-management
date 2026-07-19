@@ -3,12 +3,19 @@ import Card from "../../components/Card.jsx";
 import Badge from "../../components/Badge.jsx";
 import Button from "../../components/Button.jsx";
 import Modal from "../../components/Modal.jsx";
+import StatCard from "../../components/StatCard.jsx";
 import Tabs from "../../components/Tabs.jsx";
 import { Input, Select } from "../../components/Input.jsx";
 import { useToast } from "../../components/Toast.jsx";
 import { faults as mockFaults } from "../../mock/feedback.js";
-import { fetchAdminFaults, updateAdminFaultStatus } from "../../api/admin.js";
+import { fetchAdminFaults, fetchAdminQuality, updateAdminFaultStatus } from "../../api/admin.js";
 import { isMockRowId } from "../../api/client.js";
+
+const RESOLUTION_HINT = {
+  title: "Nasıl hesaplanır?",
+  body: "Durumu \"Çözüldü\" olan arıza bildirimlerinin, sistemdeki toplam arıza sayısına oranıdır.",
+  formula: "(Çözüldü arıza sayısı ÷ Toplam arıza sayısı) × 100",
+};
 
 const SEV = { high: { tone: "red", label: "Yüksek" }, medium: { tone: "yellow", label: "Orta" }, low: { tone: "gray", label: "Düşük" } };
 const ST = {
@@ -31,6 +38,18 @@ export default function Faults() {
   const [detail, setDetail] = useState(null);
   const [editStatus, setEditStatus] = useState("");
   const [saving, setSaving] = useState(false);
+  const [resolutionRate, setResolutionRate] = useState(86);
+
+  const loadResolutionRate = useCallback(async () => {
+    try {
+      const data = await fetchAdminQuality();
+      setResolutionRate(data.summary?.resolutionRate ?? 0);
+    } catch {
+      const total = mockFaults.length;
+      const resolved = mockFaults.filter((f) => f.status === "resolved").length;
+      setResolutionRate(total ? Math.round((resolved / total) * 100) : 0);
+    }
+  }, []);
 
   const load = useCallback(async () => {
     try {
@@ -41,7 +60,8 @@ export default function Faults() {
     } catch {
       setList(mockFaults);
     }
-  }, []);
+    loadResolutionRate();
+  }, [loadResolutionRate]);
 
   useEffect(() => {
     load();
@@ -74,6 +94,7 @@ export default function Faults() {
         setDetail(updated);
       }
       toast("Durum güncellendi", "success");
+      loadResolutionRate();
     } catch (err) {
       toast(err.message ?? "Güncelleme başarısız", "error");
     } finally {
@@ -87,6 +108,14 @@ export default function Faults() {
         <h1 className="text-2xl font-extrabold text-gray-900">Arıza Bildirimleri</h1>
         <p className="text-sm text-gray-400">Bildirimleri filtrele, incele ve durumunu güncelle</p>
       </div>
+
+      <StatCard
+        label="Çözüm Oranı"
+        value={`%${resolutionRate}`}
+        icon="check"
+        tone="green"
+        hint={RESOLUTION_HINT}
+      />
 
       <div className="flex items-center justify-between gap-4">
         <Tabs

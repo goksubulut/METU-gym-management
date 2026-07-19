@@ -27,7 +27,6 @@ export class ReminderService {
   async generateUpcomingReminders(): Promise<number> {
     const leadMinutes = Number(this.config.get('REMINDER_LEAD_MINUTES') ?? DEFAULT_LEAD_MINUTES);
     const now = new Date();
-    const windowEnd = new Date(now.getTime() + leadMinutes * 60_000);
 
     const candidates = await this.prisma.appointment.findMany({
       where: { status: AppointmentStatus.BOOKED },
@@ -39,7 +38,11 @@ export class ReminderService {
       const alreadyNotified = a.notifications.some(
         (n) => n.type === NotificationType.APPOINTMENT_REMINDER,
       );
-      return !alreadyNotified && start > now && start <= windowEnd;
+      const msUntilStart = start.getTime() - now.getTime();
+      // Randevu başladıktan veya bittikten sonra hatırlatma üretme.
+      if (alreadyNotified || msUntilStart <= 0) return false;
+      // REMINDER_LEAD_MINUTES penceresi içinde, henüz başlamamış randevular.
+      return msUntilStart <= leadMinutes * 60_000;
     });
 
     let created = 0;

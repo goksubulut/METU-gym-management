@@ -8,7 +8,7 @@ import Icon from "../../components/Icon.jsx";
 import { CATEGORY_LABELS, CATEGORY_TONES } from "../../mock/announcements.js";
 import { getAccessToken } from "../../api/client.js";
 import { loadActiveAnnouncements } from "../../api/announcements.js";
-import { loadMyNotifications, markNotificationRead } from "../../api/notifications.js";
+import { loadMyNotifications, markNotificationRead, isExpiredAppointmentReminder } from "../../api/notifications.js";
 import { markAnnouncementsRead } from "../../utils/announcementRead.js";
 
 /** İki kaynağı (duyuru + kişisel bildirim) tek listeye normalize eder. */
@@ -19,15 +19,18 @@ function toItems(announcements, personal) {
     title: a.title,
     body: a.body,
     category: a.category,
-    ts: new Date(`${a.date}T12:00:00`).getTime(),
+    ts: new Date(`${a.date}T12:00:00+03:00`).getTime(),
   }));
-  const personalItems = personal.map((n) => ({
-    kind: "personal",
-    id: `notif-${n.id}`,
-    title: n.title,
-    body: n.body,
-    ts: new Date(n.createdAt).getTime(),
-  }));
+  const personalItems = personal
+    .map((n) => ({
+      kind: "personal",
+      id: `notif-${n.id}`,
+      title: n.title,
+      body: n.body,
+      ts: new Date(n.createdAt).getTime(),
+      createdAt: n.createdAt,
+    }))
+    .filter((n) => !isExpiredAppointmentReminder(n));
   return [...annItems, ...personalItems].sort((a, b) => b.ts - a.ts);
 }
 
@@ -110,11 +113,18 @@ export default function Notifications() {
                   <div>
                     <p className="font-bold text-gray-900">{item.title}</p>
                     <p className="text-xs text-gray-400">
-                      {new Date(item.ts).toLocaleDateString("tr-TR", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })}
+                      {item.kind === "personal" && item.createdAt
+                        ? `${new Date(item.createdAt).toLocaleString("tr-TR", {
+                            day: "numeric",
+                            month: "long",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })} · gönderildi`
+                        : new Date(item.ts).toLocaleDateString("tr-TR", {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                          })}
                     </p>
                   </div>
                 </div>
