@@ -13,6 +13,7 @@ import { CatalogModule } from './catalog/catalog.module';
 import { FeedbackModule } from './feedback/feedback.module';
 import { HealthModule } from './health/health.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { ProgramsModule } from './programs/programs.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { QrModule } from './qr/qr.module';
 import { ReceptionModule } from './reception/reception.module';
@@ -46,6 +47,7 @@ import { SlotsModule } from './slots/slots.module';
     ReceptionModule,
     QrModule,
     NotificationsModule,
+    ProgramsModule,
     HealthModule,
   ],
   providers: [

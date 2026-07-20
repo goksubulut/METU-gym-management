@@ -70,6 +70,11 @@ enum NotificationType {
   APPOINTMENT_REMINDER
 }
 
+enum ProgramItemType {
+  MACHINE
+  EXERCISE
+}
+
 // ---------------------------------------------------------------------------
 // Kimlik
 // ---------------------------------------------------------------------------
@@ -95,6 +100,7 @@ model User {
   ratings       Rating[]
   suggestions   Suggestion[]
   notifications Notification[]
+  workoutPrograms WorkoutProgram[]
 }
 
 // ---------------------------------------------------------------------------
@@ -132,6 +138,7 @@ model Machine {
   faultReports FaultReport[]
   ratings      Rating[]
   appointments AppointmentMachine[]
+  programItems     WorkoutProgramItem[]
 }
 
 // n-n: bir makine birden çok kas grubunu çalıştırır (SRS MachineMuscleGroup)
@@ -157,6 +164,7 @@ model Exercise {
   targetMuscles String[] @default([])
 
   muscleGroups ExerciseMuscleGroup[]
+  programItems WorkoutProgramItem[]
 }
 
 // n-n: bir egzersiz birden çok kas grubunu çalıştırır (SRS ExerciseMuscleGroup)
@@ -242,6 +250,38 @@ model AppointmentMuscleGroup {
   muscleGroup MuscleGroup @relation(fields: [muscleGroupId], references: [id])
 
   @@id([appointmentId, muscleGroupId])
+}
+
+// ---------------------------------------------------------------------------
+// Antrenman programları (kullanıcıya özel)
+// ---------------------------------------------------------------------------
+
+model WorkoutProgram {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items WorkoutProgramItem[]
+}
+
+// sortOrder benzersizliği bilinçli olarak yok — PATCH sıralama güncellemesinde
+// swap sırasında unique çakışmasını önlemek için öğeler delete+recreate ile yazılır.
+model WorkoutProgramItem {
+  id         String           @id @default(cuid())
+  programId  String
+  sortOrder  Int
+  itemType   ProgramItemType
+  machineId  String?
+  exerciseId String?
+
+  program  WorkoutProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+  machine  Machine?       @relation(fields: [machineId], references: [id], onDelete: SetNull)
+  exercise Exercise?      @relation(fields: [exerciseId], references: [id], onDelete: SetNull)
+
+  @@index([programId, sortOrder])
 }
 
 // ---------------------------------------------------------------------------

@@ -144,6 +144,8 @@ const PATHS = {
   ),
   chevronRight: <path d="m9 5 7 7-7 7" />,
   chevronLeft: <path d="m15 19-7-7 7-7" />,
+  chevronUp: <path d="m5 15 7-7 7 7" />,
+  chevronDown: <path d="m5 9 7 7 7-7" />,
   mapPin: (
     <>
       <path d="M12 21s-7-5.4-7-11a7 7 0 0 1 14 0c0 5.6-7 11-7 11Z" />

@@ -25,6 +25,9 @@ import Appointments from "./pages/user/Appointments.jsx";
 import EditAppointment from "./pages/user/EditAppointment.jsx";
 import Profile from "./pages/user/Profile.jsx";
 import Notifications from "./pages/user/Notifications.jsx";
+import ProgramsHub from "./pages/user/ProgramsHub.jsx";
+import ProgramCreate from "./pages/user/ProgramCreate.jsx";
+import ProgramDetail from "./pages/user/ProgramDetail.jsx";
 
 // Admin pages
 import AdminLogin from "./pages/admin/AdminLogin.jsx";
@@ -71,6 +74,9 @@ export default function App() {
         <Route path="/appointments/:id/edit" element={<EditAppointment />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/notifications" element={<Notifications />} />
+        <Route path="/programs" element={<ProgramsHub />} />
+        <Route path="/programs/new" element={<ProgramCreate />} />
+        <Route path="/programs/:id" element={<ProgramDetail />} />
       </Route>
 
       {/* B. Yönetici paneli (masaüstü) */}

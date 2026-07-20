@@ -16,7 +16,7 @@ const labelOf = (id) => MUSCLE_GROUPS.find((m) => m.id === id)?.label || id;
 const QUICK_ACTIONS = [
   { to: "/appointments", icon: "calendar", title: "Randevularım", desc: "Geçmiş & gelecek", iconBg: "bg-ink-900", iconFg: "text-white" },
   { to: "/exercises", icon: "flame", title: "Egzersizler", desc: "Serbest & ısınma", iconBg: "bg-primary-600", iconFg: "text-white" },
-  { to: "/notifications", icon: "bell", title: "Bildirimler", desc: "Duyuru & hatırlatma", iconBg: "bg-primary-50", iconFg: "text-primary-700" },
+  { to: "/programs", icon: "clipboard", title: "Programlarım", desc: "Oluştur & yönet", iconBg: "bg-primary-50", iconFg: "text-primary-700" },
   { to: "/feedback", icon: "message", title: "Geri Bildirim", desc: "Arıza & öneri", iconBg: "bg-gray-100", iconFg: "text-gray-500" },
 ];
 
