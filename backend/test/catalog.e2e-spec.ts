@@ -8,7 +8,7 @@ import { TransformInterceptor } from './../src/common/interceptors/transform.int
 
 /**
  * Katalog + öneri motoru. Uçlar @Public olduğundan token gerekmez (FR-CAT-1).
- * Seed verisine dayanır (25 makine, 8 kas grubu, 39 egzersiz).
+ * Seed verisine dayanır (36 makine, 8 kas grubu, 39 egzersiz).
  */
 describe('Catalog (e2e)', () => {
   let app: INestApplication<App>;
@@ -33,7 +33,7 @@ describe('Catalog (e2e)', () => {
   describe('GET /api/machines', () => {
     it('token olmadan makine listesini döner (FR-CAT-1)', async () => {
       const res = await request(app.getHttpServer()).get('/api/machines').expect(200);
-      expect(res.body.data.length).toBeGreaterThanOrEqual(25);
+      expect(res.body.data.length).toBeGreaterThanOrEqual(36);
       const m = res.body.data.find((x: { id: string }) => x.id === 'm1');
       expect(m.name).toBe('Koşu Bandı');
       expect(m).toHaveProperty('rating');

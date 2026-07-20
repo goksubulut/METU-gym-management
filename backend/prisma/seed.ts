@@ -232,7 +232,7 @@ async function seedAppointments() {
   // Tekrar çalıştırmada çift kayıt olmaması için demo randevular temizlenir.
   await prisma.appointment.deleteMany();
 
-  // Makine id'leri gerçek katalogla (content/machines.json, m1..m25) hizalanmıştır.
+  // Makine id'leri gerçek katalogla (content/machines.json, m1..m36) hizalanmıştır.
   const demo: DemoAppointment[] = [
     // Gyedu Ernest'in randevu geçmişi (mock a1-a5)
     { user: 'Gyedu Ernest', dayOffset: 0, time: '18:30', status: 'BOOKED', muscleGroups: ['chest', 'arms'], machines: ['m19', 'm9'], note: 'Üst vücut günü' },

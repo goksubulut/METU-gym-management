@@ -14,7 +14,7 @@
     ],
     "location": "Kardiyo Alanı — C1",
     "hasVideo": false,
-    "photoUrl": "/media/photos/m1.jpg",
+    "photoUrl": "/media/photos/m1.jpeg",
     "description": "Eğim ve hız programlı koşu bandı. Isınma, yağ yakımı ve dayanıklılık için idealdir. Salonda 7 adet bulunur.",
     "tips": "Isınma için 5 dk yürüyüşle başla, tutamaklara asılma."
   },
@@ -24,7 +24,8 @@
     "category": "Kardiyo",
     "muscles": [
       "cardio",
-      "legs"
+      "legs",
+      "glutes"
     ],
     "targetMuscles": [
       "quadriceps",
@@ -52,7 +53,7 @@
     ],
     "location": "Kardiyo Alanı — C3",
     "hasVideo": false,
-    "photoUrl": "/media/photos/m3.jpg",
+    "photoUrl": "/media/photos/m3.jpeg",
     "description": "Yatay/dikey pedal bisikleti. Alt vücut dayanıklılığı ve düşük etkili kardiyo. Salonda 2 adet bulunur.",
     "tips": "Sele yüksekliğini diz hafif bükülü kalacak şekilde ayarla."
   },
@@ -72,7 +73,7 @@
     "hasVideo": false,
     "description": "Dik oturuşlu spinning tarzı bisiklet. Yüksek tempolu kardiyo için uygundur. Salonda 2 adet bulunur.",
     "tips": "Direnç seviyesini kademeli artır, tempoyu koru.",
-    "photoUrl": "/media/photos/m4.jpg"
+    "photoUrl": "/media/photos/m4.jpeg"
   },
   {
     "id": "m5",
@@ -92,7 +93,7 @@
     "hasVideo": false,
     "description": "Sürekli basamak tırmanışı simülasyonu. Kalça ve bacak yoğun kardiyo. Salonda 2 adet bulunur.",
     "tips": "Tırabzana yüklenme, gövdeni dik tut.",
-    "photoUrl": "/media/photos/m5.jpg"
+    "photoUrl": "/media/photos/m5.jpeg"
   },
   {
     "id": "m6",
@@ -112,7 +113,7 @@
     ],
     "location": "Serbest Ağırlık — B1",
     "hasVideo": true,
-    "photoUrl": "/media/photos/m6.jpg",
+    "photoUrl": "/media/photos/m6.jpeg",
     "description": "Barbell ile klasik deadlift alanı. Arka zincir (bel, hamstring, kalça) için temel bileşik hareket. Salonda 1 adet bulunur.",
     "tips": "Sırtı nötr tut, barı vücuda yakın kaldır."
   },
@@ -128,36 +129,46 @@
     "targetMuscles": [
       "quadriceps",
       "gluteal",
-      "hamstring"
+      "hamstring",
+      "lower-back",
+      "trapezius"
     ],
     "location": "Serbest Ağırlık — B2",
     "hasVideo": false,
-    "photoUrl": "/media/photos/m7.jpg",
+    "photoUrl": "/media/photos/m7.jpeg",
     "description": "Trap/hex bar ile deadlift. Bele daha az yük bindirir, quadriceps katkısı yüksektir. Salonda 1 adet bulunur.",
     "tips": "Göğsü yukarıda tut, itişi topuktan başlat."
   },
   {
     "id": "m8",
-    "name": "İstasyon (Çok Fonksiyonlu)",
-    "category": "Fonksiyonel",
+    "name": "Olimpik Bar",
+    "category": "Serbest Ağırlık",
     "muscles": [
       "chest",
       "back",
       "shoulders",
-      "arms"
+      "arms",
+      "legs",
+      "glutes",
+      "core"
     ],
     "targetMuscles": [
       "chest",
       "upper-back",
+      "lower-back",
+      "trapezius",
       "deltoids",
       "biceps",
-      "triceps"
+      "triceps",
+      "quadriceps",
+      "gluteal",
+      "hamstring"
     ],
-    "location": "Fonksiyonel Alan — F1",
+    "location": "Serbest Ağırlık — B0",
     "hasVideo": false,
-    "photoUrl": "/media/photos/m8.jpg",
-    "description": "Birden çok üst vücut hareketine izin veren çok istasyonlu kule. Göğüs, sırt, omuz ve kol çalışması. Salonda 1 adet bulunur.",
-    "tips": "İstasyonlar arası ağırlık pimini doğru seç, formu koru."
+    "photoUrl": "/media/photos/m8.jpeg",
+    "description": "Standart olimpik barbell (20 kg). Bench, squat, deadlift ve overhead hareketler için temel serbest ağırlık ekipmanı. Salonda 1 adet bulunur.",
+    "tips": "Kelepçe ve plakaları dengeli yükle, barı kaldırmadan önce alanı kontrol et."
   },
   {
     "id": "m9",
@@ -168,7 +179,9 @@
       "back",
       "shoulders",
       "arms",
-      "core"
+      "core",
+      "legs",
+      "glutes"
     ],
     "targetMuscles": [
       "chest",
@@ -176,11 +189,13 @@
       "deltoids",
       "biceps",
       "triceps",
-      "abs"
+      "abs",
+      "quadriceps",
+      "gluteal"
     ],
     "location": "Fonksiyonel Alan — F2",
     "hasVideo": true,
-    "photoUrl": "/media/photos/m9.jpg",
+    "photoUrl": "/media/photos/m9.jpeg",
     "description": "Çift ayarlı kablo makinesi; sonsuz varyasyonla tüm vücudu çalıştırır. Salonda 1 adet bulunur.",
     "tips": "Makara yüksekliğini harekete göre ayarla, gövdeyi sabitle."
   },
@@ -198,7 +213,7 @@
     ],
     "location": "Kablolu Alan — A1",
     "hasVideo": true,
-    "photoUrl": "/media/photos/m10.jpg",
+    "photoUrl": "/media/photos/m10.jpeg",
     "description": "Geniş kavrama ile sırt (latissimus dorsi) çalıştıran kablolu istasyon. Salonda 1 adet bulunur.",
     "tips": "Çubuğu göğse doğru çek, omuzları aşağıda tut."
   },
@@ -219,7 +234,7 @@
     "hasVideo": false,
     "description": "Alçak makaralı çekiş; orta sırt ve kürek kemiği kaslarını hedefler. Salonda 1 adet bulunur.",
     "tips": "Sırtı dik tut, kürek kemiklerini geriye sık.",
-    "photoUrl": "/media/photos/m11.jpg"
+    "photoUrl": "/media/photos/m11.jpeg"
   },
   {
     "id": "m12",
@@ -235,7 +250,7 @@
     ],
     "location": "Kablolu Alan — A3",
     "hasVideo": false,
-    "photoUrl": "/media/photos/m12.jpg",
+    "photoUrl": "/media/photos/m12.jpeg",
     "description": "Yüksek makara istasyonu; triceps pushdown ve sırt izolasyonu için kullanılır. Salonda 1 adet bulunur.",
     "tips": "Dirsekleri gövdeye sabitle, hareketi kontrollü yap."
   },
@@ -254,7 +269,7 @@
     ],
     "location": "Alt Vücut — L1",
     "hasVideo": true,
-    "photoUrl": "/media/photos/m13.jpg",
+    "photoUrl": "/media/photos/m13.jpeg",
     "description": "Açılı bacak presi. Quadriceps, hamstring ve kalça kaslarını hedefler. Salonda 2 adet bulunur.",
     "tips": "Dizlerini içe kilitleme, sırtını mindere yasla, kontrollü in."
   },
@@ -272,7 +287,7 @@
     ],
     "location": "Alt Vücut — L2",
     "hasVideo": true,
-    "photoUrl": "/media/photos/m14.jpg",
+    "photoUrl": "/media/photos/m14.jpeg",
     "description": "Kalça itişi makinesi. Gluteus kaslarını izole ederek çalıştırır. Salonda 1 adet bulunur.",
     "tips": "Tepede kalçayı sık, beli aşırı gerginleştirme."
   },
@@ -289,8 +304,8 @@
     ],
     "location": "Alt Vücut — L3",
     "hasVideo": false,
-    "photoUrl": "/media/photos/m15.jpg",
-    "description": "İç (adduktor) ve dış (abduktor) bacak kaslarını çalıştıran çift yönlü makine. Salonda 2 adet bulunur.",
+    "photoUrl": "/media/photos/m15.jpeg",
+    "description": "İç (adduktor) ve dış (abduktor) bacak kaslarını çalıştıran çift yönlü makine. Salonda 1 adet bulunur.",
     "tips": "Hareketi sonuna kadar götür, dönüşte kontrolü bırakma."
   },
   {
@@ -305,7 +320,7 @@
     ],
     "location": "Alt Vücut — L4",
     "hasVideo": false,
-    "photoUrl": "/media/photos/m16.jpg",
+    "photoUrl": "/media/photos/m16.jpeg",
     "description": "Yatık hamstring bükme makinesi. Arka bacak kaslarını izole eder. Salonda 1 adet bulunur.",
     "tips": "Kalçayı mindere sabitle, tepede 1 sn sık."
   },
@@ -323,9 +338,9 @@
     ],
     "location": "Üst Vücut — U1",
     "hasVideo": false,
-    "description": "Oturarak omuz presi. Deltoid kaslarını sabit yörüngeyle çalıştırır. Salonda 2 adet bulunur.",
+    "description": "Oturarak omuz presi. Deltoid kaslarını sabit yörüngeyle çalıştırır. Salonda 1 adet bulunur.",
     "tips": "Beli minderden ayırma, tam uzatmada kilitleme.",
-    "photoUrl": "/media/photos/m17.jpg"
+    "photoUrl": "/media/photos/m17.jpeg"
   },
   {
     "id": "m18",
@@ -343,7 +358,7 @@
     ],
     "location": "Üst Vücut — U2",
     "hasVideo": false,
-    "photoUrl": "/media/photos/m18.jpg",
+    "photoUrl": "/media/photos/m18.jpeg",
     "description": "Eğimli göğüs presi; üst göğüs bölgesini hedefler. Salonda 1 adet bulunur.",
     "tips": "Dirsekleri omuz hizasında tut, hareketi kontrollü it."
   },
@@ -363,7 +378,7 @@
     ],
     "location": "Üst Vücut — U3",
     "hasVideo": true,
-    "photoUrl": "/media/photos/m19.jpg",
+    "photoUrl": "/media/photos/m19.jpeg",
     "description": "Oturarak göğüs presi. Pektoral kasları güvenli sabit yörüngeyle çalıştırır. Salonda 1 adet bulunur.",
     "tips": "Dirsekleri omuz hizasında tut, tam uzatmada kilitleme."
   },
@@ -373,15 +388,17 @@
     "category": "Makine",
     "muscles": [
       "chest",
+      "back",
       "shoulders"
     ],
     "targetMuscles": [
       "chest",
-      "deltoids"
+      "deltoids",
+      "upper-back"
     ],
     "location": "Üst Vücut — U4",
     "hasVideo": false,
-    "photoUrl": "/media/photos/m20.jpg",
+    "photoUrl": "/media/photos/m20.jpeg",
     "description": "Çift yönlü makine; göğüs sıkıştırma (pec fly) ve arka omuz (rear delt) çalışması. Salonda 1 adet bulunur.",
     "tips": "Hareketi göğüs merkezinde birleştir, dönüşte omuzu zorlama."
   },
@@ -399,7 +416,7 @@
     ],
     "location": "Üst Vücut — U5",
     "hasVideo": false,
-    "photoUrl": "/media/photos/m21.jpg",
+    "photoUrl": "/media/photos/m21.jpeg",
     "description": "Oturarak kürek çekiş makinesi. Orta sırt ve kürek kemiği kaslarını hedefler. Salonda 1 adet bulunur.",
     "tips": "Gövdeyi sabit tut, kolları geriye çekerken sırtı sık."
   },
@@ -417,7 +434,7 @@
     "hasVideo": false,
     "description": "Biceps izolasyon makinesi. Kol ön yüzünü sabit yörüngeyle çalıştırır. Salonda 1 adet bulunur.",
     "tips": "Dirsekleri sabit tut, tepede sık, kontrollü indir.",
-    "photoUrl": "/media/photos/m22.jpg"
+    "photoUrl": "/media/photos/m22.jpeg"
   },
   {
     "id": "m23",
@@ -431,7 +448,7 @@
     ],
     "location": "Kol Alanı — K2",
     "hasVideo": false,
-    "photoUrl": "/media/photos/m23.jpg",
+    "photoUrl": "/media/photos/m23.jpeg",
     "description": "Triceps izolasyon makinesi. Kol arka yüzünü hedefler. Salonda 1 adet bulunur.",
     "tips": "Dirsekleri gövdeye sabitle, tam uzatmada sık."
   },
@@ -447,7 +464,7 @@
     ],
     "location": "Kol Alanı — K3",
     "hasVideo": false,
-    "photoUrl": "/media/photos/m24.jpg",
+    "photoUrl": "/media/photos/m24.jpeg",
     "description": "Destekli biceps curl (preacher). Kolu yalıtarak tam biceps kasılması sağlar. Salonda 2 adet bulunur.",
     "tips": "Kolu tam uzat, sallanmadan kaldır."
   },
@@ -463,8 +480,227 @@
     ],
     "location": "Karın Alanı — X1",
     "hasVideo": false,
-    "photoUrl": "/media/photos/m25.jpg",
+    "photoUrl": "/media/photos/m25.jpeg",
     "description": "Karın kaslarını dirençli çalıştıran crunch makinesi. Salonda 1 adet bulunur.",
     "tips": "Boyun değil karın kaslarıyla katla, nefesi vererek sık."
+  },
+  {
+    "id": "m26",
+    "name": "Leg Extension",
+    "category": "Makine",
+    "muscles": [
+      "legs"
+    ],
+    "targetMuscles": [
+      "quadriceps"
+    ],
+    "location": "Alt Vücut — L5",
+    "hasVideo": false,
+    "description": "Oturarak quadriceps uzatma makinesi. Ön bacak kaslarını izole eder. Salonda 1 adet bulunur.",
+    "tips": "Dizleri kontrollü uzat, tepede 1 sn sık, yavaş indir.",
+    "photoUrl": "/media/photos/m26.jpeg"
+  },
+  {
+    "id": "m27",
+    "name": "Seated Calf Raise",
+    "category": "Makine",
+    "muscles": [
+      "legs"
+    ],
+    "targetMuscles": [
+      "calves"
+    ],
+    "location": "Alt Vücut — L6",
+    "hasVideo": false,
+    "description": "Oturarak kalf yükseltme makinesi. Baldır kaslarını dirençli çalıştırır. Salonda 1 adet bulunur.",
+    "tips": "Topukları yavaşça indir, tepede bir an bekle, kontrollü kaldır.",
+    "photoUrl": "/media/photos/m27.jpeg"
+  },
+  {
+    "id": "m28",
+    "name": "Incline Barbell Bench Press",
+    "category": "Serbest Ağırlık",
+    "muscles": [
+      "chest",
+      "shoulders",
+      "arms"
+    ],
+    "targetMuscles": [
+      "chest",
+      "deltoids",
+      "triceps"
+    ],
+    "location": "Serbest Ağırlık — B3",
+    "hasVideo": false,
+    "description": "Eğimli barbell bench press istasyonu. Üst göğüs ve omuz ön bölgesini hedefler. Salonda 1 adet bulunur.",
+    "tips": "Omuz bıçaklarını sıkıştır, barı göğüs üst hizasına kontrollü indir.",
+    "photoUrl": "/media/photos/m28.jpeg"
+  },
+  {
+    "id": "m29",
+    "name": "Flat Barbell Bench Press",
+    "category": "Serbest Ağırlık",
+    "muscles": [
+      "chest",
+      "shoulders",
+      "arms"
+    ],
+    "targetMuscles": [
+      "chest",
+      "deltoids",
+      "triceps"
+    ],
+    "location": "Serbest Ağırlık — B4",
+    "hasVideo": false,
+    "description": "Düz barbell bench press sehpası. Göğüs kaslarını bileşik hareketle çalıştırır. Salonda 1 adet bulunur.",
+    "tips": "Ayakları yere sabitle, barı göğüs orta hizasına indir, kontrollü it.",
+    "photoUrl": "/media/photos/m29.jpeg"
+  },
+  {
+    "id": "m30",
+    "name": "Scott Bench",
+    "category": "Serbest Ağırlık",
+    "muscles": [
+      "arms"
+    ],
+    "targetMuscles": [
+      "biceps"
+    ],
+    "location": "Serbest Ağırlık — B5",
+    "hasVideo": false,
+    "description": "Preacher curl (Scott) sehpası. Biceps izolasyonu için kol desteği sağlar. Salonda 1 adet bulunur.",
+    "tips": "Dirsekleri mindere sabitle, tam uzatma ve kasılmayı kontrollü yap.",
+    "photoUrl": "/media/photos/m30.jpeg"
+  },
+  {
+    "id": "m31",
+    "name": "Adjustable / Incline-Decline Bench",
+    "category": "Serbest Ağırlık",
+    "muscles": [
+      "chest",
+      "shoulders",
+      "back",
+      "arms"
+    ],
+    "targetMuscles": [
+      "chest",
+      "deltoids",
+      "upper-back",
+      "triceps"
+    ],
+    "location": "Serbest Ağırlık — B6",
+    "hasVideo": false,
+    "description": "Ayarlanabilir eğim sehpası; düz, incline ve decline pozisyonlarında dambıl/barbell çalışması. Salonda 1 adet bulunur.",
+    "tips": "Açıyı harekete göre ayarla, ayakları ve sırt desteğini sabitle.",
+    "photoUrl": "/media/photos/m31.jpeg"
+  },
+  {
+    "id": "m32",
+    "name": "Smith Machine",
+    "category": "Serbest Ağırlık",
+    "muscles": [
+      "chest",
+      "back",
+      "shoulders",
+      "arms",
+      "legs",
+      "glutes"
+    ],
+    "targetMuscles": [
+      "chest",
+      "quadriceps",
+      "gluteal",
+      "hamstring",
+      "deltoids",
+      "triceps",
+      "upper-back"
+    ],
+    "location": "Serbest Ağırlık — B7",
+    "hasVideo": false,
+    "description": "Sabit kızaklı Smith makinesi; squat, bench ve overhead hareketler için güvenli rehberli yörünge. Salonda 1 adet bulunur.",
+    "tips": "Bar yolunu vücut hizasına göre ayarla, kilitleri kontrol et.",
+    "photoUrl": "/media/photos/m32.jpeg"
+  },
+  {
+    "id": "m33",
+    "name": "45 Derece Hiperekstansiyon Sehpası",
+    "category": "Serbest Ağırlık",
+    "muscles": [
+      "back",
+      "glutes",
+      "legs",
+      "core"
+    ],
+    "targetMuscles": [
+      "lower-back",
+      "gluteal",
+      "hamstring"
+    ],
+    "location": "Serbest Ağırlık — B8",
+    "hasVideo": false,
+    "description": "45° hyperextension sehpası. Bel altı, kalça ve arka bacak kaslarını çalıştırır. Salonda 1 adet bulunur.",
+    "tips": "Kalçayı menteşe noktasında tut, beli nötr koruyarak kaldır.",
+    "photoUrl": "/media/photos/m33.jpeg"
+  },
+  {
+    "id": "m34",
+    "name": "Vertical Knee Raise",
+    "category": "Makine",
+    "muscles": [
+      "core"
+    ],
+    "targetMuscles": [
+      "abs"
+    ],
+    "location": "Karın Alanı — X2",
+    "hasVideo": false,
+    "description": "Dikey diz kaldırma istasyonu. Alt karın ve core stabilitesini çalıştırır. Salonda 1 adet bulunur.",
+    "tips": "Sallanmadan dizleri kontrollü kaldır, inişte core'u gevşetme.",
+    "photoUrl": "/media/photos/m34.jpeg"
+  },
+  {
+    "id": "m35",
+    "name": "Multi-Jungle / 4-Stack Cable Station",
+    "category": "Kablolu",
+    "muscles": [
+      "chest",
+      "back",
+      "shoulders",
+      "arms",
+      "legs",
+      "glutes"
+    ],
+    "targetMuscles": [
+      "chest",
+      "upper-back",
+      "deltoids",
+      "biceps",
+      "triceps",
+      "quadriceps",
+      "gluteal"
+    ],
+    "location": "Kablolu Alan — A4",
+    "hasVideo": false,
+    "description": "Dört istasyonlu kablo kulesi (multi-jungle). Üst/alt vücut için çok yönlü kablo hareketleri. Salonda 1 adet bulunur.",
+    "tips": "İstasyon ağırlık pinini doğru seç, kablo yüksekliğini harekete göre ayarla.",
+    "photoUrl": "/media/photos/m35.jpeg"
+  },
+  {
+    "id": "m36",
+    "name": "Shoulder Press",
+    "category": "Makine",
+    "muscles": [
+      "shoulders",
+      "arms"
+    ],
+    "targetMuscles": [
+      "deltoids",
+      "triceps"
+    ],
+    "location": "Üst Vücut — U6",
+    "hasVideo": false,
+    "description": "Oturarak omuz presi. Deltoid kaslarını sabit yörüngeyle çalıştırır. Salonda 1 adet bulunur.",
+    "tips": "Beli minderden ayırma, tam uzatmada kilitleme.",
+    "photoUrl": "/media/photos/m36.jpeg"
   }
 ]
