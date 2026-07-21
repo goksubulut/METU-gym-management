@@ -18,6 +18,8 @@ export function mapMachineFromApi(m) {
     description: m.description ?? "",
     tips: m.tips ?? "",
     photoUrl: m.photoUrl ?? null,
+    isActive: m.isActive !== false,
+    qrImageUrl: m.qrImageUrl ?? null,
   };
 }
 

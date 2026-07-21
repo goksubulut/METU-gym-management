@@ -4,10 +4,12 @@ import * as QRCode from 'qrcode';
 import { PrismaService } from '../prisma/prisma.service';
 
 export interface QrView {
-  /** QR'ın içine gömülen tam URL */
+  /** QR'ın içine gömülen tam URL (deep-link) */
   url: string;
-  /** <img src=...> ile doğrudan gösterilebilen PNG (base64 data URL) */
+  /** <img src=...> — özel PNG yolu veya üretilmiş data-URL */
   dataUrl: string;
+  /** true: admin yüklediği özel PNG kullanılıyor */
+  custom: boolean;
 }
 
 export interface MachineQrView extends QrView {
@@ -19,6 +21,7 @@ export interface MachineQrView extends QrView {
 /**
  * QR üretimi (FR-QR-1..3). QR'lar machine_id bazlı deep-link URL taşır;
  * fiziksel olarak basılıp makinelere/kapıya yapıştırılır. Üretim admin işidir.
+ * Admin özel PNG yüklediyse o gösterilir; yoksa deep-link'ten üretilir.
  */
 @Injectable()
 export class QrService {
@@ -31,27 +34,36 @@ export class QrService {
   async forMachine(machineId: string): Promise<MachineQrView> {
     const machine = await this.prisma.machine.findUnique({
       where: { id: machineId },
-      select: { id: true, name: true, location: true, qrCode: true, isActive: true },
+      select: {
+        id: true,
+        name: true,
+        location: true,
+        qrCode: true,
+        qrImageUrl: true,
+        isActive: true,
+      },
     });
-    if (!machine || !machine.isActive) {
+    if (!machine) {
       throw new NotFoundException('Makine bulunamadı');
     }
 
     // Machine.qrCode deep-link yolunu tutar (ör. "/machine/m1")
     const url = `${this.appBaseUrl()}${machine.qrCode}`;
+    const custom = Boolean(machine.qrImageUrl);
     return {
       machineId: machine.id,
       machineName: machine.name,
       location: machine.location,
       url,
-      dataUrl: await this.toDataUrl(url),
+      custom,
+      dataUrl: custom ? machine.qrImageUrl! : await this.toDataUrl(url),
     };
   }
 
   /** FR-QR-1: kapı QR'ı — uygulama tanıtım/bilgilendirme sayfasına gider. */
   async forDoor(): Promise<QrView> {
     const url = `${this.appBaseUrl()}/qr-info`;
-    return { url, dataUrl: await this.toDataUrl(url) };
+    return { url, custom: false, dataUrl: await this.toDataUrl(url) };
   }
 
   private appBaseUrl(): string {

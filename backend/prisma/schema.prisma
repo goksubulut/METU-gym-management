@@ -124,6 +124,8 @@ model Machine {
   photoUrl    String?
   location    String // fiziksel konum, ör. "Zemin Kat — B3"
   qrCode      String   @unique // makine QR'ının taşıdığı deep-link yolu, ör. "/machine/m1"
+  // Opsiyonel özel QR PNG (admin yükler). Yoksa runtime'da deep-link'ten üretilir.
+  qrImageUrl  String?
   description String?
   tips        String?
   // Hibrit öneri motoru: kaba MachineMuscleGroup bağının yanında ince hedef kas

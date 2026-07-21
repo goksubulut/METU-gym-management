@@ -120,10 +120,15 @@ export function scheduleProactiveRefresh() {
 }
 
 export async function apiFetch(path, options = {}, retried = false) {
+  const isFormData = typeof FormData !== "undefined" && options.body instanceof FormData;
   const headers = {
-    "Content-Type": "application/json",
+    ...(isFormData ? {} : { "Content-Type": "application/json" }),
     ...options.headers,
   };
+  // FormData'da Content-Type'ı elle set etme — boundary tarayıcı ekler.
+  if (isFormData && headers["Content-Type"]) {
+    delete headers["Content-Type"];
+  }
   const token = getAccessToken();
   if (token) headers.Authorization = `Bearer ${token}`;
 

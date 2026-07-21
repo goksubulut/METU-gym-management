@@ -1,8 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { FaultStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { OCCUPYING_STATUSES } from '../../slots/slots.service';
+import { CreateMachineDto } from './dto/create-machine.dto';
 import { MachinesQuery } from './dto/machines.query';
+import { UpdateMachineDto } from './dto/update-machine.dto';
+import { deletePhotoFile, deleteQrFile } from './machine-media.util';
 
 export interface MachineListItem {
   id: string;
@@ -18,6 +21,12 @@ export interface MachineListItem {
   reviews: number;
   openFaults: number;
   hasVideo: boolean;
+}
+
+/** Admin envanter: pasif makineler + isActive + özel QR. */
+export interface AdminMachineListItem extends MachineListItem {
+  isActive: boolean;
+  qrImageUrl: string | null;
 }
 
 export interface MachineDetail extends MachineListItem {
@@ -89,6 +98,218 @@ export class MachinesService {
     }
     const stats = await this.loadStats([id]);
     return { ...this.toListItem(machine, stats), videos: machine.videos, qrCode: machine.qrCode };
+  }
+
+  // ---------------------------------------------------------------------------
+  // Admin CRUD (envanter paneli)
+  // ---------------------------------------------------------------------------
+
+  /** Tüm makineler (aktif + pasif) — admin envanter listesi. */
+  async findAllAdmin(): Promise<AdminMachineListItem[]> {
+    const machines = await this.prisma.machine.findMany({
+      include: MACHINE_INCLUDE,
+      orderBy: { name: 'asc' },
+    });
+    const stats = await this.loadStats(machines.map((m) => m.id));
+    return machines.map((m) => ({
+      ...this.toListItem(m, stats),
+      isActive: m.isActive,
+      qrImageUrl: m.qrImageUrl,
+    }));
+  }
+
+  async create(dto: CreateMachineDto): Promise<AdminMachineListItem> {
+    const muscleGroupIds = dto.muscleGroupIds ?? [];
+    await this.assertMuscleGroupsExist(muscleGroupIds);
+
+    // Geçici qrCode ile oluştur; id belli olunca deep-link güncellenir.
+    const created = await this.prisma.machine.create({
+      data: {
+        name: dto.name.trim(),
+        category: dto.category,
+        location: dto.location.trim(),
+        description: dto.description?.trim() || null,
+        tips: dto.tips?.trim() || null,
+        targetMuscles: dto.targetMuscles ?? [],
+        isActive: dto.isActive ?? true,
+        qrCode: `/machine/pending-${Date.now()}`,
+        muscleGroups: {
+          create: muscleGroupIds.map((muscleGroupId) => ({ muscleGroupId })),
+        },
+      },
+      include: MACHINE_INCLUDE,
+    });
+
+    const machine = await this.prisma.machine.update({
+      where: { id: created.id },
+      data: { qrCode: `/machine/${created.id}` },
+      include: MACHINE_INCLUDE,
+    });
+
+    const stats = await this.loadStats([machine.id]);
+    return {
+      ...this.toListItem(machine, stats),
+      isActive: machine.isActive,
+      qrImageUrl: machine.qrImageUrl,
+    };
+  }
+
+  async update(id: string, dto: UpdateMachineDto): Promise<AdminMachineListItem> {
+    await this.assertExists(id);
+    if (dto.muscleGroupIds) {
+      await this.assertMuscleGroupsExist(dto.muscleGroupIds);
+    }
+
+    const machine = await this.prisma.machine.update({
+      where: { id },
+      data: {
+        name: dto.name?.trim(),
+        category: dto.category,
+        location: dto.location?.trim(),
+        description: dto.description === undefined ? undefined : dto.description.trim() || null,
+        tips: dto.tips === undefined ? undefined : dto.tips.trim() || null,
+        targetMuscles: dto.targetMuscles,
+        isActive: dto.isActive,
+        ...(dto.muscleGroupIds
+          ? {
+              muscleGroups: {
+                deleteMany: {},
+                create: dto.muscleGroupIds.map((muscleGroupId) => ({ muscleGroupId })),
+              },
+            }
+          : {}),
+      },
+      include: MACHINE_INCLUDE,
+    });
+
+    const stats = await this.loadStats([id]);
+    return {
+      ...this.toListItem(machine, stats),
+      isActive: machine.isActive,
+      qrImageUrl: machine.qrImageUrl,
+    };
+  }
+
+  /** Soft-delete: isActive=false — ilişkili randevu/arıza kayıtları korunur. */
+  async softDelete(id: string): Promise<{ deleted: true }> {
+    await this.assertExists(id);
+    await this.prisma.machine.update({
+      where: { id },
+      data: { isActive: false },
+    });
+    return { deleted: true };
+  }
+
+  /**
+   * Multipart fotoğraf yükle/değiştir.
+   * Dosya: media/photos/{id}.{ext} → photoUrl: /media/photos/{id}.{ext}
+   */
+  async uploadPhoto(id: string, file: Express.Multer.File | undefined): Promise<AdminMachineListItem> {
+    if (!file?.filename) {
+      throw new BadRequestException('Fotoğraf dosyası gerekli (alan: photo)');
+    }
+    const existing = await this.assertExists(id);
+    const photoUrl = `/media/photos/${file.filename}`;
+
+    // Multer dosyayı PHOTOS_DIR altına yazdı; eski dosya farklıysa sil.
+    if (existing.photoUrl && existing.photoUrl !== photoUrl) {
+      deletePhotoFile(existing.photoUrl);
+    }
+
+    const machine = await this.prisma.machine.update({
+      where: { id },
+      data: { photoUrl },
+      include: MACHINE_INCLUDE,
+    });
+    const stats = await this.loadStats([id]);
+    return {
+      ...this.toListItem(machine, stats),
+      isActive: machine.isActive,
+      qrImageUrl: machine.qrImageUrl,
+    };
+  }
+
+  async deletePhoto(id: string): Promise<AdminMachineListItem> {
+    const existing = await this.assertExists(id);
+    deletePhotoFile(existing.photoUrl);
+    const machine = await this.prisma.machine.update({
+      where: { id },
+      data: { photoUrl: null },
+      include: MACHINE_INCLUDE,
+    });
+    const stats = await this.loadStats([id]);
+    return {
+      ...this.toListItem(machine, stats),
+      isActive: machine.isActive,
+      qrImageUrl: machine.qrImageUrl,
+    };
+  }
+
+  /** Özel QR PNG yükle/değiştir → media/qr/{id}.png */
+  async uploadQrImage(id: string, file: Express.Multer.File | undefined): Promise<AdminMachineListItem> {
+    if (!file?.filename) {
+      throw new BadRequestException('QR PNG dosyası gerekli (alan: qr)');
+    }
+    const existing = await this.assertExists(id);
+    const qrImageUrl = `/media/qr/${file.filename}`;
+
+    if (existing.qrImageUrl && existing.qrImageUrl !== qrImageUrl) {
+      deleteQrFile(existing.qrImageUrl);
+    }
+
+    const machine = await this.prisma.machine.update({
+      where: { id },
+      data: { qrImageUrl },
+      include: MACHINE_INCLUDE,
+    });
+    const stats = await this.loadStats([id]);
+    return {
+      ...this.toListItem(machine, stats),
+      isActive: machine.isActive,
+      qrImageUrl: machine.qrImageUrl,
+    };
+  }
+
+  async deleteQrImage(id: string): Promise<AdminMachineListItem> {
+    const existing = await this.assertExists(id);
+    deleteQrFile(existing.qrImageUrl);
+    const machine = await this.prisma.machine.update({
+      where: { id },
+      data: { qrImageUrl: null },
+      include: MACHINE_INCLUDE,
+    });
+    const stats = await this.loadStats([id]);
+    return {
+      ...this.toListItem(machine, stats),
+      isActive: machine.isActive,
+      qrImageUrl: machine.qrImageUrl,
+    };
+  }
+
+  private async assertExists(
+    id: string,
+  ): Promise<{ id: string; photoUrl: string | null; qrImageUrl: string | null }> {
+    const row = await this.prisma.machine.findUnique({
+      where: { id },
+      select: { id: true, photoUrl: true, qrImageUrl: true },
+    });
+    if (!row) {
+      throw new NotFoundException('Makine bulunamadı');
+    }
+    return row;
+  }
+
+  private async assertMuscleGroupsExist(ids: string[]): Promise<void> {
+    if (ids.length === 0) return;
+    const found = await this.prisma.muscleGroup.findMany({
+      where: { id: { in: ids } },
+      select: { id: true },
+    });
+    if (found.length !== ids.length) {
+      const ok = new Set(found.map((g) => g.id));
+      const missing = ids.filter((id) => !ok.has(id));
+      throw new BadRequestException(`Geçersiz kas grubu: ${missing.join(', ')}`);
+    }
   }
 
   /**
