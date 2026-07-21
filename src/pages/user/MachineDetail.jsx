@@ -28,6 +28,7 @@ export default function MachineDetail() {
   const [faultSeverity, setFaultSeverity] = useState("medium");
   const [faultDesc, setFaultDesc] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [photoOpen, setPhotoOpen] = useState(false);
   const viaQR = location.pathname.startsWith("/machine/");
 
   useEffect(() => {
@@ -86,11 +87,18 @@ export default function MachineDetail() {
   return (
     <div className="pb-6">
       <div className="hero-sheen relative grid h-56 place-items-center overflow-hidden bg-gray-900 bg-gradient-to-br from-ink-800 via-ink-900 to-ink-950">
-        {m.photoUrl && (
-          <>
+        {m.photoUrl ? (
+          <button
+            type="button"
+            onClick={() => setPhotoOpen(true)}
+            className="absolute inset-0 cursor-zoom-in"
+            aria-label="Fotoğrafı büyüt"
+          >
             <img src={m.photoUrl} alt={m.name} className="absolute inset-0 h-full w-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-ink-950/85 via-ink-950/25 to-transparent" />
-          </>
+          </button>
+        ) : (
+          <Icon name="dumbbell" size={56} strokeWidth={1.2} className="text-white/60" />
         )}
         <button
           onClick={() => nav(-1)}
@@ -99,19 +107,32 @@ export default function MachineDetail() {
         >
           <Icon name="chevronRight" size={17} className="rotate-180" />
         </button>
-        {m.hasVideo ? (
-          <div className="relative z-10 flex flex-col items-center">
-            <div className="grid h-16 w-16 place-items-center rounded-full bg-white text-primary-600 shadow-glow">
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-                <path d="M8.5 6.5v11l9-5.5z" />
-              </svg>
-            </div>
-            <span className="mt-2 text-xs font-semibold text-white/70">Kullanım videosu</span>
-          </div>
-        ) : !m.photoUrl ? (
-          <Icon name="dumbbell" size={56} strokeWidth={1.2} className="text-white/60" />
-        ) : null}
       </div>
+
+      {photoOpen && m.photoUrl && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+          onClick={() => setPhotoOpen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${m.name} fotoğrafı`}
+        >
+          <button
+            type="button"
+            onClick={() => setPhotoOpen(false)}
+            className="absolute right-4 top-4 z-10 grid h-10 w-10 place-items-center rounded-full bg-white/15 text-white hover:bg-white/25"
+            aria-label="Kapat"
+          >
+            <Icon name="x" size={18} />
+          </button>
+          <img
+            src={m.photoUrl}
+            alt={m.name}
+            className="max-h-full max-w-full object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
 
       <div className="px-4 py-4">
         {viaQR && (
