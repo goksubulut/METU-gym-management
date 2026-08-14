@@ -157,7 +157,7 @@ async function seedUsers() {
 
   // Frontend mock'larındaki üyeler (resepsiyon check-in listesi + aktif kullanıcı)
   const members = [
-    { name: 'Gyedu Ernest', email: 'gyeduernest@gmail.com', phone: '054 861 2354' },
+    { name: 'Göksu Bulut', email: 'goksu.bulut0@gmail.com', phone: '0532 000 00 00' },
     { name: 'Ahmet Yılmaz', email: 'ahmet.yilmaz@demo.metugym.local', phone: '0532 111 22 33' },
     { name: 'Elif Demir', email: 'elif.demir@demo.metugym.local', phone: '0533 222 33 44' },
     { name: 'Mehmet Kaya', email: 'mehmet.kaya@demo.metugym.local', phone: '0534 333 44 55' },

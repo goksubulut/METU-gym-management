@@ -192,7 +192,7 @@ export default function GymAuthScreen({
                     name="email"
                     icon={Mail}
                     type="email"
-                    placeholder="gyeduernest@gmail.com"
+                    placeholder="ornek@gmail.com"
                     autoComplete="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -224,13 +224,7 @@ export default function GymAuthScreen({
                   />
 
                   {mode === "login" && (
-                    <div className="flex items-center justify-between pt-0.5">
-                      <p className="text-xs text-zinc-400">
-                        Demo:{" "}
-                        <span className="text-zinc-500">gyeduernest@gmail.com</span>
-                        {" / "}
-                        <span className="text-zinc-500">user1234</span>
-                      </p>
+                    <div className="flex items-center justify-end pt-0.5">
                       <button
                         type="button"
                         onClick={onForgotPassword}
