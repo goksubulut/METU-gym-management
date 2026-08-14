@@ -9,7 +9,14 @@
  *
  * Çalıştırma: npx prisma db seed
  */
-import { PrismaClient, AppointmentStatus, FaultSeverity, FaultStatus, SuggestionType, Role } from '@prisma/client';
+import {
+  PrismaClient,
+  AppointmentStatus,
+  FaultSeverity,
+  FaultStatus,
+  SuggestionType,
+  Role,
+} from '@prisma/client';
 import * as argon2 from 'argon2';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -65,15 +72,31 @@ function slotTimes(): string[] {
 // 1. İçerik: kas grupları, makineler, egzersizler
 // ---------------------------------------------------------------------------
 
-interface MuscleGroupContent { id: string; name: string; svgRegionCode: string }
+interface MuscleGroupContent {
+  id: string;
+  name: string;
+  svgRegionCode: string;
+}
 interface MachineContent {
-  id: string; name: string; category: string; muscles: string[];
+  id: string;
+  name: string;
+  category: string;
+  muscles: string[];
   targetMuscles?: string[];
-  location: string; hasVideo: boolean; description: string; tips: string; photoUrl?: string;
+  location: string;
+  hasVideo: boolean;
+  description: string;
+  tips: string;
+  photoUrl?: string;
 }
 interface ExerciseContent {
-  name: string; type: 'MACHINE' | 'FREE' | 'WARMUP' | 'COOLDOWN';
-  muscles: string[]; targetMuscles?: string[]; instructions?: string; duration?: string; videoUrl?: string;
+  name: string;
+  type: 'MACHINE' | 'FREE' | 'WARMUP' | 'COOLDOWN';
+  muscles: string[];
+  targetMuscles?: string[];
+  instructions?: string;
+  duration?: string;
+  videoUrl?: string;
 }
 
 async function seedContent() {
@@ -91,7 +114,12 @@ async function seedContent() {
 
   for (const m of machines) {
     const videoCreate = m.hasVideo
-      ? [{ title: `${m.name} Kullanım Videosu`, url: `/media/videos/${m.id}.mp4` }]
+      ? [
+          {
+            title: `${m.name} Kullanım Videosu`,
+            url: `/media/videos/${m.id}.mp4`,
+          },
+        ]
       : [];
     await prisma.machine.upsert({
       where: { id: m.id },
@@ -99,20 +127,32 @@ async function seedContent() {
       // eşlenip makine adı değişse bile eski kas grubu/video bağları kalır
       // (ör. m1 "Leg Press" → "Koşu Bandı" ama grupları [legs] kalırdı).
       update: {
-        name: m.name, category: m.category, location: m.location,
-        description: m.description, tips: m.tips,
+        name: m.name,
+        category: m.category,
+        location: m.location,
+        description: m.description,
+        tips: m.tips,
         photoUrl: m.photoUrl ?? null,
         targetMuscles: m.targetMuscles ?? [],
-        muscleGroups: { deleteMany: {}, create: m.muscles.map((mid) => ({ muscleGroupId: mid })) },
+        muscleGroups: {
+          deleteMany: {},
+          create: m.muscles.map((mid) => ({ muscleGroupId: mid })),
+        },
         videos: { deleteMany: {}, create: videoCreate },
       },
       create: {
-        id: m.id, name: m.name, category: m.category, location: m.location,
+        id: m.id,
+        name: m.name,
+        category: m.category,
+        location: m.location,
         qrCode: `/machine/${m.id}`, // frontend'deki QR deep-link rotası
-        description: m.description, tips: m.tips,
+        description: m.description,
+        tips: m.tips,
         photoUrl: m.photoUrl ?? null,
         targetMuscles: m.targetMuscles ?? [],
-        muscleGroups: { create: m.muscles.map((mid) => ({ muscleGroupId: mid })) },
+        muscleGroups: {
+          create: m.muscles.map((mid) => ({ muscleGroupId: mid })),
+        },
         videos: { create: videoCreate },
       },
     });
@@ -124,16 +164,22 @@ async function seedContent() {
   for (const ex of exercises) {
     await prisma.exercise.create({
       data: {
-        name: ex.name, type: ex.type,
-        instructions: ex.instructions, duration: ex.duration,
+        name: ex.name,
+        type: ex.type,
+        instructions: ex.instructions,
+        duration: ex.duration,
         videoUrl: ex.videoUrl ?? null,
         targetMuscles: ex.targetMuscles ?? [],
-        muscleGroups: { create: ex.muscles.map((mid) => ({ muscleGroupId: mid })) },
+        muscleGroups: {
+          create: ex.muscles.map((mid) => ({ muscleGroupId: mid })),
+        },
       },
     });
   }
 
-  console.log(`İçerik: ${muscleGroups.length} kas grubu, ${machines.length} makine, ${exercises.length} egzersiz`);
+  console.log(
+    `İçerik: ${muscleGroups.length} kas grubu, ${machines.length} makine, ${exercises.length} egzersiz`,
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -144,29 +190,84 @@ async function seedUsers() {
   const memberHash = await argon2.hash('user1234');
 
   const staff = [
-    { name: 'Salon Yöneticisi', email: 'admin@metugym.local', role: Role.ADMIN, password: 'admin1234' },
-    { name: 'Resepsiyon', email: 'reception@metugym.local', role: Role.RECEPTION, password: 'reception1234' },
+    {
+      name: 'Salon Yöneticisi',
+      email: 'admin@metugym.local',
+      role: Role.ADMIN,
+      password: 'admin1234',
+    },
+    {
+      name: 'Resepsiyon',
+      email: 'reception@metugym.local',
+      role: Role.RECEPTION,
+      password: 'reception1234',
+    },
   ];
   for (const s of staff) {
     await prisma.user.upsert({
       where: { email: s.email },
       update: {},
-      create: { name: s.name, email: s.email, role: s.role, passwordHash: await argon2.hash(s.password) },
+      create: {
+        name: s.name,
+        email: s.email,
+        role: s.role,
+        passwordHash: await argon2.hash(s.password),
+      },
     });
   }
 
   // Frontend mock'larındaki üyeler (resepsiyon check-in listesi + aktif kullanıcı)
   const members = [
-    { name: 'Göksu Bulut', email: 'goksu.bulut0@gmail.com', phone: '0532 000 00 00' },
-    { name: 'Ahmet Yılmaz', email: 'ahmet.yilmaz@demo.metugym.local', phone: '0532 111 22 33' },
-    { name: 'Elif Demir', email: 'elif.demir@demo.metugym.local', phone: '0533 222 33 44' },
-    { name: 'Mehmet Kaya', email: 'mehmet.kaya@demo.metugym.local', phone: '0534 333 44 55' },
-    { name: 'Zeynep Şahin', email: 'zeynep.sahin@demo.metugym.local', phone: '0535 444 55 66' },
-    { name: 'Can Öztürk', email: 'can.ozturk@demo.metugym.local', phone: '0536 555 66 77' },
-    { name: 'Aylin Arslan', email: 'aylin.arslan@demo.metugym.local', phone: '0537 666 77 88' },
-    { name: 'Burak Doğan', email: 'burak.dogan@demo.metugym.local', phone: '0538 777 88 99' },
-    { name: 'Selin Aydın', email: 'selin.aydin@demo.metugym.local', phone: '0539 888 99 00' },
-    { name: 'Emre Çelik', email: 'emre.celik@demo.metugym.local', phone: '0530 999 00 11' },
+    {
+      name: 'Göksu Bulut',
+      email: 'goksu.bulut0@gmail.com',
+      phone: '0532 000 00 00',
+    },
+    {
+      name: 'Ahmet Yılmaz',
+      email: 'ahmet.yilmaz@demo.metugym.local',
+      phone: '0532 111 22 33',
+    },
+    {
+      name: 'Elif Demir',
+      email: 'elif.demir@demo.metugym.local',
+      phone: '0533 222 33 44',
+    },
+    {
+      name: 'Mehmet Kaya',
+      email: 'mehmet.kaya@demo.metugym.local',
+      phone: '0534 333 44 55',
+    },
+    {
+      name: 'Zeynep Şahin',
+      email: 'zeynep.sahin@demo.metugym.local',
+      phone: '0535 444 55 66',
+    },
+    {
+      name: 'Can Öztürk',
+      email: 'can.ozturk@demo.metugym.local',
+      phone: '0536 555 66 77',
+    },
+    {
+      name: 'Aylin Arslan',
+      email: 'aylin.arslan@demo.metugym.local',
+      phone: '0537 666 77 88',
+    },
+    {
+      name: 'Burak Doğan',
+      email: 'burak.dogan@demo.metugym.local',
+      phone: '0538 777 88 99',
+    },
+    {
+      name: 'Selin Aydın',
+      email: 'selin.aydin@demo.metugym.local',
+      phone: '0539 888 99 00',
+    },
+    {
+      name: 'Emre Çelik',
+      email: 'emre.celik@demo.metugym.local',
+      phone: '0530 999 00 11',
+    },
   ];
   for (const m of members) {
     await prisma.user.upsert({
@@ -217,15 +318,25 @@ async function findUser(name: string) {
 
 async function findSlot(offsetDays: number, startTime: string) {
   const slot = await prisma.slot.findUnique({
-    where: { date_startTime: { date: new Date(dateKey(offsetDays)), startTime } },
+    where: {
+      date_startTime: { date: new Date(dateKey(offsetDays)), startTime },
+    },
   });
-  if (!slot) throw new Error(`Seed hatası: slot bulunamadı: ${dateKey(offsetDays)} ${startTime}`);
+  if (!slot)
+    throw new Error(
+      `Seed hatası: slot bulunamadı: ${dateKey(offsetDays)} ${startTime}`,
+    );
   return slot;
 }
 
 interface DemoAppointment {
-  user: string; dayOffset: number; time: string; status: AppointmentStatus;
-  muscleGroups: string[]; machines: string[]; note?: string;
+  user: string;
+  dayOffset: number;
+  time: string;
+  status: AppointmentStatus;
+  muscleGroups: string[];
+  machines: string[];
+  note?: string;
 }
 
 async function seedAppointments() {
@@ -234,22 +345,121 @@ async function seedAppointments() {
 
   // Makine id'leri gerçek katalogla (content/machines.json, m1..m36) hizalanmıştır.
   const demo: DemoAppointment[] = [
-    // Gyedu Ernest'in randevu geçmişi (mock a1-a5)
-    { user: 'Gyedu Ernest', dayOffset: 0, time: '18:30', status: 'BOOKED', muscleGroups: ['chest', 'arms'], machines: ['m19', 'm9'], note: 'Üst vücut günü' },
-    { user: 'Gyedu Ernest', dayOffset: 2, time: '10:00', status: 'BOOKED', muscleGroups: ['legs'], machines: ['m13', 'm7'] },
-    { user: 'Gyedu Ernest', dayOffset: -5, time: '19:00', status: 'COMPLETED', muscleGroups: ['back'], machines: ['m10', 'm11'] },
-    { user: 'Gyedu Ernest', dayOffset: -6, time: '08:30', status: 'COMPLETED', muscleGroups: ['cardio'], machines: ['m1'] },
-    { user: 'Gyedu Ernest', dayOffset: -3, time: '17:30', status: 'CANCELLED', muscleGroups: ['core'], machines: ['m25'] },
+    // Göksu Bulut'in randevu geçmişi (mock a1-a5)
+    {
+      user: 'Göksu Bulut',
+      dayOffset: 0,
+      time: '18:30',
+      status: 'BOOKED',
+      muscleGroups: ['chest', 'arms'],
+      machines: ['m19', 'm9'],
+      note: 'Üst vücut günü',
+    },
+    {
+      user: 'Göksu Bulut',
+      dayOffset: 2,
+      time: '10:00',
+      status: 'BOOKED',
+      muscleGroups: ['legs'],
+      machines: ['m13', 'm7'],
+    },
+    {
+      user: 'Göksu Bulut',
+      dayOffset: -5,
+      time: '19:00',
+      status: 'COMPLETED',
+      muscleGroups: ['back'],
+      machines: ['m10', 'm11'],
+    },
+    {
+      user: 'Göksu Bulut',
+      dayOffset: -6,
+      time: '08:30',
+      status: 'COMPLETED',
+      muscleGroups: ['cardio'],
+      machines: ['m1'],
+    },
+    {
+      user: 'Göksu Bulut',
+      dayOffset: -3,
+      time: '17:30',
+      status: 'CANCELLED',
+      muscleGroups: ['core'],
+      machines: ['m25'],
+    },
     // Bugünün resepsiyon check-in listesi (mock todaysCheckins c1-c9)
-    { user: 'Ahmet Yılmaz', dayOffset: 0, time: '08:00', status: 'CHECKED_IN', muscleGroups: ['chest'], machines: ['m19'] },
-    { user: 'Elif Demir', dayOffset: 0, time: '08:30', status: 'CHECKED_IN', muscleGroups: ['legs'], machines: ['m13', 'm7'] },
-    { user: 'Mehmet Kaya', dayOffset: 0, time: '09:00', status: 'BOOKED', muscleGroups: ['back'], machines: ['m10'] },
-    { user: 'Zeynep Şahin', dayOffset: 0, time: '09:30', status: 'BOOKED', muscleGroups: ['cardio'], machines: ['m1'] },
-    { user: 'Can Öztürk', dayOffset: 0, time: '10:00', status: 'NO_SHOW', muscleGroups: ['arms'], machines: ['m22'] },
-    { user: 'Aylin Arslan', dayOffset: 0, time: '10:30', status: 'BOOKED', muscleGroups: ['glutes'], machines: ['m14'] },
-    { user: 'Burak Doğan', dayOffset: 0, time: '11:00', status: 'BOOKED', muscleGroups: ['core'], machines: ['m25'] },
-    { user: 'Selin Aydın', dayOffset: 0, time: '17:30', status: 'BOOKED', muscleGroups: ['shoulders'], machines: ['m17'] },
-    { user: 'Emre Çelik', dayOffset: 0, time: '18:00', status: 'BOOKED', muscleGroups: ['chest', 'back'], machines: ['m19', 'm10'] },
+    {
+      user: 'Ahmet Yılmaz',
+      dayOffset: 0,
+      time: '08:00',
+      status: 'CHECKED_IN',
+      muscleGroups: ['chest'],
+      machines: ['m19'],
+    },
+    {
+      user: 'Elif Demir',
+      dayOffset: 0,
+      time: '08:30',
+      status: 'CHECKED_IN',
+      muscleGroups: ['legs'],
+      machines: ['m13', 'm7'],
+    },
+    {
+      user: 'Mehmet Kaya',
+      dayOffset: 0,
+      time: '09:00',
+      status: 'BOOKED',
+      muscleGroups: ['back'],
+      machines: ['m10'],
+    },
+    {
+      user: 'Zeynep Şahin',
+      dayOffset: 0,
+      time: '09:30',
+      status: 'BOOKED',
+      muscleGroups: ['cardio'],
+      machines: ['m1'],
+    },
+    {
+      user: 'Can Öztürk',
+      dayOffset: 0,
+      time: '10:00',
+      status: 'NO_SHOW',
+      muscleGroups: ['arms'],
+      machines: ['m22'],
+    },
+    {
+      user: 'Aylin Arslan',
+      dayOffset: 0,
+      time: '10:30',
+      status: 'BOOKED',
+      muscleGroups: ['glutes'],
+      machines: ['m14'],
+    },
+    {
+      user: 'Burak Doğan',
+      dayOffset: 0,
+      time: '11:00',
+      status: 'BOOKED',
+      muscleGroups: ['core'],
+      machines: ['m25'],
+    },
+    {
+      user: 'Selin Aydın',
+      dayOffset: 0,
+      time: '17:30',
+      status: 'BOOKED',
+      muscleGroups: ['shoulders'],
+      machines: ['m17'],
+    },
+    {
+      user: 'Emre Çelik',
+      dayOffset: 0,
+      time: '18:00',
+      status: 'BOOKED',
+      muscleGroups: ['chest', 'back'],
+      machines: ['m19', 'm10'],
+    },
   ];
 
   for (const a of demo) {
@@ -261,7 +471,9 @@ async function seedAppointments() {
         slotId: slot.id,
         status: a.status,
         note: a.note,
-        muscleGroups: { create: a.muscleGroups.map((id) => ({ muscleGroupId: id })) },
+        muscleGroups: {
+          create: a.muscleGroups.map((id) => ({ muscleGroupId: id })),
+        },
         machines: { create: a.machines.map((id) => ({ machineId: id })) },
       },
     });
@@ -279,67 +491,206 @@ async function seedFeedback() {
   await prisma.rating.deleteMany();
 
   // mock/feedback.js → faults (f1-f7)
-  const faults: Array<{ user: string; machineId: string; description: string; severity: FaultSeverity; status: FaultStatus; dayOffset: number }> = [
-    { user: 'Ahmet Yılmaz', machineId: 'm1', description: 'Ekran donuyor, hız değişmiyor', severity: 'HIGH', status: 'OPEN', dayOffset: -2 },
-    { user: 'Elif Demir', machineId: 'm2', description: 'Pedal gürültü yapıyor', severity: 'MEDIUM', status: 'OPEN', dayOffset: -3 },
-    { user: 'Mehmet Kaya', machineId: 'm13', description: 'Ağırlık pimi gevşek', severity: 'MEDIUM', status: 'IN_PROGRESS', dayOffset: -4 },
-    { user: 'Zeynep Şahin', machineId: 'm19', description: 'Minder yırtık', severity: 'LOW', status: 'RESOLVED', dayOffset: -8 },
-    { user: 'Can Öztürk', machineId: 'm1', description: 'Acil durdurma çalışmıyor', severity: 'HIGH', status: 'OPEN', dayOffset: -1 },
-    { user: 'Aylin Arslan', machineId: 'm7', description: 'Güvenlik kolu sıkışıyor', severity: 'HIGH', status: 'IN_PROGRESS', dayOffset: -5 },
-    { user: 'Burak Doğan', machineId: 'm25', description: 'Ayar pimi kayıp', severity: 'LOW', status: 'RESOLVED', dayOffset: -11 },
+  const faults: Array<{
+    user: string;
+    machineId: string;
+    description: string;
+    severity: FaultSeverity;
+    status: FaultStatus;
+    dayOffset: number;
+  }> = [
+    {
+      user: 'Ahmet Yılmaz',
+      machineId: 'm1',
+      description: 'Ekran donuyor, hız değişmiyor',
+      severity: 'HIGH',
+      status: 'OPEN',
+      dayOffset: -2,
+    },
+    {
+      user: 'Elif Demir',
+      machineId: 'm2',
+      description: 'Pedal gürültü yapıyor',
+      severity: 'MEDIUM',
+      status: 'OPEN',
+      dayOffset: -3,
+    },
+    {
+      user: 'Mehmet Kaya',
+      machineId: 'm13',
+      description: 'Ağırlık pimi gevşek',
+      severity: 'MEDIUM',
+      status: 'IN_PROGRESS',
+      dayOffset: -4,
+    },
+    {
+      user: 'Zeynep Şahin',
+      machineId: 'm19',
+      description: 'Minder yırtık',
+      severity: 'LOW',
+      status: 'RESOLVED',
+      dayOffset: -8,
+    },
+    {
+      user: 'Can Öztürk',
+      machineId: 'm1',
+      description: 'Acil durdurma çalışmıyor',
+      severity: 'HIGH',
+      status: 'OPEN',
+      dayOffset: -1,
+    },
+    {
+      user: 'Aylin Arslan',
+      machineId: 'm7',
+      description: 'Güvenlik kolu sıkışıyor',
+      severity: 'HIGH',
+      status: 'IN_PROGRESS',
+      dayOffset: -5,
+    },
+    {
+      user: 'Burak Doğan',
+      machineId: 'm25',
+      description: 'Ayar pimi kayıp',
+      severity: 'LOW',
+      status: 'RESOLVED',
+      dayOffset: -11,
+    },
   ];
   for (const f of faults) {
     const user = await findUser(f.user);
     await prisma.faultReport.create({
       data: {
-        userId: user.id, machineId: f.machineId, description: f.description,
-        severity: f.severity, status: f.status,
+        userId: user.id,
+        machineId: f.machineId,
+        description: f.description,
+        severity: f.severity,
+        status: f.status,
         createdAt: new Date(dateKey(f.dayOffset)),
       },
     });
   }
 
   // mock/feedback.js → feedbackList (s1-s7)
-  const suggestions: Array<{ user: string; type: SuggestionType; tag: string; text: string; dayOffset: number }> = [
-    { user: 'Selin Aydın', type: 'SUGGESTION', tag: 'Ekipman', text: 'Daha fazla dambıl seti olsa harika olur', dayOffset: -2 },
-    { user: 'Emre Çelik', type: 'COMPLAINT', tag: 'Temizlik', text: 'Soyunma odaları akşam saatlerinde kalabalık', dayOffset: -3 },
-    { user: 'Ahmet Yılmaz', type: 'SUGGESTION', tag: 'Uygulama', text: 'Randevu hatırlatma bildirimi eklenebilir', dayOffset: -4 },
-    { user: 'Zeynep Şahin', type: 'COMPLAINT', tag: 'Personel', text: 'Resepsiyon yoğun saatlerde yavaş', dayOffset: -5 },
-    { user: 'Can Öztürk', type: 'SUGGESTION', tag: 'Ekipman', text: 'Fonksiyonel antrenman alanı genişletilmeli', dayOffset: -6 },
-    { user: 'Aylin Arslan', type: 'COMPLAINT', tag: 'Ekipman', text: 'Koşu bantlarından biri sürekli arızalı', dayOffset: -7 },
-    { user: 'Burak Doğan', type: 'SUGGESTION', tag: 'Uygulama', text: 'Kas grubu şemasına bacak detayı eklenmeli', dayOffset: -8 },
+  const suggestions: Array<{
+    user: string;
+    type: SuggestionType;
+    tag: string;
+    text: string;
+    dayOffset: number;
+  }> = [
+    {
+      user: 'Selin Aydın',
+      type: 'SUGGESTION',
+      tag: 'Ekipman',
+      text: 'Daha fazla dambıl seti olsa harika olur',
+      dayOffset: -2,
+    },
+    {
+      user: 'Emre Çelik',
+      type: 'COMPLAINT',
+      tag: 'Temizlik',
+      text: 'Soyunma odaları akşam saatlerinde kalabalık',
+      dayOffset: -3,
+    },
+    {
+      user: 'Ahmet Yılmaz',
+      type: 'SUGGESTION',
+      tag: 'Uygulama',
+      text: 'Randevu hatırlatma bildirimi eklenebilir',
+      dayOffset: -4,
+    },
+    {
+      user: 'Zeynep Şahin',
+      type: 'COMPLAINT',
+      tag: 'Personel',
+      text: 'Resepsiyon yoğun saatlerde yavaş',
+      dayOffset: -5,
+    },
+    {
+      user: 'Can Öztürk',
+      type: 'SUGGESTION',
+      tag: 'Ekipman',
+      text: 'Fonksiyonel antrenman alanı genişletilmeli',
+      dayOffset: -6,
+    },
+    {
+      user: 'Aylin Arslan',
+      type: 'COMPLAINT',
+      tag: 'Ekipman',
+      text: 'Koşu bantlarından biri sürekli arızalı',
+      dayOffset: -7,
+    },
+    {
+      user: 'Burak Doğan',
+      type: 'SUGGESTION',
+      tag: 'Uygulama',
+      text: 'Kas grubu şemasına bacak detayı eklenmeli',
+      dayOffset: -8,
+    },
   ];
   for (const s of suggestions) {
     const user = await findUser(s.user);
     await prisma.suggestion.create({
-      data: { userId: user.id, type: s.type, tag: s.tag, text: s.text, createdAt: new Date(dateKey(s.dayOffset)) },
+      data: {
+        userId: user.id,
+        type: s.type,
+        tag: s.tag,
+        text: s.text,
+        createdAt: new Date(dateKey(s.dayOffset)),
+      },
     });
   }
 
   // Puanlar: mock'taki ortalama puana yaklaşan 4'er kayıt (makine başına).
   const mockAverages: Record<string, number> = {
-    m1: 4.6, m2: 4.4, m5: 4.7, m6: 4.2, m7: 4.5, m9: 4.8,
-    m10: 4.9, m13: 4.3, m14: 4.1, m17: 4.6, m19: 4.7, m25: 4.0,
+    m1: 4.6,
+    m2: 4.4,
+    m5: 4.7,
+    m6: 4.2,
+    m7: 4.5,
+    m9: 4.8,
+    m10: 4.9,
+    m13: 4.3,
+    m14: 4.1,
+    m17: 4.6,
+    m19: 4.7,
+    m25: 4.0,
   };
   const raters = ['Ahmet Yılmaz', 'Elif Demir', 'Mehmet Kaya', 'Zeynep Şahin'];
-  const tagPool = ['Rahattı', 'Kalabalıktı', 'Arızalıydı', 'Ayarları bozuktu', 'Kullanımı zordu'];
+  const tagPool = [
+    'Rahattı',
+    'Kalabalıktı',
+    'Arızalıydı',
+    'Ayarları bozuktu',
+    'Kullanımı zordu',
+  ];
   let ratingCount = 0;
   for (const [machineId, avg] of Object.entries(mockAverages)) {
-    const scores = [Math.ceil(avg), Math.floor(avg), Math.round(avg), Math.round(avg)];
+    const scores = [
+      Math.ceil(avg),
+      Math.floor(avg),
+      Math.round(avg),
+      Math.round(avg),
+    ];
     for (let i = 0; i < scores.length; i++) {
       const user = await findUser(raters[i]);
       await prisma.rating.create({
         data: {
-          userId: user.id, machineId, score: scores[i],
+          userId: user.id,
+          machineId,
+          score: scores[i],
           // Düşük puanlara anlamlı etiket ekle (5 → etiketsiz "Rahattı" olabilir)
-          tags: scores[i] >= 5 ? ['Rahattı'] : scores[i] <= 3 ? [tagPool[2]] : [],
+          tags:
+            scores[i] >= 5 ? ['Rahattı'] : scores[i] <= 3 ? [tagPool[2]] : [],
         },
       });
       ratingCount++;
     }
   }
 
-  console.log(`Geri bildirim: ${faults.length} arıza, ${suggestions.length} öneri/şikayet, ${ratingCount} puan`);
+  console.log(
+    `Geri bildirim: ${faults.length} arıza, ${suggestions.length} öneri/şikayet, ${ratingCount} puan`,
+  );
 }
 
 async function seedAnnouncements() {
