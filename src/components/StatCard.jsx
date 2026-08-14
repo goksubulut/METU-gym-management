@@ -13,32 +13,32 @@ function renderHint(hint) {
 
 export default function StatCard({ label, value, delta, icon, tone = "primary", hint, to, onClick }) {
   const tones = {
-    primary: "bg-primary-50 text-primary-600",
-    green: "bg-emerald-50 text-emerald-600",
-    blue: "bg-blue-50 text-blue-600",
-    amber: "bg-amber-50 text-amber-600",
+    primary: "bg-primary-50 text-accent",
+    green: "bg-available-soft text-available",
+    blue: "bg-info-soft text-info",
+    amber: "bg-busy-soft text-busy",
   };
 
   const interactive = Boolean(to || onClick);
   const body = (
     <div className="flex items-start justify-between">
       <div>
-        <p className="flex items-center gap-1.5 text-sm font-medium text-gray-500">
+        <p className="flex items-center gap-1.5 text-sm font-medium text-muted">
           {label}
           {renderHint(hint)}
         </p>
-        <p className="mt-1 font-display text-3xl font-bold tracking-tight text-gray-900">{value}</p>
+        <p className="mt-1 font-mono text-3xl font-bold tracking-tight tabular-nums text-content">{value}</p>
         {delta && (
           <p
             className={`mt-1 text-xs font-semibold ${
-              delta.startsWith("-") ? "text-red-500" : "text-emerald-600"
+              delta.startsWith("-") ? "text-accent" : "text-available"
             }`}
           >
             {delta} bu hafta
           </p>
         )}
         {interactive && (
-          <p className="mt-1.5 text-[11px] font-semibold text-primary-600 opacity-80">Detay için tıklayın →</p>
+          <p className="mt-1.5 text-[11px] font-semibold text-accent opacity-80">Detay için tıklayın →</p>
         )}
       </div>
       {icon && (

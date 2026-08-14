@@ -14,6 +14,10 @@ import ProgramItemList from "../../components/ProgramItemList.jsx";
 
 import { useToast } from "../../components/Toast.jsx";
 
+import MachineSelectCard from "../../components/ui/machine-select-card.jsx";
+
+import { MUSCLES } from "../../components/BodyDiagram.jsx";
+
 import { MUSCLE_GROUPS } from "../../mock/machines.js";
 
 import { getAccessToken } from "../../api/client.js";
@@ -29,6 +33,18 @@ import { sortProgramItems } from "../../utils/programSort.js";
 const STEPS = ["Ad", "Kas grupları", "Seçim", "Sırala"];
 
 const PREVIEW_LIMIT = 4;
+
+const SECTIONS = [
+  { group: "chest", title: "Göğüs" },
+  { group: "back", title: "Sırt" },
+  { group: "shoulders", title: "Omuz" },
+  { group: "arms", title: "Kol" },
+  { group: "core", title: "Karın" },
+  { group: "glutes", title: "Kalça" },
+  { group: "legs", title: "Bacak" },
+];
+
+const MUSCLE_ENTRIES = Object.entries(MUSCLES);
 
 
 
@@ -128,43 +144,17 @@ function SelectionRow({ row, typePrefix, selected, onToggle }) {
 
   const checked = selected.has(key);
 
-
-
   return (
 
-    <label
+    <MachineSelectCard
 
-      className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition-colors ${
+      machine={row}
 
-        checked ? "border-primary-600 bg-primary-50" : "border-gray-100 bg-white"
+      selected={checked}
 
-      }`}
+      onToggle={() => onToggle(key)}
 
-    >
-
-      <input
-
-        type="checkbox"
-
-        checked={checked}
-
-        onChange={() => onToggle(key)}
-
-        className="h-4 w-4 accent-primary-600"
-
-      />
-
-      <div className="min-w-0 flex-1">
-
-        <p className="truncate text-sm font-semibold text-gray-900">{row.name}</p>
-
-        {row.duration && <p className="text-xs text-gray-400">{row.duration}</p>}
-
-        {row.location && <p className="text-xs text-gray-400">{row.location}</p>}
-
-      </div>
-
-    </label>
+    />
 
   );
 
@@ -248,7 +238,7 @@ function CategorySelection({ title, catalogByGroup, rowKey, typePrefix, selected
 
                     onClick={() => onExpand(expandKey)}
 
-                    className="w-full py-1.5 text-center text-xs font-semibold text-primary-600"
+                    className="w-full py-1.5 text-center text-xs font-semibold text-accent"
 
                   >
 
@@ -326,7 +316,7 @@ export default function ProgramCreate() {
 
   const [name, setName] = useState("");
 
-  const [groups, setGroups] = useState([]);
+  const [muscleSlugs, setMuscleSlugs] = useState([]);
 
   const [selected, setSelected] = useState(() => new Set());
 
@@ -339,6 +329,11 @@ export default function ProgramCreate() {
   const [loadingCatalog, setLoadingCatalog] = useState(false);
 
   const [submitting, setSubmitting] = useState(false);
+
+  const broadGroups = useMemo(
+    () => [...new Set(muscleSlugs.map((s) => MUSCLES[s]?.group).filter(Boolean))],
+    [muscleSlugs],
+  );
 
 
 
@@ -358,7 +353,7 @@ export default function ProgramCreate() {
 
   useEffect(() => {
 
-    if (step !== 3 || groups.length === 0) return;
+    if (step !== 3 || broadGroups.length === 0) return;
 
     let cancelled = false;
 
@@ -366,7 +361,7 @@ export default function ProgramCreate() {
 
 
 
-    Promise.all(groups.map((g) => fetchGroupCatalog(g)))
+    Promise.all(broadGroups.map((g) => fetchGroupCatalog(g)))
 
       .then((rows) => {
 
@@ -394,7 +389,7 @@ export default function ProgramCreate() {
 
     };
 
-  }, [step, groups, toast]);
+  }, [step, broadGroups, toast]);
 
 
 
@@ -426,9 +421,11 @@ export default function ProgramCreate() {
 
 
 
-  const toggleGroup = (id) => {
+  const toggleMuscleSlug = (slug) => {
 
-    setGroups((g) => (g.includes(id) ? g.filter((x) => x !== id) : [...g, id]));
+    setMuscleSlugs((prev) =>
+      prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug],
+    );
 
     setSelected(new Set());
 
@@ -470,9 +467,9 @@ export default function ProgramCreate() {
 
     }
 
-    if (step === 2 && groups.length === 0) {
+    if (step === 2 && muscleSlugs.length === 0) {
 
-      toast("En az bir kas grubu seç", "error");
+      toast("En az bir kas seç", "error");
 
       return;
 
@@ -596,7 +593,7 @@ export default function ProgramCreate() {
 
 
 
-      <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-primary-600">
+      <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-accent">
 
         Adım {step}/{STEPS.length}
 
@@ -640,37 +637,77 @@ export default function ProgramCreate() {
 
         <div>
 
-          <p className="mb-4 text-sm text-gray-400">Programına dahil etmek istediğin kas gruplarını seç.</p>
+          <p className="mb-4 text-sm text-muted">Programına dahil etmek istediğin kasları seç.</p>
 
-          <div className="flex flex-wrap gap-2">
+          {muscleSlugs.length > 0 && (
 
-            {MUSCLE_GROUPS.map((g) => (
+            <p className="mb-4 text-sm font-semibold text-accent">{muscleSlugs.length} kas seçildi</p>
 
-              <button
+          )}
 
-                key={g.id}
+          <div className="space-y-5">
 
-                type="button"
+            {SECTIONS.map(({ group, title }) => {
 
-                onClick={() => toggleGroup(g.id)}
+              const sectionMuscles = MUSCLE_ENTRIES.filter(([, info]) => info.group === group);
 
-                className={`rounded-xl border px-4 py-2 text-sm font-semibold transition-colors active:scale-[0.96] ${
+              return (
 
-                  groups.includes(g.id)
+                <div key={group}>
 
-                    ? "border-primary-600 bg-primary-50 text-primary-800"
+                  <div className="mb-2.5 flex items-center gap-2">
 
-                    : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
+                    <span className="text-xs font-bold uppercase tracking-wide text-gray-500">{title}</span>
 
-                }`}
+                    <div className="h-px flex-1 bg-gray-100" />
 
-              >
+                  </div>
 
-                {g.label}
+                  <div className="flex flex-wrap gap-2">
 
-              </button>
+                    {sectionMuscles.map(([slug, info]) => {
 
-            ))}
+                      const isSelected = muscleSlugs.includes(slug);
+
+                      return (
+
+                        <button
+
+                          key={slug}
+
+                          type="button"
+
+                          onClick={() => toggleMuscleSlug(slug)}
+
+                          className={[
+
+                            "rounded-full border px-3.5 py-1.5 text-xs font-bold transition-colors duration-200",
+
+                            isSelected
+
+                              ? "border-primary-600 bg-primary-600/15 text-primary-600"
+
+                              : "border-gray-200 bg-white text-gray-500",
+
+                          ].join(" ")}
+
+                        >
+
+                          {info.label}
+
+                        </button>
+
+                      );
+
+                    })}
+
+                  </div>
+
+                </div>
+
+              );
+
+            })}
 
           </div>
 
@@ -684,15 +721,15 @@ export default function ProgramCreate() {
 
         <div>
 
-          {groups.length > 0 && (
+          {muscleSlugs.length > 0 && (
 
             <div className="mb-4 flex flex-wrap gap-1.5">
 
-              {groups.map((g) => (
+              {muscleSlugs.map((slug) => (
 
-                <Badge key={g} tone="primary">
+                <Badge key={slug} tone="primary">
 
-                  {groupLabel(g)}
+                  {MUSCLES[slug]?.label ?? slug}
 
                 </Badge>
 
@@ -883,4 +920,3 @@ export default function ProgramCreate() {
   );
 
 }
-

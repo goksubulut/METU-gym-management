@@ -7,6 +7,7 @@ import { loadActiveAnnouncements } from "../api/announcements.js";
 import { loadMyNotifications, hasUnreadNotifications, NOTIFICATIONS_READ_EVENT } from "../api/notifications.js";
 import { getAuthUser, initialsFromName } from "../utils/authUser.js";
 import { hasUnreadAnnouncements } from "../utils/announcementRead.js";
+import { useTheme } from "../utils/theme.js";
 
 const NAV = [
   { to: "/home", label: "Ana Sayfa", icon: "home" },
@@ -22,6 +23,7 @@ export default function UserLayout() {
   const profile = getAuthUser();
   const avatar = initialsFromName(profile?.name);
   const [hasUnread, setHasUnread] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     if (bare || !getAccessToken()) {
@@ -56,18 +58,25 @@ export default function UserLayout() {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Mobil çerçeve: geniş ekranda ortada telefon görünümü */}
-      <div className="relative mx-auto flex min-h-screen max-w-[430px] flex-col bg-[#f7f7f8] shadow-xl">
-        <header className="sticky top-0 z-20 flex items-center justify-between border-b border-gray-100/80 bg-white/85 px-4 py-3 backdrop-blur-md">
+      <div className="relative mx-auto flex min-h-screen max-w-[430px] flex-col bg-bg shadow-xl">
+        <header className="glass sticky top-0 z-20 flex items-center justify-between border-b border-hairline px-4 py-3">
           <Logo size={24} />
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={toggleTheme}
+              aria-label={theme === "dark" ? "Açık temaya geç" : "Koyu temaya geç"}
+              className="grid h-9 w-9 place-items-center rounded-full text-muted transition-colors hover:bg-surface-2 hover:text-content active:scale-[0.92]"
+            >
+              <Icon name={theme === "dark" ? "sun" : "moon"} size={18} />
+            </button>
             <Link
               to="/notifications"
               aria-label="Bildirimler"
-              className="relative grid h-9 w-9 place-items-center rounded-full text-gray-500 transition-colors hover:bg-gray-100"
+              className="relative grid h-9 w-9 place-items-center rounded-full text-muted transition-colors hover:bg-surface-2 hover:text-content"
             >
               <Icon name="bell" size={19} />
               {hasUnread && (
-                <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-primary-600 ring-2 ring-white" />
+                <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-primary-600 ring-2 ring-surface" />
               )}
             </Link>
             <Link
@@ -84,15 +93,15 @@ export default function UserLayout() {
           <Outlet />
         </main>
 
-        {/* Yüzen hap navigasyon */}
-        <nav className="fixed bottom-4 left-1/2 z-20 flex w-[calc(100%-2rem)] max-w-[398px] -translate-x-1/2 items-center justify-around rounded-3xl border border-white/60 bg-white/90 px-2 py-2 shadow-nav-float backdrop-blur-md">
+        {/* Yüzen hap navigasyon — translucent (Apple malzeme) */}
+        <nav className="glass fixed bottom-4 left-1/2 z-20 flex w-[calc(100%-2rem)] max-w-[398px] -translate-x-1/2 items-center justify-around rounded-3xl border border-hairline px-2 py-2 shadow-nav-float">
           {NAV.map((n) =>
             n.primary ? (
               <NavLink key={n.to} to={n.to} className="relative -mt-8 flex flex-col items-center">
-                <span className="grid h-14 w-14 place-items-center rounded-full bg-primary-600 text-white ring-4 ring-[#f7f7f8] transition-transform active:scale-[0.92]">
+                <span className="grid h-14 w-14 place-items-center rounded-full bg-primary-600 text-white shadow-cta ring-4 ring-bg transition-transform active:scale-[0.92]">
                   <Icon name={n.icon} size={24} strokeWidth={2.2} />
                 </span>
-                <span className="mt-1 text-[10px] font-semibold text-primary-600">{n.label}</span>
+                <span className="mt-1 text-[10px] font-semibold text-accent">{n.label}</span>
               </NavLink>
             ) : (
               <NavLink
@@ -100,7 +109,7 @@ export default function UserLayout() {
                 to={n.to}
                 className={({ isActive }) =>
                   `flex flex-1 flex-col items-center gap-1 py-1 text-[10px] font-semibold transition-colors ${
-                    isActive ? "text-primary-600" : "text-gray-400 hover:text-gray-600"
+                    isActive ? "text-accent" : "text-muted hover:text-content"
                   }`
                 }
               >

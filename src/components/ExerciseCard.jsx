@@ -11,7 +11,7 @@ export function ExerciseGridCard({ exercise, onClick, className = "" }) {
   const muscles = exercise.muscles ?? [];
   return (
     <Card soft onClick={onClick} className={`overflow-hidden ${className}`}>
-      <div className="hero-sheen grid h-24 place-items-center bg-gray-900 bg-gradient-to-br from-ink-800 to-ink-950 text-white/85">
+      <div className="hero-sheen grid h-24 place-items-center bg-ink-900 bg-gradient-to-br from-ink-800 to-ink-950 text-white/85">
         <Icon name={TYPE_ICON[exercise.type] ?? "dumbbell"} size={30} strokeWidth={1.4} />
       </div>
       <div className="p-3">
@@ -33,7 +33,7 @@ export function ExerciseGridCard({ exercise, onClick, className = "" }) {
 export function ExerciseMatchListCard({ exercise, onClick, className = "" }) {
   return (
     <Card onClick={onClick} className={`flex items-center gap-3 p-3 ${className}`}>
-      <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gray-900 text-white">
+      <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-ink-900 text-white">
         <Icon name={TYPE_ICON[exercise.type] ?? "dumbbell"} size={20} />
       </div>
       <div className="min-w-0 flex-1">
@@ -49,7 +49,7 @@ export function ExerciseMatchListCard({ exercise, onClick, className = "" }) {
 export function ExerciseListCard({ exercise, onClick, className = "" }) {
   return (
     <Card onClick={onClick} className={`flex items-center gap-3 p-3 ${className}`}>
-      <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-gray-900 text-white">
+      <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-ink-900 text-white">
         <Icon name={TYPE_ICON[exercise.type] ?? "dumbbell"} size={19} />
       </div>
       <div className="min-w-0 flex-1">

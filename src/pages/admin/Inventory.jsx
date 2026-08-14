@@ -49,8 +49,8 @@ function ChipToggle({ selected, onClick, children }) {
       onClick={onClick}
       className={`rounded-lg border px-2.5 py-1 text-xs font-semibold transition-colors ${
         selected
-          ? "border-primary-500 bg-primary-50 text-primary-700"
-          : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
+          ? "border-primary-500 bg-primary-50 text-accent"
+          : "border-gray-200 bg-surface text-gray-600 hover:border-gray-300"
       }`}
     >
       {children}
@@ -325,7 +325,7 @@ export default function Inventory() {
                         .join(", ")
                     : "—"}
                 </td>
-                <td className="px-5 py-3 font-bold text-primary-600">
+                <td className="px-5 py-3 font-bold text-accent">
                   {m.rating || "—"}
                 </td>
                 <td className="px-5 py-3">
@@ -341,7 +341,7 @@ export default function Inventory() {
                     <button
                       type="button"
                       onClick={() => openEdit(m)}
-                      className="text-primary-600"
+                      className="text-accent"
                     >
                       Düzenle
                     </button>
@@ -429,7 +429,7 @@ export default function Inventory() {
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="cursor-pointer">
-                    <span className="inline-flex h-10 items-center rounded-xl border border-gray-200 bg-white px-4 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+                    <span className="inline-flex h-10 items-center rounded-xl border border-gray-200 bg-surface px-4 text-sm font-semibold text-gray-700 hover:bg-gray-50">
                       Dosya seç
                     </span>
                     <input
@@ -526,7 +526,7 @@ export default function Inventory() {
                   type="checkbox"
                   checked={form.isActive}
                   onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
-                  className="h-4 w-4 rounded border-gray-300 text-primary-600"
+                  className="h-4 w-4 rounded border-gray-300 text-accent"
                 />
                 Aktif (katalogda görünsün)
               </label>
@@ -538,7 +538,7 @@ export default function Inventory() {
       <Modal open={!!qr} onClose={() => !qrBusy && setQr(null)} title="QR Kodu" size="sm">
         {qr && (
           <div className="flex flex-col items-center">
-            <div className="grid h-44 w-44 place-items-center rounded-2xl border-4 border-gray-900 bg-white p-2">
+            <div className="grid h-44 w-44 place-items-center rounded-2xl border-4 border-gray-900 bg-surface p-2">
               {qr.dataUrl ? (
                 <img src={qr.dataUrl} alt={`${qr.name} QR kodu`} className="h-full w-full object-contain" />
               ) : (
@@ -559,7 +559,7 @@ export default function Inventory() {
             </p>
             <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
               <label className={qrBusy ? "pointer-events-none opacity-50" : "cursor-pointer"}>
-                <span className="inline-flex h-9 items-center rounded-xl border border-gray-200 bg-white px-3 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+                <span className="inline-flex h-9 items-center rounded-xl border border-gray-200 bg-surface px-3 text-sm font-semibold text-gray-700 hover:bg-gray-50">
                   {qrBusy ? "Yükleniyor…" : "PNG yükle"}
                 </span>
                 <input

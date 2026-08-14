@@ -126,7 +126,7 @@ export default function Profile() {
   return (
     <div className="px-4 py-5 pb-8">
       <div className="mb-6 flex flex-col items-center text-center">
-        <div className="mb-3 grid h-20 w-20 place-items-center rounded-full bg-primary-100 text-2xl font-extrabold text-primary-700">
+        <div className="mb-3 grid h-20 w-20 place-items-center rounded-full bg-primary-100 text-2xl font-extrabold text-accent">
           {avatar}
         </div>
         <h1 className="text-xl font-extrabold text-gray-900">{profile.name}</h1>

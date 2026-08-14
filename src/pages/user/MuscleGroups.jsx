@@ -120,7 +120,7 @@ export default function MuscleGroups() {
   return (
     <div className="pb-4">
       {/* Üst bar */}
-      <div className="flex items-center justify-between bg-gray-900 px-4 py-4 text-white">
+      <div className="flex items-center justify-between bg-ink-900 px-4 py-4 text-white">
         <div>
           <h1 className="font-display text-lg font-bold tracking-tight">Kas Haritası</h1>
           <p className="text-[11px] text-white/50">Çalıştırmak istediğin kasa dokun</p>
@@ -157,7 +157,7 @@ export default function MuscleGroups() {
                 <button
                   key={slug}
                   onClick={() => toggle(slug)}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-2.5 py-1 text-xs font-semibold text-gray-700 shadow-card"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-surface px-2.5 py-1 text-xs font-semibold text-gray-700 shadow-card"
                 >
                   <span
                     className="h-2 w-2 rounded-full"
@@ -170,7 +170,7 @@ export default function MuscleGroups() {
               {cardio && (
                 <button
                   onClick={() => setCardio(false)}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-2.5 py-1 text-xs font-semibold text-gray-700 shadow-card"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-surface px-2.5 py-1 text-xs font-semibold text-gray-700 shadow-card"
                 >
                   <span className="h-2 w-2 rounded-full bg-primary-500" />
                   Kardiyo
@@ -202,7 +202,7 @@ export default function MuscleGroups() {
                         className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all ${
                           on
                             ? "border-transparent text-white shadow-card"
-                            : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
+                            : "border-gray-200 bg-surface text-gray-600 hover:border-gray-300"
                         }`}
                         style={on ? { background: m.color[1] } : undefined}
                       >
@@ -228,7 +228,7 @@ export default function MuscleGroups() {
               className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all ${
                 cardio
                   ? "border-transparent bg-primary-600 text-white"
-                  : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
+                  : "border-gray-200 bg-surface text-gray-600 hover:border-gray-300"
               }`}
             >
               <Icon name="flame" size={13} />
@@ -263,7 +263,7 @@ export default function MuscleGroups() {
                         onClick={() => nav(`/machines/${m.id}`)}
                         className="flex items-center gap-3 p-3"
                       >
-                        <div className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-xl bg-gray-900 text-white">
+                        <div className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-xl bg-ink-900 text-white">
                           {m.photoUrl ? (
                             <>
                               <img src={m.photoUrl} alt={m.name} className="h-full w-full object-cover" />
@@ -280,7 +280,7 @@ export default function MuscleGroups() {
                             {m.location}
                           </p>
                         </div>
-                        <span className="flex items-center gap-1 text-sm font-bold text-primary-600">
+                        <span className="flex items-center gap-1 text-sm font-bold text-accent">
                           <Icon name="star" size={14} className="fill-primary-600" />
                           {m.rating}
                         </span>
@@ -290,7 +290,7 @@ export default function MuscleGroups() {
                       <button
                         type="button"
                         onClick={() => setExpandedMachineGroups((s) => new Set([...s, id]))}
-                        className="w-full py-1.5 text-center text-xs font-semibold text-primary-600"
+                        className="w-full py-1.5 text-center text-xs font-semibold text-accent"
                       >
                         +{list.length - 4} makine daha göster
                       </button>
@@ -333,7 +333,7 @@ export default function MuscleGroups() {
                       <button
                         type="button"
                         onClick={() => setExpandedExerciseGroups((s) => new Set([...s, id]))}
-                        className="w-full py-1.5 text-center text-xs font-semibold text-primary-600"
+                        className="w-full py-1.5 text-center text-xs font-semibold text-accent"
                       >
                         +{list.length - 4} egzersiz daha göster
                       </button>

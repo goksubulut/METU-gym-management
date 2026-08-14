@@ -105,7 +105,7 @@ export default function Notifications() {
                     className={`grid h-9 w-9 shrink-0 place-items-center rounded-full ${
                       item.kind === "personal"
                         ? "bg-green-50 text-green-600"
-                        : "bg-primary-50 text-primary-600"
+                        : "bg-primary-50 text-accent"
                     }`}
                   >
                     <Icon name={item.kind === "personal" ? "calendar" : "bell"} size={18} />

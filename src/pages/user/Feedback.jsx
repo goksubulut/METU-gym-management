@@ -123,7 +123,7 @@ export default function Feedback() {
       </Card>
 
       <Card soft className="mt-4 flex items-start gap-3 p-4">
-        <Icon name="wrench" size={19} className="mt-0.5 shrink-0 text-primary-600" />
+        <Icon name="wrench" size={19} className="mt-0.5 shrink-0 text-accent" />
         <p className="text-xs text-gray-500">
           Bir makinede arıza mı var? Makinenin üzerindeki <b>QR kodu</b> telefonunla
           okut; doğru makineye özel arıza bildirim formu açılır.

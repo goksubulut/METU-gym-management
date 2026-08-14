@@ -16,7 +16,7 @@ export default function Pagination({ page, totalPages, total, pageSize, onPage }
           type="button"
           disabled={page === 1}
           onClick={() => onPage(page - 1)}
-          className="grid h-8 w-8 place-items-center rounded-lg border border-gray-200 bg-white text-gray-500 transition-colors hover:border-gray-300 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-40"
+          className="grid h-8 w-8 place-items-center rounded-lg border border-gray-200 bg-surface text-gray-500 transition-colors hover:border-gray-300 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-40"
         >
           <Icon name="chevronLeft" size={15} />
         </button>
@@ -41,7 +41,7 @@ export default function Pagination({ page, totalPages, total, pageSize, onPage }
                 className={`grid h-8 w-8 place-items-center rounded-lg text-xs font-semibold transition-colors ${
                   p === page
                     ? "bg-primary-600 text-white"
-                    : "border border-gray-200 bg-white text-gray-600 hover:border-gray-300"
+                    : "border border-gray-200 bg-surface text-gray-600 hover:border-gray-300"
                 }`}
               >
                 {p}
@@ -53,7 +53,7 @@ export default function Pagination({ page, totalPages, total, pageSize, onPage }
           type="button"
           disabled={page === totalPages}
           onClick={() => onPage(page + 1)}
-          className="grid h-8 w-8 place-items-center rounded-lg border border-gray-200 bg-white text-gray-500 transition-colors hover:border-gray-300 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-40"
+          className="grid h-8 w-8 place-items-center rounded-lg border border-gray-200 bg-surface text-gray-500 transition-colors hover:border-gray-300 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-40"
         >
           <Icon name="chevronRight" size={15} />
         </button>

@@ -16,7 +16,7 @@ const labelOf = (id) => MUSCLE_GROUPS.find((m) => m.id === id)?.label || id;
 const QUICK_ACTIONS = [
   { to: "/appointments", icon: "calendar", title: "Randevularım", desc: "Geçmiş & gelecek", iconBg: "bg-ink-900", iconFg: "text-white" },
   { to: "/exercises", icon: "flame", title: "Egzersizler", desc: "Serbest & ısınma", iconBg: "bg-primary-600", iconFg: "text-white" },
-  { to: "/programs", icon: "clipboard", title: "Programlarım", desc: "Oluştur & yönet", iconBg: "bg-primary-50", iconFg: "text-primary-700" },
+  { to: "/programs", icon: "clipboard", title: "Programlarım", desc: "Oluştur & yönet", iconBg: "bg-primary-50", iconFg: "text-accent" },
   { to: "/feedback", icon: "message", title: "Geri Bildirim", desc: "Arıza & öneri", iconBg: "bg-gray-100", iconFg: "text-gray-500" },
 ];
 
@@ -80,7 +80,7 @@ export default function Dashboard() {
 
       {loading ? (
         <Card className="animate-rise overflow-hidden border-0">
-          <div className="bg-gray-900 px-5 py-5">
+          <div className="bg-ink-900 px-5 py-5">
             <Skeleton className="h-2.5 w-24 bg-white/10" />
             <div className="mt-4 flex items-baseline gap-2">
               <Skeleton className="h-9 w-20 bg-white/10" />
@@ -101,7 +101,7 @@ export default function Dashboard() {
         </Card>
       ) : active ? (
         <Card className="animate-rise overflow-hidden border-0">
-          <div className="hero-sheen bg-gray-900 bg-gradient-to-br from-ink-800 via-ink-900 to-ink-950 px-5 py-5 text-white">
+          <div className="hero-sheen bg-ink-900 bg-gradient-to-br from-ink-800 via-ink-900 to-ink-950 px-5 py-5 text-white">
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-300">
                 <span className="relative flex h-2 w-2 shrink-0">
@@ -112,7 +112,7 @@ export default function Dashboard() {
               </span>
             </div>
             <div className="mt-3 flex items-baseline gap-2">
-              <span className="tabular-nums font-display text-4xl font-bold tracking-tight">{active.time}</span>
+              <span className="tabular-nums font-mono text-4xl font-bold tracking-tight">{active.time}</span>
               <span className="text-sm text-white/60">
                 {new Date(`${active.date}T12:00:00`).toLocaleDateString("tr-TR", {
                   day: "numeric",
@@ -143,7 +143,7 @@ export default function Dashboard() {
                       key={m}
                       type="button"
                       onClick={() => nav(`/machines/${m}`)}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-semibold text-gray-700 transition-colors hover:border-primary-200 hover:bg-primary-50 hover:text-primary-700"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-semibold text-gray-700 transition-colors hover:border-primary-200 hover:bg-primary-50 hover:text-accent"
                     >
                       <Icon name="dumbbell" size={12} />
                       {machineById(m)?.name ?? m}
@@ -189,12 +189,12 @@ export default function Dashboard() {
       <div className="animate-rise-late mt-6">
         <div className="mb-2 flex items-center justify-between">
           <h2 className="text-base font-bold text-gray-900">İpuçları</h2>
-          <Link to="/exercises" className="text-xs font-semibold text-primary-600">
+          <Link to="/exercises" className="text-xs font-semibold text-accent">
             Tümü
           </Link>
         </div>
         <Card className="flex items-center gap-3 p-4">
-          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary-50 text-primary-600">
+          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary-50 text-accent">
             <Icon name="flame" size={19} />
           </div>
           <p className="text-sm text-gray-600">

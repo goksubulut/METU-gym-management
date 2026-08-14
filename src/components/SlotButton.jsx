@@ -23,24 +23,24 @@ export default function SlotButton({
     : fill(slot.booked / slot.capacity);
   const selectedClass =
     selectedVariant === "green"
-      ? "border-emerald-600 bg-emerald-600 text-white shadow-sm"
-      : "border-primary-600 bg-primary-600 text-white shadow-sm";
+      ? "border-available bg-available text-white shadow-sm"
+      : "border-primary-600 bg-primary-600 text-white shadow-cta";
   return (
     <button
       type="button"
       disabled={info.disabled}
       onClick={() => onSelect(slot)}
-      className={`flex flex-col items-center rounded-xl border p-2.5 transition-all ${
+      className={`flex flex-col items-center rounded-xl border p-2.5 transition-[background-color,border-color,transform] duration-150 ease-smooth active:scale-[0.97] ${
         info.disabled
-          ? "cursor-not-allowed border-gray-100 bg-gray-50 opacity-60"
+          ? "cursor-not-allowed border-hairline bg-surface-2 opacity-60"
           : selected
             ? selectedClass
-            : "border-gray-200 bg-white hover:border-primary-300"
+            : "border-line bg-surface hover:border-primary-300"
       }`}
     >
-      <span className="text-sm font-bold">{slot.time}</span>
+      <span className="font-mono text-sm font-bold tabular-nums">{slot.time}</span>
       {info.disabled ? (
-        <span className="mt-1 text-[10px] font-semibold text-gray-400">Dolu</span>
+        <span className="mt-1 text-[10px] font-semibold text-muted">Dolu</span>
       ) : selected ? (
         <span className="mt-1 text-[10px] font-semibold text-white/90">
           {slot.capacity - slot.booked} yer

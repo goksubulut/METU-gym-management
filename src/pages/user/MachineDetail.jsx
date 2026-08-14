@@ -12,7 +12,8 @@ import { useToast } from "../../components/Toast.jsx";
 import { machineById, MUSCLE_GROUPS } from "../../mock/machines.js";
 import { getAccessToken } from "../../api/client.js";
 import { createFault, createRating } from "../../api/feedback.js";
-import { fetchMachine } from "../../api/catalog.js";
+import { fetchMachine, fetchAlternatives } from "../../api/catalog.js";
+import ExerciseCardCarousel from "../../components/ui/exercise-card-carousel.jsx";
 
 export default function MachineDetail() {
   const { id } = useParams();
@@ -22,6 +23,7 @@ export default function MachineDetail() {
   const [params] = useSearchParams();
   // Önce mock'tan (anında render), sonra API'den güncel veriyle tazelenir.
   const [m, setM] = useState(() => machineById(id));
+  const [exercises, setExercises] = useState([]);
   const [rating, setRating] = useState(0);
   const [ratingTags, setRatingTags] = useState([]);
   const [faultOpen, setFaultOpen] = useState(location.pathname.startsWith("/machine/") && params.get("report") === "1");
@@ -34,6 +36,9 @@ export default function MachineDetail() {
   useEffect(() => {
     fetchMachine(id)
       .then(setM)
+      .catch(() => {});
+    fetchAlternatives(id)
+      .then((d) => setExercises(d.alternativeExercises))
       .catch(() => {});
   }, [id]);
 
@@ -86,7 +91,7 @@ export default function MachineDetail() {
 
   return (
     <div className="pb-6">
-      <div className="hero-sheen relative grid h-56 place-items-center overflow-hidden bg-gray-900 bg-gradient-to-br from-ink-800 via-ink-900 to-ink-950">
+      <div className="hero-sheen relative grid h-56 place-items-center overflow-hidden bg-ink-900 bg-gradient-to-br from-ink-800 via-ink-900 to-ink-950">
         {m.photoUrl ? (
           <button
             type="button"
@@ -137,7 +142,7 @@ export default function MachineDetail() {
       <div className="px-4 py-4">
         {viaQR && (
           <Card soft className="mb-3 flex items-center gap-2.5 p-3">
-            <Icon name="qr" size={18} className="shrink-0 text-primary-600" />
+            <Icon name="qr" size={18} className="shrink-0 text-accent" />
             <p className="text-xs text-gray-600">
               Bu sayfa <b>makine QR kodu</b> ile açıldı. Arıza bildirimi bu makineye ({m.location}) özel gönderilir.
             </p>
@@ -149,7 +154,7 @@ export default function MachineDetail() {
             <p className="text-sm text-gray-400">{m.category} · {m.location}</p>
           </div>
           <div className="text-right">
-            <p className="flex items-center justify-end gap-1 text-lg font-extrabold text-primary-600">
+            <p className="flex items-center justify-end gap-1 text-lg font-extrabold text-accent">
               <Icon name="star" size={16} className="fill-primary-600" /> {m.rating}
             </p>
             <p className="text-[10px] text-gray-400">{m.reviews} değerlendirme</p>
@@ -167,12 +172,14 @@ export default function MachineDetail() {
         <p className="mt-4 text-sm leading-relaxed text-gray-600">{m.description}</p>
 
         <Card soft className="mt-4 flex gap-3 p-4">
-          <Icon name="bulb" size={20} className="mt-0.5 shrink-0 text-primary-600" />
+          <Icon name="bulb" size={20} className="mt-0.5 shrink-0 text-accent" />
           <div>
             <p className="text-sm font-bold text-gray-900">İpucu</p>
             <p className="text-sm text-gray-600">{m.tips}</p>
           </div>
         </Card>
+
+        <ExerciseCardCarousel exercises={exercises} />
 
         <Card className="mt-4 p-4">
           <p className="mb-2 text-center text-sm font-bold text-gray-900">Bu makineyi puanla</p>

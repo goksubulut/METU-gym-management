@@ -161,7 +161,7 @@ export default function Faults() {
                 <td className="px-5 py-3 text-right">
                   <button
                     onClick={() => setDetail(f)}
-                    className="text-sm font-semibold text-primary-600"
+                    className="text-sm font-semibold text-accent"
                   >
                     Detay
                   </button>

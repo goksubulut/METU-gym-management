@@ -4,8 +4,6 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import Button from "../../components/Button.jsx";
 
-import Card from "../../components/Card.jsx";
-
 import Icon from "../../components/Icon.jsx";
 
 import Modal from "../../components/Modal.jsx";
@@ -312,17 +310,25 @@ export default function ProgramDetail() {
 
         </Button>
 
-        <Card className="border-red-100 p-4">
+        <Button
+          full
+          variant="outline"
+          onClick={() => {
+            const machineIds = items
+              .filter((item) => item.itemType === "MACHINE")
+              .map((item) => item.machineId)
+              .filter(Boolean);
+            nav("/book", { state: { machineIds } });
+          }}
+        >
+          Bu program ile randevu al
+        </Button>
 
-          <p className="mb-3 text-sm font-semibold text-red-700">Tehlikeli bölge</p>
+        <Button variant="danger" full onClick={() => setDeleteOpen(true)} disabled={deleting}>
 
-          <Button variant="danger" full onClick={() => setDeleteOpen(true)} disabled={deleting}>
+          Programı Sil
 
-            Programı Sil
-
-          </Button>
-
-        </Card>
+        </Button>
 
       </div>
 

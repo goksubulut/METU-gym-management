@@ -1,9 +1,21 @@
 <!doctype html>
-<html lang="tr">
+<html lang="tr" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark light" />
     <title>METU Gym Management System</title>
+    <!-- Tema flash-önleme: ilk boyamadan önce data-theme'i ayarla (koyu varsayılan) -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem("metu-gym-theme");
+          document.documentElement.setAttribute("data-theme", t === "light" ? "light" : "dark");
+        } catch (e) {
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

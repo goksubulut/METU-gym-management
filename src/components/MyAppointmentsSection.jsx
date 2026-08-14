@@ -94,7 +94,7 @@ export default function MyAppointmentsSection({ className = "" }) {
           ["Tamamlanan", list.filter((a) => a.status === "completed").length],
         ].map(([l, v]) => (
           <Card key={l} soft className="p-3 text-center">
-            <p className="text-xl font-extrabold text-primary-600">{v}</p>
+            <p className="text-xl font-extrabold text-accent">{v}</p>
             <p className="text-[11px] text-gray-500">{l}</p>
           </Card>
         ))}
@@ -180,7 +180,7 @@ export default function MyAppointmentsSection({ className = "" }) {
                           onClick={() => nav(`/machines/${m}`)}
                           className="flex items-center gap-2.5 rounded-xl border border-gray-100 bg-gray-50 px-3 py-2 text-left transition-colors hover:border-primary-200 hover:bg-primary-50"
                         >
-                          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-gray-900 text-white">
+                          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-ink-900 text-white">
                             <Icon name="dumbbell" size={15} />
                           </span>
                           <span className="min-w-0 flex-1">

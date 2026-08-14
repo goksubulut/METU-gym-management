@@ -136,7 +136,7 @@ export default function AdminDashboard() {
           <div className="space-y-3">
             {topMachines.map((m, i) => (
               <div key={m.name} className="flex items-center gap-3">
-                <span className="grid h-7 w-7 place-items-center rounded-lg bg-primary-50 text-xs font-bold text-primary-600">
+                <span className="grid h-7 w-7 place-items-center rounded-lg bg-primary-50 text-xs font-bold text-accent">
                   {i + 1}
                 </span>
                 <div className="min-w-0 flex-1">

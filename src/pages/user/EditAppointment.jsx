@@ -206,7 +206,7 @@ export default function EditAppointment() {
             className={`flex flex-col items-center rounded-xl border px-1 py-2 transition-colors ${
               dateKey === d.key
                 ? "border-emerald-600 bg-emerald-600 text-white"
-                : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
+                : "border-gray-200 bg-surface text-gray-600 hover:border-gray-300"
             }`}
           >
             <span className={`text-[10px] font-semibold ${dateKey === d.key ? "text-white/80" : "text-gray-400"}`}>{d.day}</span>
@@ -314,7 +314,7 @@ export default function EditAppointment() {
                 className={`flex items-center gap-3 rounded-xl border p-3 ${
                   machines.includes(m.id)
                     ? "border-emerald-600 bg-emerald-50"
-                    : "border-gray-200 bg-white"
+                    : "border-gray-200 bg-surface"
                 }`}
               >
                 <input

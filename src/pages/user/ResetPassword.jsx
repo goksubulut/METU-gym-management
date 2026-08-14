@@ -43,7 +43,7 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-[430px] flex-col justify-center bg-white px-6 py-10">
+    <div className="mx-auto flex min-h-screen max-w-[430px] flex-col justify-center bg-surface px-6 py-10">
       <div className="mb-8 flex flex-col items-center">
         <Logo size={40} />
       </div>

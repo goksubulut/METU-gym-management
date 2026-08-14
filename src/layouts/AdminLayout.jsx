@@ -24,7 +24,7 @@ export default function AdminLayout() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <aside className="fixed inset-y-0 left-0 flex w-64 flex-col border-r border-gray-100 bg-white">
+      <aside className="fixed inset-y-0 left-0 flex w-64 flex-col border-r border-gray-100 bg-surface">
         <div className="border-b border-gray-100 px-6 py-5">
           <Logo />
           <p className="mt-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
@@ -62,7 +62,7 @@ export default function AdminLayout() {
       </aside>
 
       <div className="ml-64 flex-1">
-        <header className="flex items-center justify-between border-b border-gray-100 bg-white px-8 py-4">
+        <header className="flex items-center justify-between border-b border-gray-100 bg-surface px-8 py-4">
           <div>
             <p className="text-xs text-gray-400">METU GYM Merkez Şube</p>
             <p className="text-sm font-semibold text-gray-800">
@@ -76,7 +76,7 @@ export default function AdminLayout() {
           </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-gray-500">Admin</span>
-            <div className="grid h-9 w-9 place-items-center rounded-full bg-gray-900 text-xs font-bold text-white">
+            <div className="grid h-9 w-9 place-items-center rounded-full bg-ink-900 text-xs font-bold text-white">
               AD
             </div>
           </div>

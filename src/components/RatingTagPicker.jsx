@@ -33,8 +33,8 @@ export default function RatingTagPicker({ selected = [], onChange, disabled }) {
               onClick={() => toggle(tag)}
               className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
                 active
-                  ? "border-primary-600 bg-primary-50 text-primary-700"
-                  : "border-gray-200 bg-white text-gray-600 hover:border-primary-200"
+                  ? "border-primary-600 bg-primary-50 text-accent"
+                  : "border-gray-200 bg-surface text-gray-600 hover:border-primary-200"
               } ${disabled ? "cursor-default opacity-60" : ""}`}
             >
               {tag}

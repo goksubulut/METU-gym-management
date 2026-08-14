@@ -250,7 +250,7 @@ export default function Matrix() {
               labelFormatter={() => ""}
               content={({ payload }) =>
                 payload && payload.length ? (
-                  <div className="rounded-lg bg-white px-3 py-2 text-xs shadow-pop">
+                  <div className="rounded-lg bg-surface px-3 py-2 text-xs shadow-pop">
                     <p className="font-bold text-gray-900">{payload[0].payload.name}</p>
                     <p className="text-gray-500">Kullanım: {payload[0].payload.uses}</p>
                     <p className="text-gray-500">Puan: {payload[0].payload.rating}</p>

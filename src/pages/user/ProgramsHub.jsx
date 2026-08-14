@@ -61,7 +61,7 @@ export default function ProgramsHub() {
           <p className="text-xs text-gray-500">Yeni program</p>
         </Card>
         <Card className="p-4 opacity-90">
-          <div className="mb-3 grid h-11 w-11 place-items-center rounded-xl bg-primary-50 text-primary-700">
+          <div className="mb-3 grid h-11 w-11 place-items-center rounded-xl bg-primary-50 text-accent">
             <Icon name="clipboard" size={20} />
           </div>
           <p className="text-sm font-bold text-gray-900">Programlarım</p>

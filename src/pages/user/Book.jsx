@@ -1,20 +1,40 @@
-import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { ArrowRight, Calendar, CheckCircle, MapPin } from "lucide-react";
+import { motion } from "framer-motion";
 import Button from "../../components/Button.jsx";
 import Badge from "../../components/Badge.jsx";
 import Icon from "../../components/Icon.jsx";
 import Skeleton from "../../components/Skeleton.jsx";
+import Spinner from "../../components/Spinner.jsx";
 import { useToast } from "../../components/Toast.jsx";
-import { MUSCLE_GROUPS, machinesByMuscle } from "../../mock/machines.js";
+import MachineSelectCard from "../../components/ui/machine-select-card.jsx";
+import Bucket from "../../components/ui/bucket.jsx";
+import { MUSCLES } from "../../components/BodyDiagram.jsx";
+import { MUSCLE_GROUPS, machinesByMuscle, machineById } from "../../mock/machines.js";
 import { upcomingDates } from "../../utils/dates.js";
 import { getAccessToken } from "../../api/client.js";
 import { createAppointment, fetchSlots, mapSlotFromApi } from "../../api/bookings.js";
+import { fetchMachines } from "../../api/catalog.js";
 
 const TIME_PERIODS = [
   { id: "morning", label: "Sabah", from: 6 * 60, to: 12 * 60 },
   { id: "afternoon", label: "Öğleden Sonra", from: 12 * 60, to: 17 * 60 },
   { id: "evening", label: "Akşam", from: 17 * 60, to: 24 * 60 },
 ];
+
+// Fine-grained sections (same structure as MuscleGroups.jsx)
+const SECTIONS = [
+  { group: "chest", title: "Göğüs" },
+  { group: "back", title: "Sırt" },
+  { group: "shoulders", title: "Omuz" },
+  { group: "arms", title: "Kol" },
+  { group: "core", title: "Karın" },
+  { group: "glutes", title: "Kalça" },
+  { group: "legs", title: "Bacak" },
+];
+
+const MUSCLE_ENTRIES = Object.entries(MUSCLES);
 
 function toMin(t) {
   const [h, m] = t.split(":").map(Number);
@@ -25,19 +45,107 @@ function isAvailable(s) {
   return !s.isPast && !(s.isFull || s.booked >= s.capacity);
 }
 
+// ── Step indicator (steps 2–4) ────────────────────────────────────────────────
+function StepIndicator({ step }) {
+  const labels = ["Kaslar", "Makine", "Onayla"];
+  const active = step - 2;
+
+  return (
+    <div className="mb-6 flex items-center">
+      {labels.map((label, i) => (
+        <Fragment key={i}>
+          {i > 0 && (
+            <div
+              className={[
+                "h-px flex-1 transition-colors duration-300",
+                i <= active ? "bg-primary-600" : "bg-surface-3",
+              ].join(" ")}
+            />
+          )}
+          <div className="flex flex-col items-center gap-1">
+            <div
+              className={[
+                "h-2.5 w-2.5 rounded-full transition-all duration-200",
+                i < active
+                  ? "bg-primary-600"
+                  : i === active
+                  ? "bg-primary-600 ring-[3px] ring-primary-600/25"
+                  : "bg-surface-3",
+              ].join(" ")}
+            />
+            <span
+              className={[
+                "text-[10px] font-bold",
+                i === active ? "text-accent" : "text-faint",
+              ].join(" ")}
+            >
+              {label}
+            </span>
+          </div>
+        </Fragment>
+      ))}
+    </div>
+  );
+}
+
+// ── Date + slot summary banner ────────────────────────────────────────────────
+function DateSlotBanner({ selectedDate, slot }) {
+  return (
+    <div className="mb-5 flex items-center gap-2.5 rounded-xl bg-surface-2 px-4 py-3">
+      <Icon name="calendar" size={15} className="shrink-0 text-accent" />
+      <span className="text-sm font-semibold text-content">
+        {selectedDate?.day} {selectedDate?.date} {selectedDate?.month}
+      </span>
+      <span className="text-muted">·</span>
+      <span className="tabular-nums text-sm font-bold text-accent">{slot.time}</span>
+    </div>
+  );
+}
+
+function SelectionCount({ count, label }) {
+  if (!count) return null;
+  return (
+    <p className="mb-5 text-sm font-semibold text-accent">
+      {count} {label}
+    </p>
+  );
+}
+
 export default function Book() {
   const nav = useNavigate();
+  const location = useLocation();
   const toast = useToast();
   const dates = useMemo(() => upcomingDates(7), []);
 
+  // Capture pre-loaded IDs from "Bu program ile randevu al" navigation
+  const preloadedMachineIds = useRef(location.state?.machineIds ?? []).current;
+  const musclesDerivedRef = useRef(false);
+
+  const [step, setStep] = useState(1);
   const [dateKey, setDateKey] = useState(null);
   const [slot, setSlot] = useState(null);
-  const [groups, setGroups] = useState([]);
-  const [machines, setMachines] = useState([]);
+
+  // Fine-grained muscle slugs (e.g. "biceps", "quadriceps")
+  const [muscleSlugs, setMuscleSlugs] = useState([]);
+
+  const [machines, setMachines] = useState(() => location.state?.machineIds ?? []);
+  const [orderedMachines, setOrderedMachines] = useState([]);
+  const [apiMachines, setApiMachines] = useState(null);
+
   const [slots, setSlots] = useState([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
+
+  // Step 4 bucket → step 5 transition
   const [submitting, setSubmitting] = useState(false);
-  const [step, setStep] = useState(1);
+  const [bucketDone, setBucketDone] = useState(false);
+  const [appointmentResult, setAppointmentResult] = useState(null);
+  const [appointmentError, setAppointmentError] = useState(null);
+
+  // Broad groups derived from selected fine-grained slugs
+  const broadGroups = useMemo(
+    () => [...new Set(muscleSlugs.map((s) => MUSCLES[s]?.group).filter(Boolean))],
+    [muscleSlugs],
+  );
 
   useEffect(() => {
     if (!getAccessToken()) {
@@ -45,6 +153,24 @@ export default function Book() {
       nav("/auth");
     }
   }, [nav, toast]);
+
+  useEffect(() => {
+    fetchMachines().then(setApiMachines).catch(() => {});
+  }, []);
+
+  // Derive muscleSlugs from pre-selected machines once API data loads
+  useEffect(() => {
+    if (!apiMachines || !preloadedMachineIds.length || musclesDerivedRef.current) return;
+    musclesDerivedRef.current = true;
+    const machineObjects = preloadedMachineIds
+      .map((id) => apiMachines.find((m) => m.id === id))
+      .filter(Boolean);
+    const broadGroupIds = [...new Set(machineObjects.flatMap((m) => m.muscles ?? []))];
+    const slugs = Object.entries(MUSCLES)
+      .filter(([, info]) => broadGroupIds.includes(info.group))
+      .map(([slug]) => slug);
+    if (slugs.length > 0) setMuscleSlugs(slugs);
+  }, [apiMachines]);
 
   useEffect(() => {
     if (!dateKey) return;
@@ -56,17 +182,28 @@ export default function Book() {
       .then((data) => {
         if (!cancelled) setSlots(data.slots.map(mapSlotFromApi));
       })
-      .catch((err) => {
-        if (!cancelled) {
-          toast(err.message ?? "Slotlar yüklenemedi", "error");
-          setSlots([]);
-        }
+      .catch(() => {
+        if (!cancelled) setSlots([]);
       })
       .finally(() => { if (!cancelled) setLoadingSlots(false); });
     return () => { cancelled = true; };
-  }, [dateKey, toast]);
+  }, [dateKey]);
 
-  // Sadece rezerve edilebilir slotlar, dönemlere göre gruplandırılmış
+  // When bucket finishes + API resolves → go to step 5
+  useEffect(() => {
+    if (step !== 4 || !bucketDone) return;
+    if (appointmentError) {
+      toast(appointmentError, "error");
+      setStep(3);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    if (appointmentResult !== null) {
+      setStep(5);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [step, bucketDone, appointmentResult, appointmentError, toast]);
+
   const availablePeriods = useMemo(
     () =>
       TIME_PERIODS.map((p) => ({
@@ -80,122 +217,242 @@ export default function Book() {
 
   const hasAnyAvailable = availablePeriods.length > 0;
 
-  const machinesByGroup = useMemo(
-    () =>
-      groups
-        .map((g) => ({
-          id: g,
-          label: MUSCLE_GROUPS.find((x) => x.id === g)?.label ?? g,
-          list: machinesByMuscle(g),
-        }))
-        .filter((grp) => grp.list.length > 0),
-    [groups],
-  );
+  const machinesByGroup = useMemo(() => {
+    if (broadGroups.length === 0) return [];
+    const byGroup = (g) =>
+      apiMachines
+        ? apiMachines.filter((m) => m.muscles.includes(g))
+        : machinesByMuscle(g);
+    return broadGroups
+      .map((g) => ({
+        id: g,
+        label: SECTIONS.find((s) => s.group === g)?.title
+          ?? MUSCLE_GROUPS.find((x) => x.id === g)?.label
+          ?? g,
+        list: byGroup(g),
+      }))
+      .filter((grp) => grp.list.length > 0);
+  }, [broadGroups, apiMachines]);
 
-  const toggleGroup = (id) =>
-    setGroups((g) => (g.includes(id) ? g.filter((x) => x !== id) : [...g, id]));
+  const toggleMuscleSlug = (slug) => {
+    setMuscleSlugs((prev) =>
+      prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug],
+    );
+    setMachines([]); // reset machine selection on muscle change
+  };
 
   const toggleMachine = (id) =>
     setMachines((m) => (m.includes(id) ? m.filter((x) => x !== id) : [...m, id]));
 
-  const goToStep2 = () => {
-    setStep(2);
+  const goToStep = (n) => {
+    setStep(n);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const confirm = async () => {
-    if (!slot?.id) return;
+  // Enter step 4: convert IDs → objects, fire API call
+  const startBucketStep = () => {
+    const find = (id) => (apiMachines?.find((m) => m.id === id)) || machineById(id);
+    const ordered = machines.map(find).filter(Boolean);
+    setOrderedMachines(ordered);
+    setBucketDone(false);
+    setAppointmentResult(null);
+    setAppointmentError(null);
     setSubmitting(true);
-    try {
-      await createAppointment({
-        slotId: slot.id,
-        machineIds: machines.length ? machines : undefined,
-        muscleGroupIds: groups.length ? groups : undefined,
-      });
-      toast("Randevun oluşturuldu", "success");
-      nav("/appointments");
-    } catch (err) {
-      toast(err.message ?? "Randevu oluşturulamadı", "error");
-    } finally {
-      setSubmitting(false);
-    }
+
+    createAppointment({
+      slotId: slot.id,
+      machineIds: machines.length ? machines : undefined,
+      muscleGroupIds: broadGroups.length ? broadGroups : undefined,
+    })
+      .then((res) => setAppointmentResult(res ?? "__ok__"))
+      .catch((err) => setAppointmentError(err.message ?? "Randevu oluşturulamadı"))
+      .finally(() => setSubmitting(false));
+
+    goToStep(4);
   };
 
   const selectedDate = dates.find((d) => d.key === dateKey);
+  const machineNames = orderedMachines.map((m) => m.name);
 
-  // ── Step 2: Kas grubu + Onayla ──────────────────────────────────────────
-  if (step === 2 && slot) {
+  // ── STEP 5: Summary ────────────────────────────────────────────────────────
+  if (step === 5) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="px-4 py-5 pb-10"
+      >
+        {/* Success header */}
+        <div className="mb-8 flex flex-col items-center gap-4 text-center">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20, delay: 0.15 }}
+            className="grid h-20 w-20 place-items-center rounded-full bg-primary-600/15"
+          >
+            <CheckCircle size={38} className="text-primary-600" strokeWidth={1.6} />
+          </motion.div>
+          <div>
+            <h1 className="font-display text-2xl font-bold tracking-tight text-content">
+              Randevun Oluşturuldu!
+            </h1>
+            <p className="mt-1 text-sm text-muted">Antrenmanın seni bekliyor.</p>
+          </div>
+        </div>
+
+        {/* Date / time card */}
+        <div className="mb-4 rounded-2xl border border-hairline bg-surface p-4">
+          <div className="flex items-center gap-3.5">
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary-600/10">
+              <Calendar size={18} className="text-accent" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-content">
+                {selectedDate?.day}, {selectedDate?.date} {selectedDate?.month}
+              </p>
+              <p className="text-xs text-muted">Saat {slot?.time}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Machine list */}
+        {orderedMachines.length > 0 && (
+          <div className="mb-4 rounded-2xl border border-hairline bg-surface p-4">
+            <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-muted">
+              Antrenman Planı
+            </p>
+            <div className="space-y-2.5">
+              {orderedMachines.map((m, i) => (
+                <div key={m.id} className="flex items-center gap-3">
+                  <span className="w-5 shrink-0 font-mono text-[11px] font-bold text-faint">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-content">{m.name}</p>
+                    {m.location && (
+                      <p className="flex items-center gap-1 text-[11px] text-muted">
+                        <MapPin size={10} />
+                        {m.location}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Muscle badges */}
+        {muscleSlugs.length > 0 && (
+          <div className="mb-6 flex flex-wrap gap-1.5">
+            {muscleSlugs.map((slug) => (
+              <Badge key={slug} tone="primary">
+                {MUSCLES[slug]?.label ?? slug}
+              </Badge>
+            ))}
+          </div>
+        )}
+
+        <Button full size="lg" onClick={() => nav("/appointments")}>
+          Randevularıma Git
+          <ArrowRight size={18} />
+        </Button>
+
+        <button
+          type="button"
+          onClick={() => nav("/")}
+          className="mt-3 w-full py-2 text-center text-sm font-medium text-muted"
+        >
+          Ana sayfaya dön
+        </button>
+      </motion.div>
+    );
+  }
+
+  // ── STEP 4: Bucket animation ───────────────────────────────────────────────
+  if (step === 4 && slot) {
+    return (
+      <div className="flex min-h-[80vh] flex-col items-center justify-center px-4 py-10">
+        <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-faint">
+          Antrenman Programı
+        </p>
+        <h1 className="mb-8 text-center font-display text-xl font-bold tracking-tight text-content">
+          {bucketDone && submitting
+            ? "Randevu kaydediliyor..."
+            : "Oluşturuluyor..."}
+        </h1>
+
+        <Bucket items={machineNames} onComplete={() => setBucketDone(true)} />
+
+        {/* Waiting for API after bucket finishes */}
+        {bucketDone && submitting && (
+          <div className="mt-8">
+            <Spinner />
+          </div>
+        )}
+
+        {/* Error fallback (shown momentarily before redirect to step 3) */}
+        {appointmentError && (
+          <p className="mt-6 text-center text-sm font-medium text-red-500">
+            {appointmentError}
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  // ── STEP 3: Machine selection ───────────────────────────────────────────────
+  if (step === 3 && slot) {
     return (
       <div className="px-4 py-5 pb-10">
         <button
           type="button"
-          onClick={() => setStep(1)}
-          className="mb-5 inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-700"
+          onClick={() => goToStep(2)}
+          className="mb-5 inline-flex items-center gap-1.5 text-sm font-medium text-muted"
         >
           <Icon name="chevronLeft" size={16} />
           Geri
         </button>
 
-        <div className="mb-6 flex items-center gap-2 rounded-xl bg-gray-50 px-4 py-3">
-          <Icon name="calendar" size={16} className="shrink-0 text-primary-600" />
-          <span className="text-sm font-semibold text-gray-900">
-            {selectedDate?.day} {selectedDate?.date} {selectedDate?.month}
-          </span>
-          <span className="text-gray-300">·</span>
-          <span className="tabular-nums text-sm font-bold text-primary-600">{slot.time}</span>
-        </div>
+        <StepIndicator step={3} />
 
-        <h1 className="mb-1 font-display text-xl font-bold tracking-tight text-gray-900">
-          Kas Grubu Seç
+        <h1 className="mb-1 font-display text-xl font-bold tracking-tight text-content">
+          Makinelerini Seç
         </h1>
-        <p className="mb-5 text-sm text-gray-400">Opsiyonel — istersen boş bırakabilirsin.</p>
+        <p className="mb-5 text-sm text-muted">
+          Opsiyonel — istersen boş bırakabilirsin.
+        </p>
 
-        <div className="flex flex-wrap gap-2">
-          {MUSCLE_GROUPS.map((g) => (
-            <button
-              key={g.id}
-              type="button"
-              onClick={() => toggleGroup(g.id)}
-              className={`rounded-xl border px-4 py-2 text-sm font-semibold transition-colors active:scale-[0.96] ${
-                groups.includes(g.id)
-                  ? "border-primary-600 bg-primary-50 text-primary-800"
-                  : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
-              }`}
-            >
-              {g.label}
-            </button>
-          ))}
-        </div>
+        <SelectionCount count={machines.length} label="makine seçildi" />
 
-        {machinesByGroup.length > 0 && (
-          <div className="mt-5 space-y-4">
-            <p className="text-xs font-bold text-gray-400">Makine ekle</p>
+        {machinesByGroup.length === 0 ? (
+          <div className="rounded-2xl border border-hairline bg-surface px-5 py-10 text-center">
+            <Icon name="dumbbell" size={32} className="mx-auto mb-3 text-faint" />
+            <p className="text-sm font-semibold text-content">
+              Makine listesi için kas seç
+            </p>
+            <p className="mt-1 text-xs text-muted">
+              Geri dönüp en az bir kas seçebilir veya direkt devam edebilirsin.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-5">
             {machinesByGroup.map(({ id, label, list }) => (
               <div key={id}>
-                <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-gray-400">
-                  {label}
-                </p>
+                <div className="mb-2.5 flex items-center gap-2">
+                  <span className="text-xs font-bold text-muted">{label} için</span>
+                  <div className="h-px flex-1 bg-surface-3" />
+                  <Badge tone="primary">{list.length}</Badge>
+                </div>
                 <div className="space-y-2">
                   {list.map((m) => (
-                    <label
+                    <MachineSelectCard
                       key={m.id}
-                      className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition-colors ${
-                        machines.includes(m.id)
-                          ? "border-primary-600 bg-primary-50"
-                          : "border-gray-100 bg-white"
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={machines.includes(m.id)}
-                        onChange={() => toggleMachine(m.id)}
-                        className="h-4 w-4 accent-primary-600"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold text-gray-900">{m.name}</p>
-                        <p className="text-xs text-gray-400">{m.location}</p>
-                      </div>
-                    </label>
+                      machine={m}
+                      selected={machines.includes(m.id)}
+                      onToggle={toggleMachine}
+                    />
                   ))}
                 </div>
               </div>
@@ -204,45 +461,100 @@ export default function Book() {
         )}
 
         <div className="mt-8">
-          <div className="mb-3 flex items-center justify-between rounded-xl border border-gray-100 bg-white px-4 py-3">
-            <div>
-              <p className="text-xs text-gray-400">Seçilen randevu</p>
-              <p className="tabular-nums text-sm font-bold text-gray-900">
-                {selectedDate?.day} {selectedDate?.date} {selectedDate?.month},{" "}
-                {slot.time}
-              </p>
-            </div>
-            {groups.length > 0 && (
-              <div className="flex flex-wrap justify-end gap-1">
-                {groups.slice(0, 2).map((g) => (
-                  <Badge key={g} tone="primary">
-                    {MUSCLE_GROUPS.find((x) => x.id === g)?.label}
-                  </Badge>
-                ))}
-                {groups.length > 2 && (
-                  <Badge tone="gray">+{groups.length - 2}</Badge>
-                )}
-              </div>
-            )}
-          </div>
-          <Button full size="lg" onClick={confirm} disabled={submitting}>
-            {submitting ? "Kaydediliyor…" : "Randevuyu Onayla"}
+          <Button full size="lg" onClick={startBucketStep}>
+            Devam Et
+            <ArrowRight size={18} />
           </Button>
         </div>
       </div>
     );
   }
 
-  // ── Step 1: Tarih + Saat ─────────────────────────────────────────────────
+  // ── STEP 2: Fine-grained muscle selection ──────────────────────────────────
+  if (step === 2 && slot) {
+    return (
+      <div className="px-4 py-5 pb-10">
+        <button
+          type="button"
+          onClick={() => goToStep(1)}
+          className="mb-5 inline-flex items-center gap-1.5 text-sm font-medium text-muted"
+        >
+          <Icon name="chevronLeft" size={16} />
+          Geri
+        </button>
+
+        <StepIndicator step={2} />
+
+        <DateSlotBanner selectedDate={selectedDate} slot={slot} />
+
+        <h1 className="mb-1 font-display text-xl font-bold tracking-tight text-content">
+          Kas Seç
+        </h1>
+        <p className="mb-5 text-sm text-muted">
+          Antrenmanında çalışmak istediğin kasları seç. Opsiyonel.
+        </p>
+
+        <SelectionCount count={muscleSlugs.length} label="kas seçildi" />
+
+        <div className="space-y-5">
+          {SECTIONS.map(({ group, title }) => {
+            const sectionMuscles = MUSCLE_ENTRIES.filter(
+              ([, info]) => info.group === group,
+            );
+            return (
+              <div key={group}>
+                <div className="mb-2.5 flex items-center gap-2">
+                  <span className="text-xs font-bold uppercase tracking-wide text-muted">
+                    {title}
+                  </span>
+                  <div className="h-px flex-1 bg-surface-3" />
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {sectionMuscles.map(([slug, info]) => {
+                    const selected = muscleSlugs.includes(slug);
+                    return (
+                      <motion.button
+                        key={slug}
+                        type="button"
+                        whileTap={{ scale: 0.91 }}
+                        onClick={() => toggleMuscleSlug(slug)}
+                        className={[
+                          "rounded-full border px-3.5 py-1.5 text-xs font-bold transition-colors duration-200",
+                          selected
+                            ? "border-primary-600 bg-primary-600/15 text-accent"
+                            : "border-hairline bg-surface text-muted",
+                        ].join(" ")}
+                      >
+                        {info.label}
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="mt-8">
+          <Button full size="lg" onClick={() => goToStep(3)}>
+            Devam Et
+            <ArrowRight size={18} />
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── STEP 1: Date + Time ─────────────────────────────────────────────────────
   return (
     <div className="px-4 py-5 pb-10">
-      <h1 className="mb-6 font-display text-2xl font-bold tracking-tight text-gray-900">
+      <h1 className="mb-6 font-display text-2xl font-bold tracking-tight text-content">
         Randevu Al
       </h1>
 
-      {/* Tarih şeridi */}
+      {/* Date strip */}
       <section>
-        <h2 className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400">Tarih</h2>
+        <h2 className="mb-3 text-xs font-bold uppercase tracking-wider text-muted">Tarih</h2>
         <div className="grid grid-cols-4 gap-2">
           {dates.map((d) => (
             <button
@@ -253,17 +565,23 @@ export default function Book() {
                 dateKey === d.key
                   ? "border-primary-600 bg-primary-600 text-white"
                   : d.isToday
-                  ? "border-primary-200 bg-primary-50 text-gray-900"
-                  : "border-gray-100 bg-white text-gray-600"
+                  ? "border-primary-200 bg-primary-600/10 text-content"
+                  : "border-hairline bg-surface text-muted"
               }`}
             >
-              <span className={`text-[10px] font-semibold uppercase tracking-wide ${
-                dateKey === d.key ? "text-white/70" : "text-gray-400"
-              }`}>
+              <span
+                className={`text-[10px] font-semibold uppercase tracking-wide ${
+                  dateKey === d.key ? "text-white/70" : "text-faint"
+                }`}
+              >
                 {d.day}
               </span>
               <span className="mt-0.5 text-lg font-extrabold leading-none">{d.date}</span>
-              <span className={`mt-0.5 text-[10px] ${dateKey === d.key ? "text-white/60" : "text-gray-400"}`}>
+              <span
+                className={`mt-0.5 text-[10px] ${
+                  dateKey === d.key ? "text-white/60" : "text-faint"
+                }`}
+              >
                 {d.month}
               </span>
               {d.isToday && dateKey !== d.key && (
@@ -275,15 +593,15 @@ export default function Book() {
       </section>
 
       {!dateKey && (
-        <p className="mt-10 text-center text-sm text-gray-400">
+        <p className="mt-10 text-center text-sm text-muted">
           Bir tarih seçerek müsait saatleri gör.
         </p>
       )}
 
-      {/* Saat grid — sadece müsait slotlar */}
+      {/* Time grid */}
       {dateKey && (
         <section className="animate-rise mt-8">
-          <h2 className="mb-4 text-xs font-bold uppercase tracking-wider text-gray-400">Saat</h2>
+          <h2 className="mb-4 text-xs font-bold uppercase tracking-wider text-muted">Saat</h2>
 
           {loadingSlots ? (
             <div className="space-y-5">
@@ -299,15 +617,17 @@ export default function Book() {
               ))}
             </div>
           ) : !hasAnyAvailable ? (
-            <div className="rounded-2xl border border-gray-100 bg-gray-50 py-10 text-center">
-              <p className="text-sm font-medium text-gray-400">Bu gün için müsait saat kalmadı.</p>
-              <p className="mt-1 text-xs text-gray-300">Başka bir tarih seçmeyi dene.</p>
+            <div className="rounded-2xl border border-hairline bg-surface py-10 text-center">
+              <p className="text-sm font-medium text-muted">
+                Bu gün için müsait saat kalmadı.
+              </p>
+              <p className="mt-1 text-xs text-faint">Başka bir tarih seçmeyi dene.</p>
             </div>
           ) : (
             <div className="space-y-6">
               {availablePeriods.map((period) => (
                 <div key={period.id}>
-                  <p className="mb-2.5 text-xs font-semibold text-gray-400">{period.label}</p>
+                  <p className="mb-2.5 text-xs font-semibold text-muted">{period.label}</p>
                   <div className="grid grid-cols-4 gap-2">
                     {period.slots.map((s) => {
                       const isSelected = slot?.id === s.id || slot?.time === s.time;
@@ -318,8 +638,8 @@ export default function Book() {
                           onClick={() => setSlot(isSelected ? null : s)}
                           className={`rounded-xl py-2.5 text-sm font-bold tabular-nums transition-[background-color,border-color,transform,box-shadow] duration-150 active:scale-[0.94] ${
                             isSelected
-                              ? "bg-primary-600 text-white shadow-glow"
-                              : "border border-gray-200 bg-white text-gray-800 hover:border-primary-300 hover:bg-primary-50"
+                              ? "bg-primary-600 text-white shadow-cta"
+                              : "border border-hairline bg-surface text-content"
                           }`}
                         >
                           {s.time}
@@ -336,15 +656,15 @@ export default function Book() {
 
       {slot && (
         <div className="animate-rise mt-8">
-          <div className="mb-3 flex items-center justify-between rounded-xl bg-gray-50 px-4 py-2.5">
-            <span className="text-xs text-gray-500">Seçilen saat</span>
-            <span className="tabular-nums text-sm font-bold text-gray-900">
+          <div className="mb-3 flex items-center justify-between rounded-xl bg-surface-2 px-4 py-2.5">
+            <span className="text-xs text-muted">Seçilen saat</span>
+            <span className="tabular-nums text-sm font-bold text-content">
               {selectedDate?.day} {selectedDate?.date} {selectedDate?.month} · {slot.time}
             </span>
           </div>
-          <Button full size="lg" onClick={goToStep2}>
+          <Button full size="lg" onClick={() => goToStep(2)}>
             Devam Et
-            <Icon name="chevronRight" size={18} />
+            <ArrowRight size={18} />
           </Button>
         </div>
       )}

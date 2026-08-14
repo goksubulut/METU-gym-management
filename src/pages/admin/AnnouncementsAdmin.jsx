@@ -167,7 +167,7 @@ export default function AnnouncementsAdmin() {
                   <button
                     type="button"
                     onClick={() => toggleActive(a)}
-                    className="text-xs font-semibold text-primary-600"
+                    className="text-xs font-semibold text-accent"
                   >
                     {a.isActive !== false ? "Yayında" : "Gizli"}
                   </button>
@@ -176,7 +176,7 @@ export default function AnnouncementsAdmin() {
                   <button
                     type="button"
                     onClick={() => openEdit(a)}
-                    className="mr-3 text-primary-600"
+                    className="mr-3 text-accent"
                   >
                     Düzenle
                   </button>

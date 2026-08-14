@@ -38,7 +38,7 @@ export default function ProgramItemList({ items, onMoveUp, onMoveDown, onRemove,
           <li
             key={item.id ?? item.key ?? `${item.itemType}-${item.machineId ?? item.exerciseId}`}
             className={`flex items-center gap-2 rounded-xl border px-3 py-3 ${
-              item.unavailable ? "border-gray-100 bg-gray-50 opacity-70" : "border-gray-100 bg-white"
+              item.unavailable ? "border-gray-100 bg-gray-50 opacity-70" : "border-gray-100 bg-surface"
             }`}
           >
             <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-gray-100 text-xs font-bold text-gray-500">
@@ -47,7 +47,7 @@ export default function ProgramItemList({ items, onMoveUp, onMoveDown, onRemove,
 
             <div className="min-w-0 flex-1">
               {href ? (
-                <Link to={href} className="truncate text-sm font-semibold text-gray-900 hover:text-primary-700">
+                <Link to={href} className="truncate text-sm font-semibold text-gray-900 hover:text-accent">
                   {item.name}
                 </Link>
               ) : (

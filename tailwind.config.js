@@ -1,43 +1,81 @@
 /** @type {import('tailwindcss').Config} */
+
+// Tüm renkler CSS değişkenlerine bağlanır (R G B kanalları) → Tailwind alpha
+// modifier'ları çalışır (ör. ring-primary-600/40) ve tema data-theme ile döner.
+const ch = (name) => `rgb(var(${name}) / <alpha-value>)`;
+
 export default {
+  darkMode: ["selector", '[data-theme="dark"]'],
   content: ["./index.html", "./src/**/*.{js,jsx}"],
   theme: {
     extend: {
       colors: {
-        // Tek yerden yönetilen kırmızı tema paleti.
         primary: {
-          50: "#fef2f2",
-          100: "#fee2e2",
-          200: "#fecaca",
-          300: "#fca5a5",
-          400: "#f87171",
-          500: "#ef4444",
-          600: "#dc2626", // ana marka rengi (CTA, aktif durum)
-          700: "#b91c1c",
-          800: "#991b1b",
-          900: "#7f1d1d",
+          50: ch("--primary-50"),
+          100: ch("--primary-100"),
+          200: ch("--primary-200"),
+          300: ch("--primary-300"),
+          400: ch("--primary-400"),
+          500: ch("--primary-500"),
+          600: ch("--primary-600"),
+          700: ch("--primary-700"),
+          800: ch("--primary-800"),
+          900: ch("--primary-900"),
+          DEFAULT: ch("--primary-600"),
         },
-        // Koyu "mürekkep" yüzeyler (hero kartlar, koyu paneller)
+        gray: {
+          50: ch("--gray-50"),
+          100: ch("--gray-100"),
+          200: ch("--gray-200"),
+          300: ch("--gray-300"),
+          400: ch("--gray-400"),
+          500: ch("--gray-500"),
+          600: ch("--gray-600"),
+          700: ch("--gray-700"),
+          800: ch("--gray-800"),
+          900: ch("--gray-900"),
+        },
         ink: {
-          800: "#1f2430",
-          900: "#151923",
-          950: "#0d1017",
+          800: ch("--ink-800"),
+          900: ch("--ink-900"),
+          950: ch("--ink-950"),
         },
-        // Referanstaki açık şeftali kart zeminine karşılık gelen kırmızı-nötr ton.
-        soft: "#fdf1f1",
+        // Semantik yüzey + metin
+        bg: ch("--bg"),
+        surface: {
+          DEFAULT: ch("--surface"),
+          2: ch("--surface-2"),
+          3: ch("--surface-3"),
+        },
+        content: ch("--content"),
+        muted: ch("--muted"),
+        faint: ch("--faint"),
+        accent: ch("--accent"),
+        soft: ch("--soft"),
+        hairline: "var(--hairline)",
+        line: "var(--line)",
+        // Durum (doluluk)
+        available: { DEFAULT: ch("--available"), soft: ch("--available-soft") },
+        busy: { DEFAULT: ch("--busy"), soft: ch("--busy-soft") },
+        info: { DEFAULT: ch("--info"), soft: ch("--info-soft") },
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "-apple-system", "Segoe UI", "sans-serif"],
-        display: ["Space Grotesk", "Inter", "system-ui", "sans-serif"],
+        sans: ["Geist", "-apple-system", "SF Pro Text", "system-ui", "sans-serif"],
+        display: ["Geist", "-apple-system", "system-ui", "sans-serif"],
+        mono: ["Geist Mono", "ui-monospace", "SF Mono", "monospace"],
       },
       boxShadow: {
-        card: "0 1px 2px rgba(16,20,28,0.04), 0 4px 16px rgba(16,20,28,0.06)",
-        pop: "0 4px 12px rgba(16,20,28,0.08), 0 16px 40px rgba(16,20,28,0.14)",
-        glow: "0 8px 24px rgba(220,38,38,0.35)",
-        "nav-float": "0 8px 32px rgba(16,20,28,0.16)",
+        card: "var(--shadow-card)",
+        pop: "var(--shadow-pop)",
+        cta: "var(--shadow-cta)",
+        "nav-float": "var(--shadow-nav)",
       },
       borderRadius: {
         xl2: "1.25rem",
+      },
+      transitionTimingFunction: {
+        smooth: "cubic-bezier(0.16, 1, 0.3, 1)",
+        drawer: "cubic-bezier(0.32, 0.72, 0, 1)",
       },
     },
   },

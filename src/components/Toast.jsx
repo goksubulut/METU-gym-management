@@ -15,7 +15,7 @@ export function ToastProvider({ children }) {
     primary: "bg-primary-600",
     success: "bg-emerald-600",
     error: "bg-red-600",
-    dark: "bg-gray-900",
+    dark: "bg-ink-900",
   };
 
   return (

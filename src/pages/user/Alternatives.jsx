@@ -65,7 +65,7 @@ export default function Alternatives() {
       </button>
 
       <Card soft className="mb-5 flex items-center gap-3 p-4">
-        <div className="grid h-12 w-12 place-items-center rounded-xl bg-white text-primary-600 shadow-sm">
+        <div className="grid h-12 w-12 place-items-center rounded-xl bg-surface text-accent shadow-sm">
           <Icon name="ban" size={22} />
         </div>
         <div>
@@ -83,7 +83,7 @@ export default function Alternatives() {
 
       {result.noDirectMatch && (
         <Card soft className="mb-4 flex gap-3 p-4">
-          <Icon name="bulb" size={20} className="mt-0.5 shrink-0 text-primary-600" />
+          <Icon name="bulb" size={20} className="mt-0.5 shrink-0 text-accent" />
           <div>
             <p className="text-sm font-bold text-gray-900">Birebir muadil yok</p>
             <p className="text-sm text-gray-600">
@@ -99,14 +99,14 @@ export default function Alternatives() {
         Alternatif makineler
       </h2>
       {/* Liste formatı — kart değil */}
-      <ul className="mb-6 divide-y divide-gray-100 rounded-2xl border border-gray-100 bg-white">
+      <ul className="mb-6 divide-y divide-gray-100 rounded-2xl border border-gray-100 bg-surface">
         {alts.map((m) => (
           <li
             key={m.id}
             onClick={() => nav(`/machines/${m.id}`)}
             className="flex cursor-pointer items-center gap-3 px-4 py-3 hover:bg-gray-50"
           >
-            <span className="relative grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-lg bg-gray-900 text-white">
+            <span className="relative grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-lg bg-ink-900 text-white">
               {m.photoUrl ? (
                 <>
                   <img src={m.photoUrl} alt={m.name} className="h-full w-full object-cover" />
@@ -120,7 +120,7 @@ export default function Alternatives() {
               <p className="truncate text-sm font-semibold text-gray-900">{m.name}</p>
               <p className="text-xs text-gray-400">{m.location}</p>
             </div>
-            <span className="flex items-center gap-1 text-xs font-bold text-primary-600">
+            <span className="flex items-center gap-1 text-xs font-bold text-accent">
               <Icon name="star" size={12} className="fill-primary-600" /> {m.rating}
             </span>
             <Icon name="chevronRight" size={14} className="text-gray-300" />

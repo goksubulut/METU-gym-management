@@ -145,7 +145,7 @@ export default function BodyDiagram({ selected = [], onToggle, hovered, onHover 
               onClick={() => setGender(value)}
               className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all ${
                 gender === value
-                  ? "bg-white text-gray-900 shadow-card"
+                  ? "bg-surface text-gray-900 shadow-card"
                   : "text-gray-400 hover:text-gray-600"
               }`}
             >

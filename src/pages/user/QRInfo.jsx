@@ -14,10 +14,10 @@ const STEPS = [
 export default function QRInfo() {
   const nav = useNavigate();
   return (
-    <div className="mx-auto flex min-h-screen max-w-[430px] flex-col bg-white px-6 py-10">
+    <div className="mx-auto flex min-h-screen max-w-[430px] flex-col bg-surface px-6 py-10">
       <Logo />
       <div className="mt-8 flex flex-col items-center text-center">
-        <div className="grid h-32 w-32 place-items-center rounded-2xl border-4 border-primary-600 bg-white p-2">
+        <div className="grid h-32 w-32 place-items-center rounded-2xl border-4 border-primary-600 bg-surface p-2">
           <img src={qrIcon} alt="QR kod" className="h-full w-full object-contain" />
         </div>
         <h1 className="mt-6 text-2xl font-extrabold text-gray-900">
@@ -31,7 +31,7 @@ export default function QRInfo() {
       <div className="mt-6 space-y-3">
         {STEPS.map((s) => (
           <Card key={s.title} soft className="flex items-center gap-4 p-4">
-            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white text-primary-600 shadow-sm">
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-surface text-accent shadow-sm">
               <Icon name={s.icon} size={20} />
             </div>
             <div>

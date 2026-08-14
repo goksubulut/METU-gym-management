@@ -69,7 +69,7 @@ export default function Machines() {
               key={v}
               onClick={() => setView(v)}
               className={`grid h-8 w-8 place-items-center rounded-md ${
-                view === v ? "bg-white text-primary-600 shadow-sm" : "text-gray-400"
+                view === v ? "bg-surface text-accent shadow-sm" : "text-gray-400"
               }`}
             >
               <Icon name={i} size={15} />
@@ -99,7 +99,7 @@ export default function Machines() {
           <div className="grid grid-cols-2 gap-3">
             {paged.map((m) => (
               <Card key={m.id} soft onClick={() => nav(`/machines/${m.id}`)} className="overflow-hidden">
-                <div className="relative grid h-40 place-items-center overflow-hidden bg-gray-900 text-white/85">
+                <div className="relative grid h-40 place-items-center overflow-hidden bg-ink-900 text-white/85">
                   {m.photoUrl ? (
                     <>
                       <img src={m.photoUrl} alt={m.name} className="absolute inset-0 h-full w-full object-cover" />
@@ -113,7 +113,7 @@ export default function Machines() {
                   <p className="truncate text-sm font-bold text-gray-900">{m.name}</p>
                   <p className="mb-2 text-[11px] text-gray-400">{m.category}</p>
                   <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-1 text-xs font-bold text-primary-600">
+                    <span className="flex items-center gap-1 text-xs font-bold text-accent">
                       <Icon name="star" size={12} className="fill-primary-600" /> {m.rating}
                     </span>
                     {m.hasVideo && (
@@ -141,7 +141,7 @@ export default function Machines() {
           <div className="space-y-2">
             {paged.map((m) => (
               <Card key={m.id} onClick={() => nav(`/machines/${m.id}`)} className="flex items-center gap-3 p-3">
-                <div className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-xl bg-gray-900 text-white">
+                <div className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-xl bg-ink-900 text-white">
                   {m.photoUrl ? (
                     <img src={m.photoUrl} alt={m.name} className="h-full w-full object-cover" />
                   ) : (
@@ -154,7 +154,7 @@ export default function Machines() {
                     {m.category} · {m.location}
                   </p>
                 </div>
-                <span className="flex items-center gap-1 text-sm font-bold text-primary-600">
+                <span className="flex items-center gap-1 text-sm font-bold text-accent">
                   <Icon name="star" size={14} className="fill-primary-600" /> {m.rating}
                 </span>
               </Card>

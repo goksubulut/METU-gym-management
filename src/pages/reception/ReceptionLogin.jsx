@@ -33,7 +33,7 @@ export default function ReceptionLogin() {
 
   return (
     <div className="grid min-h-screen place-items-center bg-primary-600 p-6">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-pop">
+      <div className="w-full max-w-md rounded-2xl bg-surface p-8 shadow-pop">
         <div className="mb-6 flex flex-col items-center">
           <Logo size={40} />
           <p className="mt-2 text-sm text-gray-400">Resepsiyon / Check-in Girişi</p>

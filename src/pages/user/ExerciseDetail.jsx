@@ -47,7 +47,7 @@ export default function ExerciseDetail() {
 
   return (
     <div className="pb-6">
-      <div className="hero-sheen relative grid h-56 place-items-center bg-gray-900 bg-gradient-to-br from-ink-800 via-ink-900 to-ink-950">
+      <div className="hero-sheen relative grid h-56 place-items-center bg-ink-900 bg-gradient-to-br from-ink-800 via-ink-900 to-ink-950">
         <button
           onClick={() => nav(-1)}
           className="absolute left-4 top-4 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-gray-700 shadow"
@@ -62,7 +62,7 @@ export default function ExerciseDetail() {
             rel="noopener noreferrer"
             className="flex flex-col items-center"
           >
-            <div className="grid h-16 w-16 place-items-center rounded-full bg-white text-primary-600 shadow-glow transition-transform hover:scale-105">
+            <div className="grid h-16 w-16 place-items-center rounded-full bg-surface text-accent shadow-glow transition-transform hover:scale-105">
               <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
                 <path d="M8.5 6.5v11l9-5.5z" />
               </svg>
@@ -82,7 +82,7 @@ export default function ExerciseDetail() {
           </div>
           {e.duration && (
             <div className="text-right">
-              <p className="flex items-center justify-end gap-1 text-lg font-extrabold text-primary-600">
+              <p className="flex items-center justify-end gap-1 text-lg font-extrabold text-accent">
                 <Icon name="clock" size={16} /> {e.duration}
               </p>
               <p className="text-[10px] text-gray-400">süre</p>
@@ -100,7 +100,7 @@ export default function ExerciseDetail() {
 
         {e.instructions && (
           <Card soft className="mt-4 flex gap-3 p-4">
-            <Icon name="bulb" size={20} className="mt-0.5 shrink-0 text-primary-600" />
+            <Icon name="bulb" size={20} className="mt-0.5 shrink-0 text-accent" />
             <div>
               <p className="text-sm font-bold text-gray-900">Nasıl Yapılır</p>
               <p className="text-sm text-gray-600">{e.instructions}</p>
