@@ -4,6 +4,7 @@ import Button from "../../components/Button.jsx";
 import Card from "../../components/Card.jsx";
 import Modal from "../../components/Modal.jsx";
 import MyAppointmentsSection from "../../components/MyAppointmentsSection.jsx";
+import AppointmentHeatmap from "../../components/AppointmentHeatmap.jsx";
 import { Input } from "../../components/Input.jsx";
 import { useToast } from "../../components/Toast.jsx";
 import { getAccessToken } from "../../api/client.js";
@@ -133,6 +134,7 @@ export default function Profile() {
         <p className="text-sm text-gray-400">{profile.email}</p>
       </div>
 
+      <AppointmentHeatmap />
       <MyAppointmentsSection className="mb-8" />
 
       <Card className="mb-4 p-4">

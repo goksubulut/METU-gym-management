@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Heatmap,
@@ -28,8 +28,12 @@ function getWeekStart(date) {
   return d;
 }
 
+// Use local time to avoid UTC timezone offset shifting the date
 function toDateStr(date) {
-  return date.toISOString().split("T")[0];
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 }
 
 // Realistic-looking demo history so the heatmap isn't empty in mock mode
@@ -146,6 +150,8 @@ export default function AppointmentHeatmap() {
   const { theme } = useTheme();
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const containerRef = useRef(null);
+  const [chartWidth, setChartWidth] = useState(0);
 
   const load = useCallback(async () => {
     if (!getAccessToken()) {
@@ -168,6 +174,17 @@ export default function AppointmentHeatmap() {
 
   useEffect(() => { load(); }, [load]);
 
+  // Measure container width so reaviz renders at the correct size
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const update = () => setChartWidth(el.offsetWidth);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [loading]);
+
   const heatmapData = useMemo(() => buildHeatmapData(appointments), [appointments]);
   const stats = useMemo(() => calculateStats(appointments), [appointments]);
 
@@ -175,25 +192,15 @@ export default function AppointmentHeatmap() {
 
   // METU-red color scheme: empty=gray, low=light red, high=full METU red
   const colorScheme = isDark
-    ? [
-        { fill: "rgba(166,25,46,0.28)" },
-        { fill: "rgba(196,21,53,0.58)" },
-        { fill: "#C41535" },
-        { fill: "#E84045", filter: "drop-shadow(0 0 5px rgba(232,64,69,0.55))" },
-      ]
-    : [
-        { fill: "rgba(166,25,46,0.18)" },
-        { fill: "rgba(166,25,46,0.48)" },
-        { fill: "#C41535" },
-        { fill: "#A6192E", filter: "drop-shadow(0 0 4px rgba(166,25,46,0.45))" },
-      ];
+    ? ["rgba(166,25,46,0.30)", "rgba(196,21,53,0.58)", "#C41535", "#E84045"]
+    : ["rgba(166,25,46,0.20)", "rgba(166,25,46,0.50)", "#C41535", "#A6192E"];
 
   const emptyColor = isDark ? "rgba(52,46,51,0.45)" : "rgba(220,216,221,0.55)";
   const tickFill = isDark ? "#9A9AAF" : "#9CA3AF";
 
   const legendColors = isDark
-    ? [emptyColor, "rgba(166,25,46,0.28)", "rgba(196,21,53,0.58)", "#C41535", "#E84045"]
-    : [emptyColor, "rgba(166,25,46,0.18)", "rgba(166,25,46,0.48)", "#C41535", "#A6192E"];
+    ? [emptyColor, "rgba(166,25,46,0.30)", "rgba(196,21,53,0.58)", "#C41535", "#E84045"]
+    : [emptyColor, "rgba(166,25,46,0.20)", "rgba(166,25,46,0.50)", "#C41535", "#A6192E"];
 
   const metrics = [
     {
@@ -221,7 +228,7 @@ export default function AppointmentHeatmap() {
 
   if (loading) {
     return (
-      <div className="mb-5 overflow-hidden rounded-2xl border border-gray-100 bg-surface shadow-[var(--shadow-card)]">
+      <div className="mb-5 overflow-hidden rounded-2xl border border-hairline bg-surface shadow-card">
         <div className="px-5 pt-5 pb-4">
           <div className="mb-1 h-4 w-36 animate-pulse rounded-lg bg-gray-200" />
           <div className="mt-1 h-3 w-52 animate-pulse rounded-lg bg-gray-100" />
@@ -236,7 +243,7 @@ export default function AppointmentHeatmap() {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      className="mb-5 overflow-hidden rounded-2xl border border-gray-100 bg-surface shadow-[var(--shadow-card)]"
+      className="mb-5 overflow-hidden rounded-2xl border border-hairline bg-surface shadow-card"
     >
       {/* Header */}
       <div className="flex items-center justify-between px-5 pt-5 pb-3">
@@ -253,9 +260,10 @@ export default function AppointmentHeatmap() {
       </div>
 
       {/* Heatmap chart */}
-      <div className="px-2">
-        <Heatmap
+      <div ref={containerRef} className="px-2">
+        {chartWidth > 0 && <Heatmap
           height={210}
+          width={chartWidth}
           data={heatmapData}
           yAxis={
             <LinearYAxis
@@ -288,7 +296,7 @@ export default function AppointmentHeatmap() {
               padding={0.14}
             />
           }
-        />
+        />}
       </div>
 
       {/* Color legend */}
