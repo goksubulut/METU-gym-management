@@ -25,6 +25,7 @@ import Appointments from "./pages/user/Appointments.jsx";
 import EditAppointment from "./pages/user/EditAppointment.jsx";
 import Profile from "./pages/user/Profile.jsx";
 import AccountSettings from "./pages/user/AccountSettings.jsx";
+import ScanQR from "./pages/user/ScanQR.jsx";
 import Notifications from "./pages/user/Notifications.jsx";
 import ProgramsHub from "./pages/user/ProgramsHub.jsx";
 import ProgramCreate from "./pages/user/ProgramCreate.jsx";
@@ -75,6 +76,7 @@ export default function App() {
         <Route path="/appointments/:id/edit" element={<EditAppointment />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/account-settings" element={<AccountSettings />} />
+        <Route path="/scan" element={<ScanQR />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/programs" element={<ProgramsHub />} />
         <Route path="/programs/new" element={<ProgramCreate />} />

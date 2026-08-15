@@ -252,11 +252,21 @@ export default function Dashboard() {
 
   return (
     <div className="px-4 py-5">
-      <div className="animate-rise mb-6">
-        <p className="text-[11px] font-semibold text-gray-400">Merhaba,</p>
-        <h1 className="font-display text-3xl font-bold tracking-tight text-gray-900 leading-tight">
-          {profile.name.split(" ")[0]}
-        </h1>
+      <div className="animate-rise mb-6 flex items-end justify-between">
+        <div>
+          <p className="text-[11px] font-semibold text-gray-400">Merhaba,</p>
+          <h1 className="font-display text-3xl font-bold tracking-tight text-gray-900 leading-tight">
+            {profile.name.split(" ")[0]}
+          </h1>
+        </div>
+        <button
+          type="button"
+          onClick={() => nav("/scan")}
+          className="flex items-center gap-1.5 rounded-xl border border-hairline bg-surface px-3.5 py-2 text-sm font-semibold text-content transition-transform active:scale-95"
+        >
+          <Icon name="qr" size={15} className="text-accent" />
+          QR Tara
+        </button>
       </div>
 
       {loading ? (

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import GymAuthScreen from "../../components/ui/gym-auth-screen.jsx";
 import { useToast } from "../../components/Toast.jsx";
 import { login, register } from "../../api/auth.js";
@@ -8,14 +8,18 @@ import { homePathForRole } from "../../utils/authUser.js";
 export default function Auth() {
   const [loading, setLoading] = useState(false);
   const nav = useNavigate();
+  const location = useLocation();
   const toast = useToast();
+
+  // QR deep-link veya korumalı sayfa yönlendirmesinden gelen hedef
+  const redirectTo = location.state?.redirectTo ?? null;
 
   const handleLogin = async ({ email, password }) => {
     setLoading(true);
     try {
       const { user } = await login(email, password);
       toast("Giriş başarılı", "success");
-      nav(homePathForRole(user.role));
+      nav(redirectTo ?? homePathForRole(user.role), { replace: true });
     } catch (err) {
       toast(err.message ?? "Giriş başarısız", "error");
     } finally {
@@ -28,7 +32,7 @@ export default function Auth() {
     try {
       const { user } = await register(name, email, phone, password);
       toast("Kayıt tamamlandı", "success");
-      nav(homePathForRole(user.role));
+      nav(redirectTo ?? homePathForRole(user.role), { replace: true });
     } catch (err) {
       toast(err.message ?? "Kayıt başarısız", "error");
     } finally {

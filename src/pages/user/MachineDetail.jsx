@@ -33,6 +33,16 @@ export default function MachineDetail() {
   const [photoOpen, setPhotoOpen] = useState(false);
   const viaQR = location.pathname.startsWith("/machine/");
 
+  // QR deep-link: eğer giriş yapılmamışsa auth'a yönlendir, başarılı login sonrası buraya dön
+  useEffect(() => {
+    if (viaQR && !getAccessToken()) {
+      nav(`/auth`, {
+        state: { redirectTo: location.pathname + location.search },
+        replace: true,
+      });
+    }
+  }, [viaQR, nav, location.pathname, location.search]);
+
   useEffect(() => {
     fetchMachine(id)
       .then(setM)

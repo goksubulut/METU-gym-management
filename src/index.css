@@ -170,6 +170,15 @@ h1, h2, h3 {
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+/* QR tarayıcı — tarama çizgisi aşağı/yukarı hareketi */
+@keyframes qr-scan {
+  0%, 100% { top: 6px; opacity: 1; }
+  48%       { opacity: 1; }
+  50%       { top: calc(100% - 8px); opacity: 0.6; }
+  52%       { opacity: 1; }
+}
+.animate-qr-scan { animation: qr-scan 2.2s ease-in-out infinite; }
+
 /* Wave card floating animation */
 @keyframes float {
   0%, 100% { transform: translateY(0); }

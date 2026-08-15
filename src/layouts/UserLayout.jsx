@@ -19,7 +19,7 @@ const NAV = [
 
 export default function UserLayout() {
   const { pathname } = useLocation();
-  const bare = pathname === "/" || pathname === "/auth" || pathname === "/qr-info";
+  const bare = pathname === "/" || pathname === "/auth" || pathname === "/qr-info" || pathname === "/scan";
   const profile = getAuthUser();
   const avatar = initialsFromName(profile?.name);
   const [hasUnread, setHasUnread] = useState(false);
