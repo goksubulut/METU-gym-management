@@ -45,6 +45,17 @@ function isAvailable(s) {
   return !s.isPast && !(s.isFull || s.booked >= s.capacity);
 }
 
+function occupancyPct(s) {
+  if (!s.capacity || s.booked == null) return null;
+  return Math.min(100, Math.round((s.booked / s.capacity) * 100));
+}
+
+function occupancyStyle(pct) {
+  if (pct <= 50) return { bar: "bg-green-500", text: "text-green-600 dark:text-green-400" };
+  if (pct <= 80) return { bar: "bg-amber-400", text: "text-amber-500 dark:text-amber-400" };
+  return { bar: "bg-primary-600", text: "text-accent" };
+}
+
 // ── Step indicator (steps 2–4) ────────────────────────────────────────────────
 function StepIndicator({ step }) {
   const labels = ["Kaslar", "Makine", "Onayla"];
@@ -631,18 +642,33 @@ export default function Book() {
                   <div className="grid grid-cols-4 gap-2">
                     {period.slots.map((s) => {
                       const isSelected = slot?.id === s.id || slot?.time === s.time;
+                      const pct = occupancyPct(s);
+                      const oStyle = pct != null ? occupancyStyle(pct) : null;
                       return (
                         <button
                           key={s.id ?? s.time}
                           type="button"
                           onClick={() => setSlot(isSelected ? null : s)}
-                          className={`rounded-xl py-2.5 text-sm font-bold tabular-nums transition-[background-color,border-color,transform,box-shadow] duration-150 active:scale-[0.94] ${
+                          className={`flex flex-col overflow-hidden rounded-xl text-sm font-bold tabular-nums transition-[background-color,border-color,transform,box-shadow] duration-150 active:scale-[0.94] ${
                             isSelected
                               ? "bg-primary-600 text-white shadow-cta"
                               : "border border-hairline bg-surface text-content"
                           }`}
                         >
-                          {s.time}
+                          <span className="py-2.5 text-center leading-none">{s.time}</span>
+                          {pct != null && (
+                            <>
+                              <span className={`pb-1.5 text-center text-[10px] font-semibold leading-none ${isSelected ? "text-white/70" : oStyle.text}`}>
+                                %{pct}
+                              </span>
+                              <div className={`h-1 w-full ${isSelected ? "bg-white/20" : "bg-surface-3"}`}>
+                                <div
+                                  className={`h-full transition-[width] duration-500 ${isSelected ? "bg-white/60" : oStyle.bar}`}
+                                  style={{ width: `${pct}%` }}
+                                />
+                              </div>
+                            </>
+                          )}
                         </button>
                       );
                     })}

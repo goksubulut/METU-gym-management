@@ -84,6 +84,8 @@ function buildHeatmapData(appointments) {
   });
 
   const currentWS = getWeekStart(today);
+  // Index 0 = oldest week (bottom), last index = current week (top)
+  // reaviz draws Y axis bottom-to-top → current week "Bu Hf" renders at top
   const weekStarts = [];
   for (let i = WEEKS_SHOWN - 1; i >= 0; i--) {
     const ws = new Date(currentWS);
@@ -97,7 +99,7 @@ function buildHeatmapData(appointments) {
       const cellDate = new Date(ws);
       cellDate.setDate(ws.getDate() + dayIndex);
       const count = cellDate > today ? null : (dateCount[toDateStr(cellDate)] || null);
-      const label = wi === WEEKS_SHOWN - 1 ? "Bu Hf" : `H${wi + 1}`;
+      const label = wi === WEEKS_SHOWN - 1 ? "Bu Hf" : `H${WEEKS_SHOWN - 1 - wi}`;
       return { key: label, data: count };
     }),
   }));

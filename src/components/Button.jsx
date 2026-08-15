@@ -11,7 +11,7 @@ const VARIANTS = {
   // Link tarzı, sessiz
   quiet: "bg-transparent text-accent hover:bg-primary-50",
   // Yıkıcı — kırmızı dolgu (marka CTA'sından bağlamla ayrışır)
-  danger: "bg-red-600 text-white hover:bg-red-700 active:bg-red-800",
+  danger: "bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800",
   // Yüksek vurgulu nötr — temaya göre tersine döner (koyuda açık buton)
   dark: "bg-content text-bg hover:opacity-90 active:opacity-80",
 };
