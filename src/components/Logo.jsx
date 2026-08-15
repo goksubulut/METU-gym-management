@@ -2,8 +2,8 @@ export default function Logo({ size = 28, withText = true }) {
   return (
     <div className="flex items-center gap-2.5">
       <img
-        src="/images/odtu-spor.jpg"
-        alt="ODTÜ Spor"
+        src="/images/metumotion.jpg"
+        alt="METU Motion"
         className="rounded-xl object-cover"
         style={{ width: size + 6, height: size + 6 }}
       />

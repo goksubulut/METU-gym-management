@@ -96,17 +96,17 @@ export default function GymAuthScreen({
      * Outer: fills the entire browser window.
      * On desktop this area is visible as a neutral background around the phone.
      */
-    <div className="flex min-h-screen bg-zinc-200">
+    <div className="flex min-h-screen bg-[#0A0A0A]">
       {/*
        * Phone container: 430 px wide on desktop (matches the rest of the app),
        * full-width on mobile. Uses relative positioning so absolute children
        * are contained — avoiding the full-viewport bleed of position:fixed.
        */}
       <div
-        className="relative mx-auto w-full max-w-[430px] overflow-hidden bg-white shadow-2xl"
+        className="relative mx-auto w-full max-w-[430px] overflow-hidden bg-[#0A0A0A] shadow-2xl"
         style={{ height: "100svh" }}
       >
-        {/* ── ODTÜ SPOR logo — upper portion, never moves ── */}
+        {/* ── METU Motion logo — upper portion, never moves ── */}
         <div
           className="absolute inset-x-0 top-0 flex items-center justify-center px-10"
           style={{ height: "23%" }}
@@ -114,10 +114,10 @@ export default function GymAuthScreen({
         >
           <img
             src={backgroundImageSrc}
-            alt="ODTÜ SPOR"
+            alt="METU Motion"
             draggable={false}
             className="h-full w-full object-contain object-center"
-            style={{ maxWidth: "min(260px, 75%)" }}
+            style={{ maxWidth: "min(220px, 65%)" }}
           />
         </div>
 
@@ -126,7 +126,7 @@ export default function GymAuthScreen({
           className="absolute bottom-0 left-0 right-0 flex flex-col overflow-hidden rounded-t-[2rem] bg-white"
           style={{
             height: "77%",
-            boxShadow: "0 -6px 48px rgba(0,0,0,0.10), 0 -1px 0 rgba(0,0,0,0.06)",
+            boxShadow: "0 -8px 48px rgba(0,0,0,0.5), 0 -1px 0 rgba(255,255,255,0.06)",
           }}
           initial={{ y: "100%" }}
           animate={{ y: 0 }}
