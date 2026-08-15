@@ -38,7 +38,7 @@ export default function Auth() {
 
   return (
     <GymAuthScreen
-      backgroundImageSrc="/images/metumotion.jpg"
+      backgroundImageSrc="/images/odtu-spor.jpg"
       onLogin={handleLogin}
       onRegister={handleRegister}
       onForgotPassword={() => nav("/forgot-password")}
