@@ -51,7 +51,7 @@ function ProgramItem({ machine, index, total, onMoveUp, onMoveDown, onRemove }) 
           type="button"
           onClick={onRemove}
           aria-label="Kaldır"
-          className="grid h-9 w-9 place-items-center rounded-lg text-red-400 transition-colors active:bg-red-900/20"
+          className="grid h-9 w-9 place-items-center rounded-lg text-primary-600 transition-colors active:bg-primary-50"
         >
           <X size={15} strokeWidth={2.5} />
         </button>

@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTheme } from "../../utils/theme.js";
 
 const INTERVAL_MS = 680;
 
 export default function Bucket({ items = [], onComplete }) {
   const [idx, setIdx] = useState(0);
   const onCompleteRef = useRef(onComplete);
+  const { theme } = useTheme();
+  const dotInactive = theme === "light" ? "rgb(200 196 202)" : "rgb(68 61 67)";
   useEffect(() => { onCompleteRef.current = onComplete; });
 
   useEffect(() => {
@@ -55,7 +58,7 @@ export default function Bucket({ items = [], onComplete }) {
             <motion.div
               key={i}
               animate={{
-                backgroundColor: i < idx ? "rgb(166 25 46)" : "rgb(42 42 68)",
+                backgroundColor: i < idx ? "rgb(166 25 46)" : dotInactive,
                 scale: i < idx ? 1 : 0.7,
               }}
               transition={{ duration: 0.22 }}

@@ -96,9 +96,9 @@
   --accent: 140 21 38;        /* koyu kırmızı — beyaz üstünde ≥7:1 */
 
   --gray-50: 248 247 248;
-  --gray-100: 241 240 241;
-  --gray-200: 228 226 228;
-  --gray-300: 212 209 212;
+  --gray-100: 236 233 237;    /* biraz daha koyu — telefon çerçevesi görünsün */
+  --gray-200: 220 216 221;
+  --gray-300: 200 196 202;
   --gray-400: 118 112 119;
   --gray-500: 90 85 91;
   --gray-600: 71 67 72;
@@ -106,21 +106,21 @@
   --gray-800: 40 37 41;
   --gray-900: 26 24 26;
 
-  --bg: 242 241 242;          /* nötr açık — krem/cream değil */
+  --bg: 226 222 228;          /* koyu yeterli — surface (beyaz) kartlar belirgin çıksın */
   --surface: 255 255 255;
-  --surface-2: 250 248 249;
-  --surface-3: 238 236 236;
+  --surface-2: 248 245 248;   /* surface'den daha fazla ayrışık */
+  --surface-3: 232 228 233;   /* ikon kuyuları, devre dışı alanlar */
   --content: 26 24 26;
-  --muted: 86 81 87;
-  --faint: 138 133 138;
+  --muted: 80 75 82;          /* biraz daha koyu — kontrast iyileştirme */
+  --faint: 130 124 132;
   --soft: 253 241 241;
 
   --ink-800: 31 36 48;
   --ink-900: 21 25 35;
   --ink-950: 13 16 23;
 
-  --hairline: rgba(16, 12, 14, 0.08);
-  --line: rgba(16, 12, 14, 0.12);
+  --hairline: rgba(16, 12, 14, 0.14);   /* 0.08 → 0.14: border'lar görünsün */
+  --line: rgba(16, 12, 14, 0.20);       /* 0.12 → 0.20: slot/bölen çizgiler */
 
   --available: 5 150 105;
   --available-soft: 209 250 229;
@@ -129,10 +129,10 @@
   --info: 37 99 235;
   --info-soft: 219 234 254;
 
-  --shadow-card: 0 1px 2px rgb(16 12 14 / 0.05), 0 4px 16px rgb(16 12 14 / 0.07);
-  --shadow-pop: 0 4px 12px rgb(16 12 14 / 0.09), 0 16px 40px rgb(16 12 14 / 0.14);
-  --shadow-cta: 0 6px 20px rgb(166 25 46 / 0.22);
-  --shadow-nav: 0 8px 32px rgb(16 12 14 / 0.16);
+  --shadow-card: 0 1px 3px rgb(16 12 14 / 0.11), 0 6px 24px rgb(16 12 14 / 0.13);
+  --shadow-pop: 0 4px 16px rgb(16 12 14 / 0.14), 0 16px 40px rgb(16 12 14 / 0.18);
+  --shadow-cta: 0 6px 20px rgb(166 25 46 / 0.28);
+  --shadow-nav: 0 8px 32px rgb(16 12 14 / 0.22);
 }
 
 /* ------------------------------- Temel ------------------------------- */
