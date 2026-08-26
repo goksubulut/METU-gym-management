@@ -34,6 +34,7 @@ export interface AppointmentView {
   note: string | null;
   machines: { id: string; name: string; category: string }[];
   muscleGroups: { id: string; name: string }[];
+  targetMuscles: string[];
   createdAt: Date;
 }
 
@@ -61,6 +62,7 @@ export class AppointmentsService {
           userId,
           slotId: slot.id,
           note: dto.note,
+          targetMuscles: dto.targetMuscles ?? [],
           machines: this.machinesCreate(dto.machineIds),
           muscleGroups: this.muscleGroupsCreate(dto.muscleGroupIds),
         },
@@ -134,6 +136,7 @@ export class AppointmentsService {
           status: record.status === AppointmentStatus.NO_SHOW ? AppointmentStatus.BOOKED : undefined,
           machines: this.machinesCreate(dto.machineIds),
           muscleGroups: this.muscleGroupsCreate(dto.muscleGroupIds),
+          targetMuscles: dto.targetMuscles,
         },
         include: APPOINTMENT_INCLUDE,
       });
@@ -271,6 +274,7 @@ export class AppointmentsService {
       note: record.note,
       machines: record.machines.map((m) => m.machine),
       muscleGroups: record.muscleGroups.map((mg) => mg.muscleGroup),
+      targetMuscles: record.targetMuscles,
       createdAt: record.createdAt,
     };
   }

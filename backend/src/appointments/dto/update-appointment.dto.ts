@@ -1,5 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { ArrayMaxSize, ArrayUnique, IsArray, IsOptional, IsString, MaxLength } from 'class-validator';
+import { ArrayMaxSize, ArrayUnique, IsArray, IsIn, IsOptional, IsString, MaxLength } from 'class-validator';
+import { TARGET_MUSCLE_SLUGS } from '../../catalog/machines/machine.constants';
 
 /**
  * FR-BK-4/6: plan güncelleme. Gönderilen alan komple değiştirilir
@@ -26,6 +27,15 @@ export class UpdateAppointmentDto {
   @ArrayUnique()
   @ArrayMaxSize(8)
   muscleGroupIds?: string[];
+
+  @ApiPropertyOptional({ type: [String] })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @ArrayUnique()
+  @ArrayMaxSize(20)
+  @IsIn([...TARGET_MUSCLE_SLUGS], { each: true })
+  targetMuscles?: string[];
 
   @ApiPropertyOptional()
   @IsOptional()

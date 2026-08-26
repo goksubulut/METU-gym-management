@@ -10,6 +10,7 @@ import BodyDiagram, { MUSCLES } from "../../components/BodyDiagram.jsx";
 import { machinesByMuscle, MUSCLE_GROUPS } from "../../mock/machines.js";
 import { MOCK_EXERCISES } from "../../mock/exercises.js";
 import { fetchMachines, fetchExercises } from "../../api/catalog.js";
+import { sortByTargetMatch, slugsForGroup } from "../../utils/targetMatch.js";
 
 // Panel bölümleri: ana grup başlığı altında o gruba ait ince kaslar.
 // Grup id'leri backend MuscleGroup.id ile birebir aynı.
@@ -24,24 +25,6 @@ const SECTIONS = [
 ];
 
 const muscleEntries = Object.entries(MUSCLES); // [slug, {label, group, color}]
-
-/** Seçilen ince kaslara göre isabet sıralaması (alternatifler motoru ile aynı mantık). */
-function sortByTargetMatch(items, selectedSlugs, { useRating = false } = {}) {
-  if (selectedSlugs.length === 0) return items;
-  const shared = (item) => (item.targetMuscles ?? []).filter((t) => selectedSlugs.includes(t));
-  const ratio = (item) => {
-    const count = shared(item).length;
-    const total = (item.targetMuscles ?? []).length;
-    return total > 0 ? count / total : 0;
-  };
-  return [...items].sort(
-    (a, b) =>
-      shared(b).length - shared(a).length ||
-      ratio(b) - ratio(a) ||
-      (useRating ? (b.rating ?? 0) - (a.rating ?? 0) : 0) ||
-      a.name.localeCompare(b.name, "tr"),
-  );
-}
 
 export default function MuscleGroups() {
   const nav = useNavigate();
@@ -92,7 +75,7 @@ export default function MuscleGroups() {
       .map((g) => ({
         id: g,
         label: MUSCLE_GROUPS.find((x) => x.id === g)?.label ?? g,
-        list: sortByTargetMatch(byGroup(g), selected, { useRating: true }),
+        list: sortByTargetMatch(byGroup(g), slugsForGroup(selected, g, MUSCLES), { useRating: true }),
       }))
       .filter((grp) => grp.list.length > 0);
   }, [activeGroups, apiMachines, selected]);
@@ -111,7 +94,7 @@ export default function MuscleGroups() {
         return {
           id: g,
           label: MUSCLE_GROUPS.find((x) => x.id === g)?.label ?? g,
-          list: sortByTargetMatch(pool, selected),
+          list: sortByTargetMatch(pool, slugsForGroup(selected, g, MUSCLES)),
         };
       })
       .filter((grp) => grp.list.length > 0);

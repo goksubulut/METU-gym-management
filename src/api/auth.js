@@ -10,10 +10,17 @@ export async function login(email, password) {
   return data;
 }
 
-export async function register(name, email, phone, password) {
+export async function register(name, email, phone, password, extras = {}) {
   const data = await apiFetch("/auth/register", {
     method: "POST",
-    body: JSON.stringify({ name, email, phone: phone || undefined, password }),
+    body: JSON.stringify({
+      name,
+      email,
+      phone: phone || undefined,
+      password,
+      gender: extras.gender,
+      birthDate: extras.birthDate,
+    }),
   });
   setSession(data);
   return data;

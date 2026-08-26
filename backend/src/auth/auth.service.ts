@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
-import { Role, User } from '@prisma/client';
+import { AppointmentStatus, Role, User } from '@prisma/client';
 import * as argon2 from 'argon2';
 import { randomUUID } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -16,6 +16,8 @@ import { LoginDto } from './dto/login.dto';
 import { MailService } from './mail.service';
 import { RegisterDto } from './dto/register.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { computePoints } from './points.util';
+import { toDateKey } from '../slots/slot-time.util';
 
 /** Parola sıfırlama token'ı geçerlilik süresi (dakika). */
 const PASSWORD_RESET_TTL_MINUTES = 30;
@@ -44,6 +46,8 @@ export class AuthService {
         phone: dto.phone,
         passwordHash: await argon2.hash(dto.password),
         role: Role.USER,
+        gender: dto.gender,
+        birthDate: parseDateOnly(dto.birthDate),
       },
     });
     return this.issueTokens(user);
@@ -116,7 +120,11 @@ export class AuthService {
 
     const updated = await this.prisma.user.update({
       where: { id: userId },
-      data: { email },
+      data: {
+        email,
+        gender: dto.gender,
+        birthDate: dto.birthDate !== undefined ? parseDateOnly(dto.birthDate) : undefined,
+      },
     });
     return this.toView(updated);
   }
@@ -244,7 +252,7 @@ export class AuthService {
       data: { refreshTokenHash: await argon2.hash(refreshToken) },
     });
 
-    return { user: this.toView(user), accessToken, refreshToken };
+    return { user: await this.toView(user), accessToken, refreshToken };
   }
 
   /** .env'deki süre değerini jsonwebtoken'ın beklediği tipe köprüler ("15m", "7d"...). */
@@ -252,13 +260,34 @@ export class AuthService {
     return (this.config.get<string>(key) ?? fallback) as JwtSignOptions['expiresIn'];
   }
 
-  private toView(user: User): UserView {
+  private async toView(user: User): Promise<UserView> {
+    const { points, pointsIsDemo } = await this.pointsFor(user.id);
     return {
       id: user.id,
       name: user.name,
       email: user.email,
       phone: user.phone,
       role: user.role,
+      gender: user.gender,
+      birthDate: user.birthDate ? toDateKey(user.birthDate) : null,
+      points,
+      pointsIsDemo,
     };
   }
+
+  private async pointsFor(userId: string) {
+    const rows = await this.prisma.appointment.findMany({
+      where: {
+        userId,
+        status: { in: [AppointmentStatus.CHECKED_IN, AppointmentStatus.COMPLETED] },
+      },
+      select: { slot: { select: { date: true } } },
+    });
+    return computePoints(rows.map((r) => toDateKey(r.slot.date)));
+  }
+}
+
+function parseDateOnly(value?: string): Date | undefined {
+  if (!value) return undefined;
+  return new Date(`${value}T00:00:00.000Z`);
 }

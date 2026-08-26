@@ -16,6 +16,7 @@ import { upcomingDates } from "../../utils/dates.js";
 import { getAccessToken } from "../../api/client.js";
 import { createAppointment, fetchSlots, mapSlotFromApi } from "../../api/bookings.js";
 import { fetchMachines } from "../../api/catalog.js";
+import { sortByTargetMatch, slugsForGroup } from "../../utils/targetMatch.js";
 
 const TIME_PERIODS = [
   { id: "morning", label: "Sabah", from: 6 * 60, to: 12 * 60 },
@@ -240,10 +241,10 @@ export default function Book() {
         label: SECTIONS.find((s) => s.group === g)?.title
           ?? MUSCLE_GROUPS.find((x) => x.id === g)?.label
           ?? g,
-        list: byGroup(g),
+        list: sortByTargetMatch(byGroup(g), slugsForGroup(muscleSlugs, g, MUSCLES)),
       }))
       .filter((grp) => grp.list.length > 0);
-  }, [broadGroups, apiMachines]);
+  }, [broadGroups, apiMachines, muscleSlugs]);
 
   const toggleMuscleSlug = (slug) => {
     setMuscleSlugs((prev) =>
@@ -274,6 +275,7 @@ export default function Book() {
       slotId: slot.id,
       machineIds: machines.length ? machines : undefined,
       muscleGroupIds: broadGroups.length ? broadGroups : undefined,
+      targetMuscles: muscleSlugs.length ? muscleSlugs : undefined,
     })
       .then((res) => setAppointmentResult(res ?? "__ok__"))
       .catch((err) => setAppointmentError(err.message ?? "Randevu oluşturulamadı"))

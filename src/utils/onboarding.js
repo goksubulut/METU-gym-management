@@ -5,7 +5,7 @@
 // (Kas Haritası) ekranı bu işi yapıyor, onboarding'de tekrarlamak gereksizdi.
 //
 // Cevaplar localStorage'da tutulur; kullanıcı akışı yarıda bırakıp dönerse
-// kaldığı yerden devam eder. Backend'e gönderim Part 6'da profil ucuna bağlanır.
+// kaldığı yerden devam eder. Kayıt adımında gender + birthDate API'ye gider.
 
 const KEY = "metu-motion-onboarding";
 

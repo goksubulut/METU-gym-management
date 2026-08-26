@@ -75,6 +75,12 @@ enum ProgramItemType {
   EXERCISE
 }
 
+enum Gender {
+  MALE
+  FEMALE
+  UNSPECIFIED
+}
+
 // ---------------------------------------------------------------------------
 // Kimlik
 // ---------------------------------------------------------------------------
@@ -93,6 +99,8 @@ model User {
   // kullanma anı. Aynı "ham token saklanmaz" prensibi (refreshTokenHash gibi).
   passwordResetTokenHash String?
   passwordResetExpiresAt DateTime?
+  gender       Gender?
+  birthDate    DateTime? @db.Date
   createdAt    DateTime @default(now())
 
   appointments  Appointment[]
@@ -202,6 +210,9 @@ model Appointment {
   slotId    String
   status    AppointmentStatus @default(BOOKED)
   note      String?
+  // İnce hedef kas slug'ları (BodyDiagram MUSCLES). Kaba grup bağları
+  // muscleGroups'ta durur; bu dizi randevu anındaki asıl seçimi korur.
+  targetMuscles String[] @default([])
   createdAt DateTime          @default(now())
   updatedAt DateTime          @updatedAt
 

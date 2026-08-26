@@ -51,6 +51,7 @@ export function mapAppointmentFromApi(a) {
     machines: a.machines.map((m) => m.id),
     machineDetails: a.machines.map((m) => ({ id: m.id, name: m.name })),
     muscleGroupDetails: a.muscleGroups.map((mg) => ({ id: mg.id, name: mg.name })),
+    targetMuscles: a.targetMuscles ?? [],
     note: a.note ?? "",
     fromApi: true,
   };

@@ -1,4 +1,4 @@
-import { Role } from '@prisma/client';
+import { Gender, Role } from '@prisma/client';
 
 /** Access token'ın içine yazılan alanlar. `sub` = kullanıcı id (JWT standardı). */
 export interface AccessTokenPayload {
@@ -23,6 +23,10 @@ export interface UserView {
   email: string;
   phone: string | null;
   role: Role;
+  gender: Gender | null;
+  birthDate: string | null;
+  points: number;
+  pointsIsDemo: boolean;
 }
 
 export interface AuthResult {

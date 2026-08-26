@@ -15,6 +15,7 @@ import { Stagger, StaggerItem } from "../../../components/motion/Stagger.jsx";
 import { useToast } from "../../../components/Toast.jsx";
 import { register } from "../../../api/auth.js";
 import { homePathForRole } from "../../../utils/authUser.js";
+import { onboardingToRegisterPayload } from "../../../utils/profile.js";
 import {
   readOnboarding, saveOnboarding, completeOnboarding, ONBOARDING_TOTAL,
 } from "../../../utils/onboarding.js";
@@ -58,7 +59,13 @@ export default function Register() {
 
     setLoading(true);
     try {
-      const { user } = await register(values.name, values.email, values.phone, values.password);
+      const { user } = await register(
+        values.name,
+        values.email,
+        values.phone,
+        values.password,
+        onboardingToRegisterPayload(readOnboarding()),
+      );
       // Onboarding cevaplarını hesapla ilişkilendir
       saveOnboarding({ registeredEmail: values.email });
       completeOnboarding();

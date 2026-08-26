@@ -10,6 +10,8 @@ import { appointments as mockAppointments } from "../../mock/appointments.js";
 import { machineById, MUSCLE_GROUPS } from "../../mock/machines.js";
 import { getAccessToken } from "../../api/client.js";
 import { fetchMyAppointments, mapAppointmentFromApi } from "../../api/bookings.js";
+import { fetchMe } from "../../api/auth.js";
+import { getAuthUser } from "../../utils/authUser.js";
 
 const labelOf = (id) => MUSCLE_GROUPS.find((m) => m.id === id)?.label || id;
 
@@ -220,13 +222,7 @@ function WaveAppointmentCard({ active, nav }) {
 }
 
 function getProfile() {
-  try {
-    const raw = localStorage.getItem("authUser");
-    if (raw) return JSON.parse(raw);
-  } catch {
-    /* ignore */
-  }
-  return { name: "Misafir" };
+  return getAuthUser() ?? { name: "Misafir" };
 }
 
 function pickNextUpcoming(rows) {
@@ -242,7 +238,7 @@ function pickNextUpcoming(rows) {
 export default function Dashboard() {
   const nav = useNavigate();
   const location = useLocation();
-  const [profile] = useState(getProfile);
+  const [profile, setProfile] = useState(getProfile);
   const [active, setActive] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -254,7 +250,11 @@ export default function Dashboard() {
     }
     setLoading(true);
     try {
-      const apiRows = await fetchMyAppointments();
+      const [apiRows, me] = await Promise.all([
+        fetchMyAppointments(),
+        fetchMe().catch(() => getAuthUser()),
+      ]);
+      if (me) setProfile(me);
       const mapped = apiRows.map(mapAppointmentFromApi);
       setActive(pickNextUpcoming(mapped.length ? mapped : mockAppointments));
     } catch {
@@ -289,7 +289,7 @@ export default function Dashboard() {
           className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-gold/30 bg-gold/10 px-3 py-1.5 text-caption font-bold text-gold transition-transform duration-instant active:scale-95"
         >
           <Icon name="medal" size={14} strokeWidth={2} />
-          <span className="tabular-nums">200</span>
+          <span className="tabular-nums">{profile.points ?? 200}</span>
         </button>
       </StaggerItem>
 

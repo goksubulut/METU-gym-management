@@ -9,6 +9,7 @@ import { useToast } from "../../components/Toast.jsx";
 import { getAccessToken } from "../../api/client.js";
 import { fetchMe, logout } from "../../api/auth.js";
 import { getAuthUser, initialsFromName } from "../../utils/authUser.js";
+import { ageFromBirthDate, GENDER_LABELS } from "../../utils/profile.js";
 
 export default function Profile() {
   const nav = useNavigate();
@@ -61,6 +62,16 @@ export default function Profile() {
         </div>
         <h1 className="text-xl font-extrabold text-gray-900">{profile.name}</h1>
         <p className="text-sm text-gray-400">{profile.email}</p>
+        {(profile.gender && profile.gender !== "UNSPECIFIED") || profile.birthDate ? (
+          <p className="mt-1 text-sm text-gray-500">
+            {[
+              profile.gender && profile.gender !== "UNSPECIFIED" ? GENDER_LABELS[profile.gender] : null,
+              ageFromBirthDate(profile.birthDate) != null ? `${ageFromBirthDate(profile.birthDate)} yaş` : null,
+            ]
+              .filter(Boolean)
+              .join(" · ")}
+          </p>
+        ) : null}
       </div>
 
       <AppointmentHeatmap />

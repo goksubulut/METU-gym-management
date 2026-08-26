@@ -53,6 +53,10 @@ describe('Auth (e2e)', () => {
       expect(res.body.success).toBe(true);
       expect(res.body.data.user.email).toBe(testUser.email);
       expect(res.body.data.user.role).toBe('USER');
+      expect(res.body.data.user.gender).toBeNull();
+      expect(res.body.data.user.birthDate).toBeNull();
+      expect(res.body.data.user.points).toBe(200);
+      expect(res.body.data.user.pointsIsDemo).toBe(true);
       expect(res.body.data.accessToken).toBeDefined();
       expect(res.body.data.refreshToken).toBeDefined();
       // Parola hash'i asla dışarı çıkmamalı
@@ -61,6 +65,25 @@ describe('Auth (e2e)', () => {
 
     it('aynı e-postayla ikinci kaydı 409 ile reddeder', async () => {
       await request(app.getHttpServer()).post('/api/auth/register').send(testUser).expect(409);
+    });
+
+    it('cinsiyet ve doğum tarihini kaydeder', async () => {
+      const email = 'e2e-profile@metugym.local';
+      await prisma.user.deleteMany({ where: { email } });
+      const res = await request(app.getHttpServer())
+        .post('/api/auth/register')
+        .send({
+          name: 'Profil Test',
+          email,
+          password: 'Parola1234',
+          gender: 'FEMALE',
+          birthDate: '2001-06-15',
+        })
+        .expect(201);
+
+      expect(res.body.data.user.gender).toBe('FEMALE');
+      expect(res.body.data.user.birthDate).toBe('2001-06-15');
+      await prisma.user.deleteMany({ where: { email } });
     });
 
     it('zayıf parolayı 400 ile reddeder', async () => {
@@ -126,6 +149,8 @@ describe('Auth (e2e)', () => {
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(200);
       expect(res.body.data.email).toBe(testUser.email);
+      expect(res.body.data.points).toBe(200);
+      expect(res.body.data.pointsIsDemo).toBe(true);
     });
 
     it('POST /api/auth/refresh yeni token çifti döner (rotasyon)', async () => {

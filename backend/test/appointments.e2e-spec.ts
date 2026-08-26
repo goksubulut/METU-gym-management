@@ -113,13 +113,20 @@ describe('Slots & Appointments (e2e)', () => {
       const res = await request(app.getHttpServer())
         .post('/api/appointments')
         .set('Authorization', `Bearer ${token}`)
-        .send({ slotId, machineIds: ['m3', 'm6'], muscleGroupIds: ['chest', 'arms'], note: 'Üst vücut' })
+        .send({
+          slotId,
+          machineIds: ['m3', 'm6'],
+          muscleGroupIds: ['chest', 'arms'],
+          targetMuscles: ['biceps', 'chest'],
+          note: 'Üst vücut',
+        })
         .expect(201);
 
       appointmentId = res.body.data.id;
       expect(res.body.data.status).toBe('BOOKED');
       expect(res.body.data.machines.map((m: { id: string }) => m.id).sort()).toEqual(['m3', 'm6']);
       expect(res.body.data.muscleGroups).toHaveLength(2);
+      expect(res.body.data.targetMuscles.sort()).toEqual(['biceps', 'chest']);
     });
 
     it('aynı slota ikinci randevuyu 409 ile reddeder', async () => {
