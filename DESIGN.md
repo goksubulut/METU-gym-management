@@ -31,28 +31,38 @@ Renkler **OKLCH** ile tanımlanır (hex karşılıkları referans içindir). OKL
 
 ## Renk
 
-### Marka — ODTÜ Kırmızısı
+### Marka — METU MOTION Kırmızısı
 
-Tek aksan. Pantone 187 ailesinden derin, olgun bir kırmızı. Parlak "AI kırmızısı" (#dc2626) terk edildi.
+Tek aksan. **METU MOTION spec (§1.1) ile #E31837'ye taşındı** — önceki derin ton (#A6192E)
+ekranda yeterince "atletik" okunmuyordu; yeni ton daha yüksek enerji taşır ama hâlâ tek
+aksandır. Rampa bu değer etrafında yeniden kuruldu.
 
-| Token | OKLCH | Hex | Kullanım |
-|---|---|---|---|
-| red-50  | 0.96 0.015 20 | #FBEAEC | Açık tema soft badge zemini |
-| red-100 | 0.91 0.035 20 | #F6D3D8 | Soft kart çerçevesi (açık tema) |
-| red-200 | 0.83 0.075 21 | #ECAAB3 | Selection, ince vurgu |
-| red-300 | 0.72 0.115 22 | #DF7C8B | **Koyu tema link/metin aksanı** (kontrast için) |
-| red-400 | 0.63 0.15 23 | #CE4E63 | Dekoratif ara ton, hover (koyu) |
-| red-500 | 0.55 0.175 24 | #B92D45 | Gradient/hover uç |
-| **red-600** | **0.47 0.175 25** | **#A6192E** | **Ana marka — CTA dolgu, aktif durum (ODTÜ kırmızısı)** |
-| red-700 | 0.41 0.155 25 | #8C1526 | Basılı CTA, koyu vurgu |
-| red-800 | 0.35 0.13 25 | #71101F | En koyu vurgu |
-| red-900 | 0.28 0.10 25 | #560C17 | Nadiren, derin zemin vurgusu |
+| Token | Hex | Kullanım |
+|---|---|---|
+| primary-50…200 | koyuda `#300E14`→`#54 16 21`, açıkta `#FEECEE`→`#FAB0BA` | Chip/badge zeminleri (temaya göre döner) |
+| primary-300 | #F48A98 | Dekoratif açık ton |
+| primary-400 | #ED5C6F | Hover ara tonu |
+| primary-500 | #E8384F | Gradient/hover uç |
+| **primary-600** | **#E31837** | **Ana marka — CTA dolgu, aktif segmented thumb, aktif progress dot, aktif tab ikonu, seçili radio/checkbox** |
+| primary-700 | #C4122D | Basılı CTA |
+| primary-800 | #A00E24 | En koyu vurgu; açık temada metin aksanı |
+| primary-900 | #7A0A1B | Derin zemin vurgusu |
+
+**İki ek aksan (spec §1.1):**
+
+| Token | Hex (koyu) | Kullanım |
+|---|---|---|
+| `--glow` | **#FF3B4E** | Glow/pulse/highlight: kas bölgesi vurgusu, pose-overlay noktaları, ince vurgu çizgileri. Alpha varyantları Tailwind ile: `bg-glow/60`, `bg-glow/25` |
+| `--gold` | **#F2A93B** | **SADECE** dashboard görev/kampanya kartı ve puan/rozet göstergesi |
+| `--gold-ink` | #1A1206 | Gold zemin üstündeki metin — gold üstünde beyaz kontrastı 1.9:1 kalıyor, bu yüzden koyu kahve-siyah |
 
 **Adaptif aksan (kritik erişilebilirlik kuralı):**
-- **Dolgu (buton) üzerinde:** `red-600` zemin + beyaz metin (kontrast ≥ 5:1 ✓).
-- **Metin/link olarak koyu temada:** `red-600` koyu zeminde okunmaz. `--accent-text` koyu temada **red-300 (#DF7C8B)** olur (kontrast ≥ 4.5:1 ✓).
-- **Metin/link olarak açık temada:** `--accent-text` = **red-700 (#8C1526)** (beyaz üstünde ≥ 7:1 ✓).
-- Apple mantığı: aynı semantik renk, temaya göre parlaklığını ayarlar.
+- **Dolgu (buton) üzerinde:** `primary-600` zemin + **her zaman beyaz** metin/ikon. Siyah/koyu metin kullanılmaz.
+- **Metin/link olarak koyu temada:** `--accent` = `--glow` (#FF3B4E), saf siyah üstünde ≥5:1 ✓
+- **Metin/link olarak açık temada:** `--accent` = #9E0D25 (beyaz üstünde ≥6:1 ✓). Açık temada `--glow` ve `--gold` da beyaz zeminde okunacak şekilde koyulaştırılır.
+
+**Hata/uyarı state'i (spec §1.1):** marka rengi zaten kırmızı olduğundan form validasyon hataları
+**sadece renkle gösterilmez** — her hata mesajı bir uyarı ikonu VE açık metin taşır.
 
 ### Nötr yüzey merdiveni (Apple katmanlı derinlik)
 
@@ -213,10 +223,22 @@ Hareket işlevdir: durum değişimini, mekânsal ilişkiyi, geri bildirimi taş�
 ### Easing token'ları (güçlü eğriler — built-in zayıf easing yasak)
 
 ```css
---ease-out:    cubic-bezier(0.16, 1, 0.3, 1);      /* expo-out — giriş/çıkış, çoğu UI */
---ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);    /* ekran içi taşıma/morph */
---ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);     /* iOS sheet/drawer eğrisi */
+--ease-out:      cubic-bezier(0.16, 1, 0.3, 1);    /* expo-out — giriş/çıkış, çoğu UI */
+--ease-standard: cubic-bezier(0.16, 1, 0.3, 1);    /* spec §1.5 adı — --ease-out ile aynı eğri */
+--ease-in-out:   cubic-bezier(0.77, 0, 0.175, 1);  /* ekran içi taşıma/morph (mevcut) */
+--ease-motion:   cubic-bezier(0.4, 0, 0.2, 1);     /* spec §1.5 ease-in-out — fade + flip */
+--ease-pop:      cubic-bezier(0.34, 1.56, 0.64, 1);/* hafif overshoot — highlight, checkmark */
+--ease-drawer:   cubic-bezier(0.32, 0.72, 0, 1);   /* iOS sheet/drawer eğrisi */
 ```
+
+**Süre token'ları (spec §1.5)** — `--duration-instant` 120ms · `--duration-fast` 180ms ·
+`--duration-base` 220ms · `--duration-slow` 380ms · `--duration-flip` 260ms ·
+`--duration-pulse` 2000ms · `--stagger-step` 70ms. Tailwind karşılıkları:
+`duration-instant/fast/base/slow/flip`, `ease-standard/motion/pop`.
+
+**`--ease-pop` istisnası:** aşağıdaki "bounce/elastic yok" kuralının tek muafiyeti. Yalnızca
+seçim onayı (radio/checkbox dolgusu, checkmark, kas bölgesi highlight) için — kullanıcının
+kendi dokunuşuna verilen fiziksel tepki. Menü/sheet açılışında hâlâ yasak.
 
 `ease-in` UI'da **yasak** (izlenilen anı geciktirir). Bounce/elastic yok. Sabit-hız yalnızca spinner/progress.
 
@@ -258,7 +280,31 @@ Overshoot yalnızca kullanıcı momentum kattığında (flick, drag-release). Me
 
 ## Bileşenler
 
+> **METU MOTION bileşenleri (Part 2).** Aşağıdaki altı bileşen spec §2 ve §4'e göre
+> yazıldı. Canlı önizleme: **`/dev/motion`** (ürün akışının parçası değil, silinebilir).
+>
+> | Bileşen | Dosya | Spec | Hareket |
+> |---|---|---|---|
+> | Primary Pill Button | `components/PillButton.jsx` | §2.1 | §4.3 çizgi→hap morph'u |
+> | Selectable List Item | `components/SelectableListItem.jsx` | §2.2 | §4.4 pop'lu indicator |
+> | Segmented Control | `components/SegmentedControl.jsx` | §2.3 | §4.5 kayan thumb |
+> | Wheel Picker | `components/WheelPicker.jsx` | §2.4 | — (native snap) |
+> | Progress Dots | `components/ProgressDots.jsx` | §2.5 | §4.7 uzayan çubuk |
+> | Stagger / StaggerItem | `components/motion/Stagger.jsx` | §4.2 | 70ms kademeli fade-up |
+>
+> **Hareket bölüşümü kuralı (uygulamaya özel, spec'te yok).** Framer Motion
+> `rgb(var(--token))` biçimindeki değerleri interpolate **edemez** — token'lara bağlı
+> her renk geçişi bu yüzden CSS `transition` ile yapılır, Framer yalnızca
+> `transform`/`opacity`/`width` taşır. Bu aynı zamanda §5.2 ile de örtüşür.
+>
+> **Eski `Button.jsx` ve `Tabs.jsx` duruyor.** Uygulamanın mevcut 25+ ekranı onları
+> kullanıyor; PillButton/SegmentedControl önce onboarding akışında devreye girer,
+> geriye dönük geçiş Part 6'da değerlendirilir.
+
+
 ### Button
+
+> Yeni: `PillButton.jsx` (spec §2.1 + §4.3) — 52px hap CTA, girişte çizgi→hap morph'u.
 Kırmızı dolgu ölçülü — dev glow yok. Varyantlar:
 - **primary:** `--red-600` dolgu + beyaz metin + `--shadow-cta`. Ana CTA. Pill (`--r-full`) veya `--r-sm`.
 - **secondary:** `--surface-2` zemin, `--ink` metin, `--border` hairline. Nötr eylem.
@@ -275,6 +321,8 @@ Boyut: sm (h-36px), md (h-44px ✓ dokunma hedefi), lg (h-52px). `:active` scale
 - Kart-içinde-kart yok. Border+shadow+zemin üçlüsünü aynı anda yükleme; biri yeter.
 
 ### Segmented Control (Apple imzası)
+
+> Yeni: `SegmentedControl.jsx` (spec §2.3 + §4.5) — kırmızı dolgulu thumb, `translateX` ile kayar.
 Tab/filtre için: pill track (`--surface-2`), kayan aktif thumb (`--surface` + shadow), spring geçiş. Mevcut düz "tabs"ın yerini alır — doluluk filtresi, tarih seçimi, admin sekmeleri.
 
 ### List Row (Apple gruplu liste)
@@ -314,6 +362,51 @@ Mevcut özel `<Icon>` seti korunur — Lucide/Feather "AI varsayılanı" görün
 
 ---
 
+## Onboarding Akışı (METU MOTION §3)
+
+Splash → Cinsiyet → Doğum Tarihi → Hedef Kas → Dashboard. Durum
+`utils/onboarding.js` üzerinden localStorage'da tutulur; akış yarıda kalırsa
+kullanıcı kaldığı yerden devam eder. Onboarding ekranlarında uygulama kromu
+(header + tab bar) gizlidir — `UserLayout` `/onboarding/*` yolunu `bare` sayar.
+
+| Ekran | Yol | Spec | CTA koşulu |
+|---|---|---|---|
+| Splash | `/` | §3.1 | Her zaman aktif |
+| Cinsiyetiniz | `/onboarding/gender` | §3.2 | **Sadece bir seçenek seçilince belirir** (morph reveal ilk kez orada tetiklenir) |
+| Doğum Tarihiniz | `/onboarding/birthday` | §3.3 | Her zaman aktif (picker varsayılanla gelir) |
+| Hedef Kas Grubu | `/onboarding/target-muscle` | §3.4 | Part 4 |
+
+### Pose-Overlay (§2.9 + §4.8)
+
+`components/PoseOverlay.jsx` — desatüre koşucu fotoğrafı + üstünde eklem
+nokta-çizgi grafiği. İki katman da `object-fit: cover`, aynı hizada.
+
+**Neden iskelet PNG değil, kod-çizimli SVG:** sağlanan overlay PNG'si
+1920×1080 opak beyaz zeminli, **önden bakan** bir çöp adamdı; fotoğraf ise
+960×1200 ve koşucu **profilden**. Hiçbir ölçek/konum bu ikisini hizalamıyor.
+Spec §6 asset tablosu bu durumu zaten öngörüyor: *"Pose-overlay nokta/çizgi
+grafiği — SVG (kod içinde çizilebilir, ayrı bir görsel dosyaya gerek yok)."*
+İskelet bu yüzden 12 eklemli bir SVG olarak, koşucunun gerçek anatomisine
+hizalanmış koordinatlarla çizilir (`RUNNER_JOINTS`).
+
+`mode="image"` prop'u hâlâ duruyor: base ile **birebir aynı piksel boyutunda ve
+aynı çerçevelemede** hazırlanmış şeffaf bir PNG çifti gelirse o mod kullanılır.
+
+**viewBox tuzağı:** SVG `viewBox`'ı fotoğrafın en-boy oranıyla birebir aynı
+olmalı (`baseWidth`/`baseHeight` prop'ları). Kare bir viewBox kullanılırsa
+`preserveAspectRatio="… slice"` ölçeklemesi fotoğrafın `object-fit: cover`
+ölçeklemesinden sapar ve noktalar kayar. `objectPosition` ile
+`preserveAspectRatio` hizası da eşleşmek zorundadır.
+
+**Nabız kuralları (§4.8):** saf CSS `@keyframes pulse-glow` — JS interval/rAF
+yasak. `filter: drop-shadow` kullanılır, **`box-shadow` değil**: box-shadow
+elemanın dikdörtgen sınırını parlatır, drop-shadow ise alfa kanalının gerçek
+şeklini takip eder. Sekme arka plana geçince `visibilitychange` ile
+`animation-play-state: paused` (pil). Ölçek nefesi istenirse ayrı bir
+keyframe'dir (`pulse-scale`), glow keyframe'ine karıştırılmaz.
+
+---
+
 ## Yüzeyler
 
 | Yüzey | Zemin | Yönlendirme | Register | Not |
@@ -329,8 +422,9 @@ Tüm yüzeyler aynı token sistemini paylaşır; tema (koyu/açık) global.
 
 ## Anti-slop Muhafızları (bilinçli kaçındıklarımız)
 
-- Saf `#000` / saf `#fff` yok — near-black/near-white.
-- Parlak jenerik kırmızı (#dc2626) yok — derin ODTÜ kırmızısı.
+- ~~Saf `#000` yok~~ → **METU MOTION spec (§1.1) bu kuralı geçersiz kıldı:** koyu tema zemini artık saf `#000000`. Gerekçe: spec'in glow/pulse efektleri (kas highlight, pose-overlay) saf siyah zeminde tasarlandı; near-black üstünde `#FF3B4E` glow'un halesi kirli görünüyor. Saf `#fff` metin kuralı geçerli değil — `--content` koyu temada `#FFFFFF`.
+- ~~Parlak jenerik kırmızı yok~~ → marka artık **#E31837**. Hâlâ jenerik `#dc2626` DEĞİL (Pantone 186 / ODTÜ kimliğinden türetilmiş), ama önceki #A6192E'den belirgin daha parlak.
+- **İki aksan sınırı:** kırmızı ailesi (marka + glow) + altın. Altın yalnızca görev kartı ve puan rozetinde — üçüncü bir aksan eklenmez.
 - Krem/cream/sand zemin yok (2026 AI varsayılanı).
 - İkiden fazla aksan yok — tek kırmızı.
 - Gradient metin yok, side-stripe (kalın sol kenar) border yok, dekoratif glassmorphism yok.

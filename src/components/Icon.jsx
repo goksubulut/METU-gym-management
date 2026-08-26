@@ -189,6 +189,23 @@ const PATHS = {
       <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
     </>
   ),
+  // METU MOTION spec §2.1 — CTA sağ oku; §2.7 — görev kartı sub-buton oku
+  "arrow-right": (
+    <>
+      <path d="M4 12h15" />
+      <path d="m13 6 6 6-6 6" />
+    </>
+  ),
+  "chevron-left": <path d="m15 5-7 7 7 7" />,
+  "chevron-right": <path d="m9 5 7 7-7 7" />,
+  play: <path d="M7 4.5v15l12-7.5-12-7.5Z" />,
+  // §2.5 — ödül/puan rozeti (gold aksan)
+  medal: (
+    <>
+      <circle cx="12" cy="14.5" r="5.5" />
+      <path d="M8.5 9.2 6 2.5h12l-2.5 6.7" />
+    </>
+  ),
 };
 
 export default function Icon({ name, size = 20, strokeWidth = 1.8, className = "" }) {

@@ -19,7 +19,13 @@ const NAV = [
 
 export default function UserLayout() {
   const { pathname } = useLocation();
-  const bare = pathname === "/" || pathname === "/auth" || pathname === "/qr-info" || pathname === "/scan";
+  // Onboarding ve tam ekran akışlarında uygulama kromu (header + tab bar) gizlenir.
+  const bare =
+    pathname === "/" ||
+    pathname === "/auth" ||
+    pathname === "/qr-info" ||
+    pathname === "/scan" ||
+    pathname.startsWith("/onboarding");
   const profile = getAuthUser();
   const avatar = initialsFromName(profile?.name);
   const [hasUnread, setHasUnread] = useState(false);

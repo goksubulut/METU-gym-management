@@ -7,6 +7,9 @@ import ReceptionLayout from "./layouts/ReceptionLayout.jsx";
 
 // User pages
 import Splash from "./pages/user/Splash.jsx";
+import Gender from "./pages/user/onboarding/Gender.jsx";
+import Birthday from "./pages/user/onboarding/Birthday.jsx";
+import TargetMusclePlaceholder from "./pages/user/onboarding/TargetMusclePlaceholder.jsx";
 import QRInfo from "./pages/user/QRInfo.jsx";
 import Auth from "./pages/user/Auth.jsx";
 import ForgotPassword from "./pages/user/ForgotPassword.jsx";
@@ -49,12 +52,19 @@ import AppointmentDetail from "./pages/reception/AppointmentDetail.jsx";
 
 import RequireRole from "./components/RequireRole.jsx";
 
+// Geliştirici önizlemesi — METU MOTION bileşen galerisi (ürün akışının parçası değil)
+import MotionGallery from "./pages/dev/MotionGallery.jsx";
+
 export default function App() {
   return (
     <Routes>
       {/* A. Kullanıcı uygulaması (mobil-first) */}
       <Route element={<UserLayout />}>
         <Route path="/" element={<Splash />} />
+        {/* METU MOTION onboarding akışı (§3.1-3.4) */}
+        <Route path="/onboarding/gender" element={<Gender />} />
+        <Route path="/onboarding/birthday" element={<Birthday />} />
+        <Route path="/onboarding/target-muscle" element={<TargetMusclePlaceholder />} />
         <Route path="/qr-info" element={<QRInfo />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -116,6 +126,9 @@ export default function App() {
         <Route index element={<CheckIn />} />
         <Route path="appointment/:id" element={<AppointmentDetail />} />
       </Route>
+
+      {/* D. Geliştirici önizlemesi */}
+      <Route path="/dev/motion" element={<MotionGallery />} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
