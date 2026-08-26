@@ -52,7 +52,6 @@ function IconInput({ label, id, icon: Icon, suffix, error, className = "", ...pr
 
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function GymAuthScreen({
-  backgroundImageSrc,
   onLogin,
   onRegister,
   onForgotPassword,
@@ -110,26 +109,23 @@ export default function GymAuthScreen({
         className="relative mx-auto w-full max-w-[430px] overflow-hidden bg-surface shadow-2xl"
         style={{ height: "100svh" }}
       >
-        {/* ── ODTÜ SPOR logo — upper portion, never moves ── */}
+        {/* Marka bloğu — eski beyaz zeminli odtu-spor.jpg kaldırıldı; saf siyah
+            temada beyaz bir dikdörtgen olarak duruyordu. Yerine metin kimliği. */}
         <div
-          className="absolute inset-x-0 top-0 flex items-center justify-center px-10"
-          style={{ height: "23%" }}
-          aria-hidden="true"
+          className="absolute inset-x-0 top-0 flex flex-col items-center justify-center px-10"
+          style={{ height: "20%" }}
         >
-          <img
-            src={backgroundImageSrc}
-            alt="ODTÜ SPOR"
-            draggable={false}
-            className="h-full w-full object-contain object-center"
-            style={{ maxWidth: "min(260px, 75%)" }}
-          />
+          <h1 className="text-hero uppercase leading-none text-content">
+            METU <span className="text-primary-600">Motion</span>
+          </h1>
+          <p className="mt-2 text-caption text-muted">ODTÜ Spor Merkezi</p>
         </div>
 
         {/* ── Authentication panel — slides up from below ── */}
         <motion.div
           className="absolute bottom-0 left-0 right-0 flex flex-col overflow-hidden rounded-t-[2rem] bg-surface"
           style={{
-            height: "77%",
+            height: "80%",
             boxShadow: "0 -6px 48px rgba(0,0,0,0.10), 0 -1px 0 rgba(0,0,0,0.06)",
           }}
           initial={{ y: "100%" }}

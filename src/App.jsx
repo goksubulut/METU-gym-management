@@ -9,7 +9,7 @@ import ReceptionLayout from "./layouts/ReceptionLayout.jsx";
 import Splash from "./pages/user/Splash.jsx";
 import Gender from "./pages/user/onboarding/Gender.jsx";
 import Birthday from "./pages/user/onboarding/Birthday.jsx";
-import TargetMuscle from "./pages/user/onboarding/TargetMuscle.jsx";
+import OnboardingRegister from "./pages/user/onboarding/Register.jsx";
 import QRInfo from "./pages/user/QRInfo.jsx";
 import Auth from "./pages/user/Auth.jsx";
 import ForgotPassword from "./pages/user/ForgotPassword.jsx";
@@ -64,7 +64,7 @@ export default function App() {
         {/* METU MOTION onboarding akışı (§3.1-3.4) */}
         <Route path="/onboarding/gender" element={<Gender />} />
         <Route path="/onboarding/birthday" element={<Birthday />} />
-        <Route path="/onboarding/target-muscle" element={<TargetMuscle />} />
+        <Route path="/onboarding/register" element={<OnboardingRegister />} />
         <Route path="/qr-info" element={<QRInfo />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />

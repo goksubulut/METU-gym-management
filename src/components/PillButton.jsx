@@ -11,8 +11,9 @@
 
 import { motion } from "framer-motion";
 import Icon from "./Icon.jsx";
+import { D, EASE as E } from "../utils/motion.js";
 
-const EASE = [0.16, 1, 0.3, 1]; // --ease-standard
+const EASE = E.standard;
 
 export default function PillButton({
   children,
@@ -36,7 +37,7 @@ export default function PillButton({
       // §4.3 ADIM 1 — şekil morph'u (180ms). Yükseklik/genişlik/radius birlikte.
       initial={reveal ? { width: 32, height: 4, borderRadius: 2 } : false}
       animate={{ width: "100%", height: 52, borderRadius: 26 }}
-      transition={{ duration: 0.18, ease: EASE, delay: revealDelay }}
+      transition={{ duration: D.fast, ease: EASE, delay: revealDelay }}
       // §2.1 pressed state — scale(0.97), 100ms
       whileTap={disabled ? undefined : { scale: 0.97 }}
       className={`relative mx-auto flex items-center justify-center gap-1.5 overflow-hidden bg-primary-600 text-button text-white shadow-cta outline-none transition-[background-color,opacity] duration-instant ease-standard focus-visible:ring-2 focus-visible:ring-glow/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:pointer-events-none disabled:opacity-40 ${className}`}
@@ -47,7 +48,7 @@ export default function PillButton({
         className="flex items-center gap-1.5 whitespace-nowrap"
         initial={reveal ? { opacity: 0, y: 4 } : false}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.12, ease: EASE, delay: revealDelay + 0.14 }}
+        transition={{ duration: D.instant, ease: EASE, delay: revealDelay + D.fast * 0.78 }}
       >
         {iconPosition === "left" && iconEl}
         {children}

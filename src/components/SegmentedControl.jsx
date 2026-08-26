@@ -8,6 +8,7 @@
 // Track --color-surface-muted, thumb --color-brand-red, aktif label beyaz.
 
 import { motion } from "framer-motion";
+import { D, EASE as E } from "../utils/motion.js";
 
 export default function SegmentedControl({
   options,        // [{ value, label }]
@@ -29,7 +30,7 @@ export default function SegmentedControl({
         className="absolute left-1 top-1 h-8 rounded-full bg-primary-600"
         style={{ width: `calc((100% - 8px) / ${options.length})` }}
         animate={{ x: `${index * 100}%` }}
-        transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }} // --ease-motion
+        transition={{ duration: D.base, ease: E.motion }}
       />
       {options.map((o) => {
         const on = o.value === value;

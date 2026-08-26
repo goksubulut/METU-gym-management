@@ -231,9 +231,16 @@ Hareket işlevdir: durum değişimini, mekânsal ilişkiyi, geri bildirimi taş�
 --ease-drawer:   cubic-bezier(0.32, 0.72, 0, 1);   /* iOS sheet/drawer eğrisi */
 ```
 
-**Süre token'ları (spec §1.5)** — `--duration-instant` 120ms · `--duration-fast` 180ms ·
-`--duration-base` 220ms · `--duration-slow` 380ms · `--duration-flip` 260ms ·
-`--duration-pulse` 2000ms · `--stagger-step` 70ms. Tailwind karşılıkları:
+**Süre token'ları** — `--duration-instant` 160ms · `--duration-fast` 240ms ·
+`--duration-base` 300ms · `--duration-slow` 500ms · `--duration-flip` 360ms ·
+`--duration-pulse` 2000ms · `--stagger-step` 90ms.
+
+Bunlar spec §1.5'in **~1.35 katı**: kullanıcı geri bildirimi "geçişler biraz
+hızlı". Oran korunarak ölçeklendi, yani hareketlerin birbirine göre ritmi
+değişmedi. JS tarafındaki karşılıkları **`utils/motion.js`**'te tek kaynakta
+(`D`, `MS`, `STAGGER_STEP`, `EASE`) — Framer Motion saniye cinsinden sayı
+istediği için CSS token'larını okuyamaz, ikisi elle senkron tutulur. Süre
+ayarlamak artık iki dosyaya dokunmak demek, altı dosyaya değil. Tailwind karşılıkları:
 `duration-instant/fast/base/slow/flip`, `ease-standard/motion/pop`.
 
 **`--ease-pop` istisnası:** aşağıdaki "bounce/elastic yok" kuralının tek muafiyeti. Yalnızca
@@ -364,7 +371,7 @@ Mevcut özel `<Icon>` seti korunur — Lucide/Feather "AI varsayılanı" görün
 
 ## Onboarding Akışı (METU MOTION §3)
 
-Splash → Cinsiyet → Doğum Tarihi → Hedef Kas → Dashboard. Durum
+Splash → Cinsiyet → Doğum Tarihi → **Kayıt Ol** → Dashboard. Durum
 `utils/onboarding.js` üzerinden localStorage'da tutulur; akış yarıda kalırsa
 kullanıcı kaldığı yerden devam eder. Onboarding ekranlarında uygulama kromu
 (header + tab bar) gizlidir — `UserLayout` `/onboarding/*` yolunu `bare` sayar.
@@ -374,7 +381,7 @@ kullanıcı kaldığı yerden devam eder. Onboarding ekranlarında uygulama krom
 | Splash | `/` | §3.1 | Her zaman aktif |
 | Cinsiyetiniz | `/onboarding/gender` | §3.2 | **Sadece bir seçenek seçilince belirir** (morph reveal ilk kez orada tetiklenir) |
 | Doğum Tarihiniz | `/onboarding/birthday` | §3.3 | Her zaman aktif (picker varsayılanla gelir) |
-| Hedef Kas Grubu | `/onboarding/target-muscle` | §3.4 | Her zaman aktif (0 seçimle de geçilebilir) |
+| Hesabını Oluştur | `/onboarding/register` | — | Form geçerliyse aktif |
 
 ### Hedef Kas Ekranı (§3.4 + §2.8 + §4.4 + §4.6)
 
@@ -411,6 +418,14 @@ Görünmez anda (scaleX = 0) hem silüet görünümü hem sol liste içeriği de
 
 Vücut modeli onboarding'de seçilen cinsiyetten türetilir (Kadın → `female`,
 diğerleri → `male`).
+
+**Hedef kas adımı akıştan çıkarıldı (kullanıcı kararı).** Uygulamada zaten
+`/muscle-groups` (Kas Haritası) ekranı bu işi yapıyordu; onboarding'de
+tekrarlamak gereksizdi. Yerine kayıt formu geldi: `register()` access + refresh
+token döndürdüğü için kullanıcı kayıt biter bitmez giriş yapmış olur ve
+uygulama doğrudan açılır. Splash'teki "Giriş Yap" bu akışı atlayıp `/auth`'a
+gider. Çıkarılan `TargetMuscle.jsx` ve `MuscleSilhouette.jsx` `_to_delete/`
+altında duruyor.
 
 ### Pose-Overlay (§2.9 + §4.8)
 

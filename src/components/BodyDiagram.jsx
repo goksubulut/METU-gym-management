@@ -107,7 +107,7 @@ function Figure({ label, view, selected, hovered, onToggle, onHover }) {
     <div className="flex flex-1 flex-col items-center">
       <svg viewBox={view.viewBox} className="w-full max-w-[150px]" xmlns="http://www.w3.org/2000/svg">
         {view.outline && (
-          <path d={view.outline} fill="none" stroke="#8A7B66" strokeWidth="2.5" pointerEvents="none" />
+          <path d={view.outline} fill="none" stroke="rgb(var(--border-subtle))" strokeWidth="2.5" pointerEvents="none" />
         )}
         {view.parts.map((part) => (
           <Muscle
@@ -120,7 +120,7 @@ function Figure({ label, view, selected, hovered, onToggle, onHover }) {
           />
         ))}
       </svg>
-      <span className="mt-1.5 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+      <span className="mt-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted">
         {label}
       </span>
     </div>
@@ -134,7 +134,7 @@ export default function BodyDiagram({ selected = [], onToggle, hovered, onHover 
   return (
     <div>
       <div className="mb-3 flex justify-center">
-        <div className="flex rounded-full bg-gray-100 p-0.5">
+        <div className="flex rounded-full bg-surface-2 p-0.5">
           {[
             ["male", "Erkek"],
             ["female", "Kadın"],
@@ -145,7 +145,7 @@ export default function BodyDiagram({ selected = [], onToggle, hovered, onHover 
               onClick={() => setGender(value)}
               className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all ${
                 gender === value
-                  ? "bg-surface text-gray-900 shadow-card"
+                  ? "bg-primary-600 text-white"
                   : "text-gray-400 hover:text-gray-600"
               }`}
             >
@@ -154,7 +154,7 @@ export default function BodyDiagram({ selected = [], onToggle, hovered, onHover 
           ))}
         </div>
       </div>
-      <div className="flex justify-center gap-3 rounded-2xl bg-gradient-to-b from-white to-[#f2eee8] p-3">
+      <div className="flex justify-center gap-3 rounded-card bg-surface p-3">
         <Figure
           label="Ön"
           view={body.front}

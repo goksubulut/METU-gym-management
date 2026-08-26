@@ -1,12 +1,15 @@
 // METU MOTION onboarding akışının kalıcı durumu.
-// Splash → Cinsiyet → Doğum Tarihi → Hedef Kas → Dashboard
+// Splash → Cinsiyet → Doğum Tarihi → Kayıt Ol → Dashboard
+//
+// Hedef kas seçimi bu akıştan çıkarıldı: uygulamada zaten /muscle-groups
+// (Kas Haritası) ekranı bu işi yapıyor, onboarding'de tekrarlamak gereksizdi.
 //
 // Cevaplar localStorage'da tutulur; kullanıcı akışı yarıda bırakıp dönerse
 // kaldığı yerden devam eder. Backend'e gönderim Part 6'da profil ucuna bağlanır.
 
 const KEY = "metu-motion-onboarding";
 
-export const ONBOARDING_STEPS = ["/", "/onboarding/gender", "/onboarding/birthday", "/onboarding/target-muscle"];
+export const ONBOARDING_STEPS = ["/", "/onboarding/gender", "/onboarding/birthday", "/onboarding/register"];
 export const ONBOARDING_TOTAL = ONBOARDING_STEPS.length;
 
 export function readOnboarding() {

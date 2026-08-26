@@ -214,6 +214,21 @@ const PATHS = {
       <path d="M12 16.2v.3" />
     </>
   ),
+  // Parola göster/gizle
+  eye: (
+    <>
+      <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" />
+      <circle cx="12" cy="12" r="3" />
+    </>
+  ),
+  "eye-off": (
+    <>
+      <path d="M9.9 5.8A9.4 9.4 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a17 17 0 0 1-2.8 3.6" />
+      <path d="M6.3 7.9A16.7 16.7 0 0 0 2.5 12S6 18.5 12 18.5c1.5 0 2.8-.4 3.9-.95" />
+      <path d="M10 10a2.8 2.8 0 0 0 4 4" />
+      <path d="M3.5 3.5l17 17" />
+    </>
+  ),
 };
 
 export default function Icon({ name, size = 20, strokeWidth = 1.8, className = "" }) {

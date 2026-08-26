@@ -19,13 +19,13 @@
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 
   /* --- Süreler (Bölüm 1.5) --- */
-  --duration-instant: 120ms;
-  --duration-fast: 180ms;
-  --duration-base: 220ms;
-  --duration-slow: 380ms;
-  --duration-flip: 260ms;
+  --duration-instant: 160ms;
+  --duration-fast: 240ms;
+  --duration-base: 300ms;
+  --duration-slow: 500ms;
+  --duration-flip: 360ms;
   --duration-pulse: 2000ms;
-  --stagger-step: 70ms;
+  --stagger-step: 90ms;
 
   /* --- Spacing skalası (Bölüm 1.2, 4px temel birim) --- */
   --space-1: 4px;

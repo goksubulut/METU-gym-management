@@ -5,7 +5,6 @@ import Card from "../../components/Card.jsx";
 import Badge from "../../components/Badge.jsx";
 import Icon from "../../components/Icon.jsx";
 import Skeleton from "../../components/Skeleton.jsx";
-import QuestCard from "../../components/QuestCard.jsx";
 import { Stagger, StaggerItem } from "../../components/motion/Stagger.jsx";
 import { appointments as mockAppointments } from "../../mock/appointments.js";
 import { machineById, MUSCLE_GROUPS } from "../../mock/machines.js";
@@ -306,18 +305,7 @@ export default function Dashboard() {
         </button>
       </StaggerItem>
 
-      {/* 3 + 4 — Günlük Görevler + banner kartı */}
-      <StaggerItem className="mt-6">
-        <h2 className="mb-2 text-body font-bold text-content">Günlük Görevler</h2>
-        <QuestCard
-          title="Son antrenmanın gibi devam et"
-          subtitle="20 squat seni bir adım öne taşır"
-          actionLabel="Squat Yap"
-          onAction={() => nav("/exercises")}
-        />
-      </StaggerItem>
-
-      {/* 5 — Yaklaşan randevu */}
+      {/* 3 — Yaklaşan randevu */}
       <StaggerItem className="mt-6">
         <h2 className="mb-2 text-body font-bold text-content">Yaklaşan Randevun</h2>
         {loading ? (
@@ -352,7 +340,7 @@ export default function Dashboard() {
         )}
       </StaggerItem>
 
-      {/* 6 — Öne Çıkan Antrenmanlar + Tümünü Gör */}
+      {/* 4 — Öne Çıkan Antrenmanlar + Tümünü Gör */}
       <StaggerItem className="mt-6">
         <div className="mb-2 flex items-center justify-between">
           <h2 className="text-body font-bold text-content">Öne Çıkan Antrenmanlar</h2>
@@ -373,7 +361,7 @@ export default function Dashboard() {
         </div>
       </StaggerItem>
 
-      {/* 7 — QR kısayolu + ipucu */}
+      {/* 5 — QR kısayolu + ipucu */}
       <StaggerItem className="mt-6">
         <Card className="flex items-center gap-3 p-4">
           <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary-50 text-accent">

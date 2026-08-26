@@ -20,9 +20,10 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useLocation, useOutlet } from "react-router-dom";
+import { D, EASE as E } from "../../utils/motion.js";
 
-const EASE_MOTION = [0.4, 0, 0.2, 1];    // --ease-motion
-const EASE_STANDARD = [0.16, 1, 0.3, 1]; // --ease-standard
+const EASE_MOTION = E.motion;
+const EASE_STANDARD = E.standard;
 
 // NEDEN children DEĞİL de useOutlet(): <Outlet /> bir yer tutucudur, render
 // anında router context'inden O ANKİ rotayı okur. AnimatePresence çıkış için
@@ -40,8 +41,8 @@ export default function ScreenTransition({ className = "" }) {
         key={pathname}
         className={className}
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1, transition: { duration: 0.38, ease: EASE_STANDARD } }}
-        exit={{ opacity: 0, transition: { duration: 0.15, ease: EASE_MOTION } }}
+        animate={{ opacity: 1, transition: { duration: D.slow, ease: EASE_STANDARD } }}
+        exit={{ opacity: 0, transition: { duration: D.exit, ease: EASE_MOTION } }}
       >
         {outlet}
       </motion.div>

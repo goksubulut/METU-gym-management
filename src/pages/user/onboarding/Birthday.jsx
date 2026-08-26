@@ -30,7 +30,7 @@ export default function Birthday() {
 
   const handleNext = () => {
     saveOnboarding({ birthday: { month, day: safeDay, year } });
-    nav("/onboarding/target-muscle");
+    nav("/onboarding/register");
   };
 
   return (

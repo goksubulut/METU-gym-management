@@ -15,11 +15,12 @@
 
 import { Children, cloneElement, isValidElement, createContext, useContext } from "react";
 import { motion } from "framer-motion";
+import { D, STAGGER_STEP, EASE as E } from "../../utils/motion.js";
 
 // spec §1.5: --duration-base 220ms, --stagger-step 70ms, --ease-standard
-const DURATION = 0.22;
-const STEP = 0.07;
-const EASE = [0.16, 1, 0.3, 1];
+const DURATION = D.base;
+const STEP = STAGGER_STEP;
+const EASE = E.standard;
 
 const IndexContext = createContext(0);
 

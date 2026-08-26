@@ -12,8 +12,9 @@
 // interpolate edemez), scale/opacity pop'u Framer Motion (--ease-pop).
 
 import { motion } from "framer-motion";
+import { D, EASE as E } from "../utils/motion.js";
 
-const EASE_POP = [0.34, 1.56, 0.64, 1]; // --ease-pop
+const EASE_POP = E.pop;
 
 export default function SelectableListItem({
   label,
@@ -43,7 +44,7 @@ export default function SelectableListItem({
           type === "radio" ? "rounded-full" : "rounded-md"
         } ${selected ? "border-primary-600 bg-primary-600" : "border-subtle bg-transparent"}`}
         animate={{ scale: selected ? 1 : 0.85 }}
-        transition={{ duration: 0.15, ease: EASE_POP }}
+        transition={{ duration: D.fast, ease: EASE_POP }}
       >
         <motion.svg
           viewBox="0 0 24 24"
@@ -56,7 +57,7 @@ export default function SelectableListItem({
           strokeLinejoin="round"
           aria-hidden="true"
           animate={{ opacity: selected ? 1 : 0, scale: selected ? 1 : 0.6 }}
-          transition={{ duration: 0.12, ease: EASE_POP, delay: selected ? 0.04 : 0 }}
+          transition={{ duration: D.instant, ease: EASE_POP, delay: selected ? 0.05 : 0 }}
         >
           <path d="m5 12.5 5 5L19 7" />
         </motion.svg>

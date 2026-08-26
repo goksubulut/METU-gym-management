@@ -13,6 +13,7 @@ import ProgressDots from "../../components/ProgressDots.jsx";
 import PillButton from "../../components/PillButton.jsx";
 import { Stagger, StaggerItem } from "../../components/motion/Stagger.jsx";
 import { ONBOARDING_TOTAL } from "../../utils/onboarding.js";
+import { D, EASE as E } from "../../utils/motion.js";
 
 export default function Splash() {
   const nav = useNavigate();
@@ -24,7 +25,7 @@ export default function Splash() {
         className="absolute inset-x-0 bottom-0 top-[22%]"
         initial={{ opacity: 0, filter: "brightness(0.3)" }}
         animate={{ opacity: 1, filter: "brightness(1)" }}
-        transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: D.slow, ease: E.standard }}
       >
         <PoseOverlay className="h-full w-full" objectPosition="center" priority />
         {/* Metnin okunurluğu için üstte siyaha eriyen maske — figürü kesmez */}

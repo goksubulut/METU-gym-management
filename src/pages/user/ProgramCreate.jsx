@@ -687,7 +687,7 @@ export default function ProgramCreate() {
 
                               ? "border-primary-600 bg-primary-600/15 text-primary-600"
 
-                              : "border-gray-200 bg-white text-gray-500",
+                              : "border-line bg-surface-2 text-muted",
 
                           ].join(" ")}
 
