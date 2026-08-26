@@ -235,23 +235,34 @@ h1, h2, h3 {
 }
 .animate-float { animation: float 5s ease-in-out infinite; }
 
-/* Gradient-border glass card — wave card uses these */
+/* Gradient-border glass card — Dashboard randevu kartı.
+   METU MOTION: önceki indigo/mor gradient (rgba(99,88,229) ailesi) kaldırıldı —
+   spec §1.1 tek aksan kuralını çiğniyordu ve saf siyah zeminde yabancı duruyordu.
+   Artık marka kırmızısı + glow kırmızısı token'larına bağlı. */
 .card-border {
   background:
-    linear-gradient(rgba(13,13,26,0.70), rgba(8,8,18,0.80)) padding-box,
-    linear-gradient(135deg, rgba(99,88,229,0.65), rgba(79,70,229,0.15), rgba(139,92,246,0.50)) border-box;
+    linear-gradient(rgb(var(--ink-900) / 0.7), rgb(var(--ink-950) / 0.8)) padding-box,
+    linear-gradient(135deg,
+      rgb(var(--glow) / 0.55),
+      rgb(var(--primary-600) / 0.15),
+      rgb(var(--primary-500) / 0.45)) border-box;
   border: 1px solid transparent;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
 .gradient-border {
   background:
-    linear-gradient(rgba(5,5,16,0.75), rgba(10,10,24,0.75)) padding-box,
-    linear-gradient(135deg, rgba(99,88,229,0.50), rgba(79,70,229,0.10), rgba(139,92,246,0.40)) border-box;
+    linear-gradient(rgb(var(--ink-950) / 0.75), rgb(var(--ink-900) / 0.75)) padding-box,
+    linear-gradient(135deg,
+      rgb(var(--glow) / 0.45),
+      rgb(var(--primary-600) / 0.1),
+      rgb(var(--primary-500) / 0.35)) border-box;
   border: 1px solid transparent;
 }
 .inner-glow {
-  box-shadow: inset 0 0 30px rgba(79,70,229,0.15), 0 0 20px rgba(79,70,229,0.10);
+  box-shadow:
+    inset 0 0 30px rgb(var(--primary-600) / 0.15),
+    0 0 20px rgb(var(--primary-600) / 0.1);
 }
 
 /* Giriş animasyonu — içerik blokları yumuşakça yükselir */

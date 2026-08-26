@@ -424,6 +424,33 @@ Tüm yüzeyler aynı token sistemini paylaşır; tema (koyu/açık) global.
 
 ---
 
+## Token Disiplini (Part 3.5 denetimi)
+
+Token'lar CSS değişkeni olduğu için `index.css` değiştiğinde tüm ekranlara
+kendiliğinden yayılır — **ama sabit yazılmış (hardcode) renkler bu yayılıma
+katılmaz.** Part 1'den sonra uygulamada iki farklı kırmızı yan yana duruyordu.
+Temizlenenler:
+
+| Dosya | Sorun | Çözüm |
+|---|---|---|
+| `ui/gym-auth-screen.jsx` | CTA ve linkler sabit `#A6192E`/`#8C1526` — giriş ekranı eski kırmızıda kalmıştı | `bg-primary-600` + `shadow-cta` + `text-accent` |
+| `index.css` `.card-border` / `.gradient-border` / `.inner-glow` | indigo-mor gradient (`rgba(99,88,229)` ailesi) — tek aksan kuralını çiğniyordu | `--glow` + `--primary-*` |
+| `pages/user/Dashboard.jsx` | wave canvas ve grid indigo çiziyordu | token'lar computed style'dan okunur |
+| `components/AppointmentHeatmap.jsx` | ısı rampası eski kırmızı rampasında | token'dan üretilen rampa |
+| `components/QRScanner.jsx` | tarama çizgisi gölgesi sabit | `--glow` |
+
+**Canvas / grafik kütüphanesi istisnası.** `<canvas>` 2D context'i ve reaviz gibi
+kütüphaneler CSS değişkeni kabul etmez, düz renk stringi ister. Bu dosyalarda
+token `getComputedStyle(document.documentElement).getPropertyValue("--x")` ile
+bir kez okunup sayıya çevrilir. Hardcode hex yazmak yerine **her zaman bu yol
+kullanılır** — böylece marka veya tema değişince grafik de takip eder.
+
+**Ölü dosyalar (hiçbir yerde import edilmiyor).** `ui/machine-bucket.jsx` (42
+hardcode renk), `ui/muscle-group-card.jsx`, `ui/workout-builder.jsx`. Token
+denetimine dahil edilmedi; silinmeleri ayrıca değerlendirilmeli.
+
+---
+
 ## Anti-slop Muhafızları (bilinçli kaçındıklarımız)
 
 - ~~Saf `#000` yok~~ → **METU MOTION spec (§1.1) bu kuralı geçersiz kıldı:** koyu tema zemini artık saf `#000000`. Gerekçe: spec'in glow/pulse efektleri (kas highlight, pose-overlay) saf siyah zeminde tasarlandı; near-black üstünde `#FF3B4E` glow'un halesi kirli görünüyor. Saf `#fff` metin kuralı geçerli değil — `--content` koyu temada `#FFFFFF`.

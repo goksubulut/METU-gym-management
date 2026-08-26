@@ -133,7 +133,7 @@ export default function QRScanner({ onResult, onClose }) {
                   <span className="absolute bottom-0 right-0 h-9 w-9 rounded-br-xl border-b-[3px] border-r-[3px] border-primary-600" />
 
                   {/* Scan line */}
-                  <div className="animate-qr-scan absolute left-3 right-3 h-[2px] rounded-full bg-primary-600 shadow-[0_0_6px_rgba(166,25,46,0.8)]" />
+                  <div className="animate-qr-scan absolute left-3 right-3 h-[2px] rounded-full bg-glow shadow-[0_0_6px_rgb(var(--glow)/0.8)]" />
                 </div>
               </div>
             )}

@@ -239,11 +239,7 @@ export default function GymAuthScreen({
                   <button
                     type="submit"
                     disabled={loading}
-                    className="mt-2 w-full rounded-xl py-3.5 text-sm font-semibold text-white transition-[background-color,transform,box-shadow] duration-150 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40 focus-visible:ring-offset-2"
-                    style={{
-                      backgroundColor: "#A6192E",
-                      boxShadow: "0 4px 20px rgba(166,25,46,0.28)",
-                    }}
+                    className="mt-2 w-full rounded-full bg-primary-600 py-3.5 text-button font-semibold text-white shadow-cta transition-[background-color,transform] duration-instant ease-standard hover:bg-primary-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-glow/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
                   >
                     {loading
                       ? "Lütfen bekle…"
@@ -261,7 +257,7 @@ export default function GymAuthScreen({
                       <button
                         type="button"
                         onClick={() => switchMode("register")}
-                        className="rounded font-semibold text-[#A6192E] transition-colors hover:text-[#8C1526] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40"
+                        className="rounded font-semibold text-accent transition-colors hover:text-primary-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-glow/60"
                       >
                         Kayıt Ol
                       </button>
@@ -272,7 +268,7 @@ export default function GymAuthScreen({
                       <button
                         type="button"
                         onClick={() => switchMode("login")}
-                        className="rounded font-semibold text-[#A6192E] transition-colors hover:text-[#8C1526] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40"
+                        className="rounded font-semibold text-accent transition-colors hover:text-primary-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-glow/60"
                       >
                         Giriş Yap
                       </button>

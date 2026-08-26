@@ -30,6 +30,19 @@ function WaveAppointmentCard({ active, nav }) {
     let time = 0;
     let rafId;
 
+    // Canvas 2D context CSS değişkeni okuyamaz; token'ları computed style'dan
+    // bir kez okuyup sayıya çeviriyoruz. Böylece dalga rengi tema/marka
+    // token'ı değişince otomatik takip eder, hardcode hex kalmaz.
+    const readToken = (name, fallback) => {
+      const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      const p = v.split(/[\s,]+/).map(Number).filter((n) => !Number.isNaN(n));
+      return p.length === 3 ? p : fallback;
+    };
+    const brand = readToken("--primary-600", [227, 24, 55]);
+    const glow = readToken("--glow", [255, 59, 78]);
+    const ink = readToken("--ink-950", [10, 10, 12]);
+    const inkColor = `rgb(${ink[0]},${ink[1]},${ink[2]})`;
+
     const waveData = Array.from({ length: 8 }).map(() => ({
       value: Math.random() * 0.5 + 0.1,
       targetValue: Math.random() * 0.5 + 0.1,
@@ -49,7 +62,7 @@ function WaveAppointmentCard({ active, nav }) {
     }
 
     function draw() {
-      ctx.fillStyle = "#0d0d1a";
+      ctx.fillStyle = inkColor;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       waveData.forEach((data, i) => {
         const freq = data.value * 7;
@@ -63,8 +76,12 @@ function WaveAppointmentCard({ active, nav }) {
         }
         const intensity = Math.min(1, freq * 0.3);
         ctx.lineWidth = 1 + i * 0.3;
-        ctx.strokeStyle = `rgba(${79 + intensity * 100},${70 + intensity * 130},229,0.6)`;
-        ctx.shadowColor = `rgba(${79 + intensity * 100},${70 + intensity * 130},229,0.5)`;
+        // Marka kırmızısı → glow kırmızısı arası, yoğunluğa göre (§1.1 tek aksan)
+        const wr = brand[0] + (glow[0] - brand[0]) * intensity;
+        const wg = brand[1] + (glow[1] - brand[1]) * intensity;
+        const wb = brand[2] + (glow[2] - brand[2]) * intensity;
+        ctx.strokeStyle = `rgba(${wr},${wg},${wb},0.6)`;
+        ctx.shadowColor = `rgba(${wr},${wg},${wb},0.5)`;
         ctx.shadowBlur = 5;
         ctx.stroke();
         ctx.shadowBlur = 0;
@@ -105,7 +122,7 @@ function WaveAppointmentCard({ active, nav }) {
               className="absolute inset-0 opacity-10"
               style={{
                 backgroundImage:
-                  "linear-gradient(rgba(99,88,229,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(99,88,229,0.5) 1px, transparent 1px)",
+                  "linear-gradient(rgb(var(--primary-600) / 0.45) 1px, transparent 1px), linear-gradient(90deg, rgb(var(--primary-600) / 0.45) 1px, transparent 1px)",
                 backgroundSize: "24px 24px",
               }}
             />

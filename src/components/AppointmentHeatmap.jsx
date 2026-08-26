@@ -192,17 +192,31 @@ export default function AppointmentHeatmap() {
 
   const isDark = theme === "dark";
 
-  // METU-red color scheme: empty=gray, low=light red, high=full METU red
+  // Isı rampası — METU MOTION token'larından okunur (reaviz düz renk stringi
+  // ister, CSS değişkeni kabul etmez; bu yüzden computed style'dan çözülür).
+  // Böylece marka rengi değişince rampa da otomatik takip eder.
+  const tok = (name, fallback) => {
+    if (typeof document === "undefined") return fallback;
+    const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    const p = v.split(/[\s,]+/).map(Number).filter((n) => !Number.isNaN(n));
+    return p.length === 3 ? p : fallback;
+  };
+  const rgba = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+
+  const brand = tok("--primary-600", [227, 24, 55]);   // #E31837
+  const glow = tok("--glow", [255, 59, 78]);           // #FF3B4E
+  const surf = tok("--surface-3", [46, 46, 49]);
+  const faint = tok("--faint", [122, 122, 128]);
+
+  // boş → düşük → orta → yüksek → en yüksek
   const colorScheme = isDark
-    ? ["rgba(166,25,46,0.30)", "rgba(196,21,53,0.58)", "#C41535", "#E84045"]
-    : ["rgba(166,25,46,0.20)", "rgba(166,25,46,0.50)", "#C41535", "#A6192E"];
+    ? [rgba(brand, 0.3), rgba(brand, 0.58), rgba(brand, 1), rgba(glow, 1)]
+    : [rgba(brand, 0.2), rgba(brand, 0.5), rgba(brand, 0.78), rgba(brand, 1)];
 
-  const emptyColor = isDark ? "rgba(52,46,51,0.45)" : "rgba(220,216,221,0.55)";
-  const tickFill = isDark ? "#9A9AAF" : "#9CA3AF";
+  const emptyColor = rgba(surf, isDark ? 0.45 : 0.55);
+  const tickFill = rgba(faint, 1);
 
-  const legendColors = isDark
-    ? [emptyColor, "rgba(166,25,46,0.30)", "rgba(196,21,53,0.58)", "#C41535", "#E84045"]
-    : [emptyColor, "rgba(166,25,46,0.20)", "rgba(166,25,46,0.50)", "#C41535", "#A6192E"];
+  const legendColors = [emptyColor, ...colorScheme];
 
   const metrics = [
     {
