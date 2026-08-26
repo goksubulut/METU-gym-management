@@ -374,7 +374,43 @@ kullanıcı kaldığı yerden devam eder. Onboarding ekranlarında uygulama krom
 | Splash | `/` | §3.1 | Her zaman aktif |
 | Cinsiyetiniz | `/onboarding/gender` | §3.2 | **Sadece bir seçenek seçilince belirir** (morph reveal ilk kez orada tetiklenir) |
 | Doğum Tarihiniz | `/onboarding/birthday` | §3.3 | Her zaman aktif (picker varsayılanla gelir) |
-| Hedef Kas Grubu | `/onboarding/target-muscle` | §3.4 | Part 4 |
+| Hedef Kas Grubu | `/onboarding/target-muscle` | §3.4 | Her zaman aktif (0 seçimle de geçilebilir) |
+
+### Hedef Kas Ekranı (§3.4 + §2.8 + §4.4 + §4.6)
+
+`pages/user/onboarding/TargetMuscle.jsx` + `components/MuscleSilhouette.jsx`.
+
+**Neden `BodyDiagram.jsx` kullanılmadı.** Mevcut `BodyDiagram` her kası kendi
+anatomik paletiyle boyar (göğüs turuncu, biceps mavi…) — öğretici amaçlı ve beş
+ekranda kullanılıyor, bozulmamalı. Spec §1.1 ise tek aksan istiyor: seçili bölge
+`--glow`, seçilmemiş `--surface-3`. İki model bağdaşmadığı için onboarding'e
+ayrı bir bileşen yazıldı; ikisi de aynı `BODY_DATA` ve `MUSCLES` kataloğunu
+paylaşır, yani kas tanımları tek kaynakta kalır.
+
+**§4.4'ün kritik kuralı — tek state.** Liste chip'i ve silüet bölgesi tek bir
+`toggleMuscle(slug)` çağrısından tetiklenir. İki ayrı event zinciri yok; ikisi
+de aynı render cycle'da güncellenir, bu yüzden senkron hissettirir.
+
+**§2.8 / §5.3 — path şekli asla animasyonlanmaz.** Highlight tamamen CSS'te:
+`.muscle-region` → `.muscle-region.is-active`. Yalnızca `fill`, `filter`
+(drop-shadow) ve `transform: scale(0.94 → 1)` değişir. `d` attribute'una
+dokunulmaz. `transform-box: fill-box` sayesinde ölçek merkezi path'in kendi
+bounding-box'ıdır (§4.4'ün istediği davranış).
+
+**§4.6 — sahte flip.** Gerçek `rotateY` yerine `scaleX: 1 → 0 → 1` (2 × 130ms).
+Görünmez anda (scaleX = 0) hem silüet görünümü hem sol liste içeriği değişir.
+
+İki tuzak vardı:
+1. **Thumb paralel kaymalıydı.** Segmented control `view` state'ine bağlanırsa
+   thumb 130ms geç kayar ve flip'ten kopar. Çözüm: `pendingView` (thumb için,
+   anında güncellenir) ile `view` (silüet + liste için, flip ortasında güncellenir)
+   ayrıldı. Kullanıcı ikisini aynı anda görür.
+2. **Preload (§5.4).** Ön ve arka path setlerinin ikisi de DOM'da durur, flip'te
+   yalnızca `display` değişir — hiçbir path yeniden parse edilmez, flip ortasında
+   jank olmaz.
+
+Vücut modeli onboarding'de seçilen cinsiyetten türetilir (Kadın → `female`,
+diğerleri → `male`).
 
 ### Pose-Overlay (§2.9 + §4.8)
 

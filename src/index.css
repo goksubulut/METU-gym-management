@@ -363,6 +363,43 @@ h1, h2, h3 {
   .pose-overlay-breathe { animation: none; }
 }
 
+/* ==========================================================================
+   METU MOTION §2.8 — Kas Bölgesi Highlight Sistemi
+   §4.4 — Cross-Component Sync Highlight (silüet tarafı)
+
+   Kritik kural (§5.3): path'in `d` attribute'u (şekli) ASLA değişmez /
+   animasyonlanmaz. Yalnızca fill / filter / transform toggle edilir.
+
+   transform-box: fill-box → transform-origin path'in KENDİ bounding-box
+   merkezine oturur (spec §4.4: "path'in kendi bounding-box merkezi").
+   ========================================================================== */
+.muscle-region {
+  fill: rgb(var(--surface-3));
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0.94);
+  transition:
+    fill var(--duration-fast) var(--ease-pop),
+    filter var(--duration-fast) var(--ease-pop),
+    transform var(--duration-fast) var(--ease-pop);
+}
+.muscle-region.is-selectable { cursor: pointer; }
+.muscle-region.is-active {
+  fill: rgb(var(--glow));
+  filter: drop-shadow(0 0 12px rgb(var(--glow) / 0.6));
+  transform: scale(1);
+}
+/* Kas olmayan gövde parçaları (baş, el, ayak) — tıklanamaz, nötr */
+.body-inert {
+  fill: rgb(var(--surface-2));
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .muscle-region { transform: none; transition: fill 120ms linear, filter 120ms linear; }
+  .muscle-region.is-active { transform: none; }
+}
+
 /* Azaltılmış hareket — hareket = daha az ve nazik, sıfır değil */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

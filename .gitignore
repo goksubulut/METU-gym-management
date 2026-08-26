@@ -10,3 +10,6 @@ coverage
 
 # Kişisel Claude Code araçları (repoya girmez)
 .claude/
+
+# Bu ortam dosya silemiyor; silinecekler buraya taşınıyor
+_to_delete/

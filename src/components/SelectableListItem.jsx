@@ -22,8 +22,10 @@ export default function SelectableListItem({
   type = "checkbox",   // "radio" | "checkbox"
   disabled = false,
   full = false,
+  size = "md",          // "md" 48px (§2.2 varsayılan) | "sm" 44px, dar sütunlar için
   className = "",
 }) {
+  const dims = size === "sm" ? "h-11 gap-2.5 px-3 text-caption" : "h-12 gap-3 px-4 text-body";
   return (
     <button
       type="button"
@@ -31,7 +33,7 @@ export default function SelectableListItem({
       aria-checked={selected}
       disabled={disabled}
       onClick={() => !disabled && onChange?.(!selected)}
-      className={`flex h-12 items-center gap-3 rounded-full border px-4 text-left text-body text-content outline-none transition-[border-color,background-color,transform] duration-fast ease-standard active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-glow/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg ${
+      className={`flex items-center rounded-full border text-left text-content outline-none transition-[border-color,background-color,transform] duration-fast ease-standard active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-glow/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg ${dims} ${
         selected ? "border-primary-600 bg-primary-50" : "border-subtle bg-transparent"
       } ${disabled ? "pointer-events-none opacity-40" : ""} ${full ? "w-full" : ""} ${className}`}
     >
