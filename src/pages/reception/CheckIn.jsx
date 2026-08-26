@@ -106,11 +106,11 @@ export default function CheckIn() {
             <p className="text-xs text-gray-500">Toplam</p>
           </Card>
           <Card soft className="p-4 text-center">
-            <p className="text-2xl font-extrabold text-emerald-600">{stats.arrived}</p>
+            <p className="text-2xl font-extrabold text-available">{stats.arrived}</p>
             <p className="text-xs text-gray-500">Geldi</p>
           </Card>
           <Card soft className="p-4 text-center">
-            <p className="text-2xl font-extrabold text-amber-600">{stats.pending}</p>
+            <p className="text-2xl font-extrabold text-busy">{stats.pending}</p>
             <p className="text-xs text-gray-500">Bekliyor</p>
           </Card>
         </div>
@@ -172,7 +172,7 @@ export default function CheckIn() {
                           Geldi
                         </Button>
                       ) : (
-                        <span className="text-xs font-semibold text-emerald-600">✓</span>
+                        <span className="text-xs font-semibold text-available">✓</span>
                       )}
                     </td>
                   </tr>

@@ -15,6 +15,7 @@ import { useTheme } from "../utils/theme.js";
 import { appointments as mockSeed } from "../mock/appointments.js";
 import { getAccessToken } from "../api/client.js";
 import { fetchMyAppointments, mapAppointmentFromApi } from "../api/bookings.js";
+import { useChartColors, token } from "../utils/chartColors.js";
 
 const WEEKS_SHOWN = 10;
 const DAY_LABELS = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
@@ -191,31 +192,19 @@ export default function AppointmentHeatmap() {
   const stats = useMemo(() => calculateStats(appointments), [appointments]);
 
   const isDark = theme === "dark";
+  const tokenA = (a) => token("--primary-600", "#E31837", a);
 
-  // Isı rampası — METU MOTION token'larından okunur (reaviz düz renk stringi
-  // ister, CSS değişkeni kabul etmez; bu yüzden computed style'dan çözülür).
-  // Böylece marka rengi değişince rampa da otomatik takip eder.
-  const tok = (name, fallback) => {
-    if (typeof document === "undefined") return fallback;
-    const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-    const p = v.split(/[\s,]+/).map(Number).filter((n) => !Number.isNaN(n));
-    return p.length === 3 ? p : fallback;
-  };
-  const rgba = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
-
-  const brand = tok("--primary-600", [227, 24, 55]);   // #E31837
-  const glow = tok("--glow", [255, 59, 78]);           // #FF3B4E
-  const surf = tok("--surface-3", [46, 46, 49]);
-  const faint = tok("--faint", [122, 122, 128]);
+  // Isı rampası — paylaşılan token köprüsünden (utils/chartColors.js).
+  // reaviz düz renk stringi ister; tema değişince palet otomatik yenilenir.
+  const chart = useChartColors();
 
   // boş → düşük → orta → yüksek → en yüksek
   const colorScheme = isDark
-    ? [rgba(brand, 0.3), rgba(brand, 0.58), rgba(brand, 1), rgba(glow, 1)]
-    : [rgba(brand, 0.2), rgba(brand, 0.5), rgba(brand, 0.78), rgba(brand, 1)];
+    ? [tokenA(0.3), tokenA(0.58), chart.brand, chart.glow]
+    : [tokenA(0.2), tokenA(0.5), tokenA(0.78), chart.brand];
 
-  const emptyColor = rgba(surf, isDark ? 0.45 : 0.55);
-  const tickFill = rgba(faint, 1);
-
+  const emptyColor = token("--surface-3", "#2E2E31", isDark ? 0.45 : 0.55);
+  const tickFill = chart.faint;
   const legendColors = [emptyColor, ...colorScheme];
 
   const metrics = [

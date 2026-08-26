@@ -63,7 +63,7 @@ export default function Warmup() {
             <Card key={i} className="flex items-center gap-3 p-3">
               <div
                 className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl ${
-                  e.type === "Isınma" ? "bg-primary-50 text-accent" : "bg-blue-50 text-blue-600"
+                  e.type === "Isınma" ? "bg-primary-50 text-accent" : "bg-info-soft text-info"
                 }`}
               >
                 <Icon name={e.type === "Isınma" ? "flame" : "snowflake"} size={20} />

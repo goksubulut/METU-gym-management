@@ -180,7 +180,7 @@ export default function AnnouncementsAdmin() {
                   >
                     Düzenle
                   </button>
-                  <button type="button" onClick={() => setDelId(a.id)} className="text-red-600">
+                  <button type="button" onClick={() => setDelId(a.id)} className="text-accent">
                     Sil
                   </button>
                 </td>

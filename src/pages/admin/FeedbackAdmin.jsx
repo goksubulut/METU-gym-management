@@ -4,10 +4,12 @@ import Card from "../../components/Card.jsx";
 import Badge from "../../components/Badge.jsx";
 import Tabs from "../../components/Tabs.jsx";
 import { feedbackList as mockFeedback, } from "../../mock/feedback.js";
-import { CHART_COLORS, feedbackTags as mockTags } from "../../mock/analytics.js";
+import { feedbackTags as mockTags } from "../../mock/analytics.js";
+import { seriesPalette } from "../../utils/chartColors.js";
 import { fetchAdminSuggestions } from "../../api/admin.js";
 
 export default function FeedbackAdmin() {
+  const palette = seriesPalette();
   const [type, setType] = useState("all");
   const [list, setList] = useState(mockFeedback);
   const [tags, setTags] = useState(mockTags);
@@ -93,7 +95,7 @@ export default function FeedbackAdmin() {
                 label={(e) => e.tag}
               >
                 {tags.map((_, i) => (
-                  <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                  <Cell key={i} fill={palette[i % palette.length]} />
                 ))}
               </Pie>
               <Tooltip />

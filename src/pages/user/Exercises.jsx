@@ -27,7 +27,7 @@ const TYPE_LABEL = { FREE: "Serbest", WARMUP: "Isınma", COOLDOWN: "Soğuma" };
 const TYPE_COLOR = {
   FREE: "bg-ink-900",
   WARMUP: "bg-primary-600",
-  COOLDOWN: "bg-blue-600",
+  COOLDOWN: "bg-info",
 };
 
 const PAGE_SIZE_GRID = 12;

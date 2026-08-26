@@ -104,4 +104,7 @@ export const feedbackTags = [
   { tag: "Personel", value: 3 },
 ];
 
-export const CHART_COLORS = ["#dc2626", "#f87171", "#fca5a5", "#991b1b", "#fecaca"];
+// Grafik paleti artık burada sabit tutulmuyor — marka rampasından türetilir ve
+// tema değişimini takip eder: utils/chartColors.js → seriesPalette().
+// (Eski dizi jenerik #dc2626 ailesindeydi; DESIGN.md bunu açıkça yasaklıyor.)
+export { seriesPalette as chartSeriesColors } from "../utils/chartColors.js";

@@ -349,7 +349,7 @@ export default function Inventory() {
                       <button
                         type="button"
                         onClick={() => setDel(m)}
-                        className="text-red-500"
+                        className="text-accent"
                       >
                         Sil
                       </button>
@@ -449,7 +449,7 @@ export default function Inventory() {
                   {(form.photoUrl || form.photoFile) && !form.removePhoto && (
                     <button
                       type="button"
-                      className="text-left text-xs font-semibold text-red-500"
+                      className="text-left text-xs font-semibold text-accent"
                       onClick={() =>
                         setForm({
                           ...form,

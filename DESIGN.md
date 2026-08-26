@@ -520,6 +520,36 @@ değiştirildi. Wave randevu kartındaki 11 adet Tailwind `indigo-*` sınıfı
 
 ---
 
+## METU MOTION Uygulama Durumu (spec §0.1 checklist)
+
+| # | Madde | Durum |
+|---|---|---|
+| 1 | Renk token'ları (§1.1) | ✅ Part 1 |
+| 2 | Spacing / radius / tipografi (§1.2-1.4) | ✅ Part 1 |
+| 3 | Motion token'ları (§1.5) | ✅ Part 1 |
+| 4 | Primary Button + morph reveal (§2.1, §4.3) | ✅ Part 2 (`PillButton`) + Part 6 (`Button`) |
+| 5 | Selectable List Item (§2.2, §4.4) | ✅ Part 2 |
+| 6 | Segmented Control (§2.3, §4.5) | ✅ Part 2 (`SegmentedControl`) + Part 6 (`Tabs`) |
+| 7 | Progress Dots (§2.5, §4.7) | ✅ Part 2 |
+| 8 | Bottom Tab Bar (§2.6) | ✅ Part 5 |
+| 9 | Banner / Quest Card (§2.7) | ✅ Part 5 |
+| 10 | Target Muscle bölge-highlight (§2.8, §4.4) | ✅ Part 4 |
+| 11 | Pose-overlay pulse-glow (§2.9, §4.8) | ✅ Part 3 |
+| 12 | Ekran geçişleri tek wrapper (§4.1) | ✅ Part 5 |
+| 13 | Onboarding + Dashboard metinleri (§3.1, §3.5) | ✅ Part 3 + Part 5 |
+| 14 | Performans kuralları (§5) | ✅ Part 6 — 8/8 doğrulandı |
+
+**§5 denetimi (8/8):** tek geçiş wrapper'ı · stagger yalnızca opacity+translateY ·
+path `d` hiç animasyonlanmıyor · ön/arka setler preload · pulse saf CSS + arka
+planda duruyor · thumb `translateX` · morph tek container · hardcode renk yok.
+
+**Bilinçli sapmalar** (gerekçeleri ilgili bölümlerde): §4.1 brightness rampası
+wrapper yerine hero'yu taşıyan ekranda (fixed tab bar bozulmasın); §4.6 gerçek
+`rotateY` yerine spec'in önerdiği ucuz `scaleX` sahte flip'i; tab bar 4 değil
+5 hedef taşıyor (ürün gereksinimi).
+
+---
+
 ## Token Disiplini (Part 3.5 denetimi)
 
 Token'lar CSS değişkeni olduğu için `index.css` değiştiğinde tüm ekranlara
@@ -540,6 +570,39 @@ kütüphaneler CSS değişkeni kabul etmez, düz renk stringi ister. Bu dosyalar
 token `getComputedStyle(document.documentElement).getPropertyValue("--x")` ile
 bir kez okunup sayıya çevrilir. Hardcode hex yazmak yerine **her zaman bu yol
 kullanılır** — böylece marka veya tema değişince grafik de takip eder.
+
+### Part 6 — tam yayma
+
+**Paylaşılan bileşenler spec geometrisine çekildi, 30 ekran bedavaya uydu.**
+22 dosyayı tek tek `PillButton`'a taşımak yerine `Button.jsx`'in kendisi hap
+radius + token ölçeklerine geçirildi; aynı şekilde `Tabs.jsx` §2.3 renklerine
+(kırmızı dolgulu aktif segment). API'ler değişmedi.
+
+`Button.jsx` ile `PillButton.jsx` neden ayrı duruyor: PillButton §4.3'ün
+çizgi→hap **morph reveal**'ını taşır ve bu yalnızca bir ekranın ANA ilerleme
+aksiyonu için anlamlıdır. Listedeki her butonun morph etmesi gürültü olurdu.
+
+**Hazır Tailwind paleti tamamen kaldırıldı — 46 sınıf, 12 dosya.** Sorun sadece
+marka tutarlılığı değildi: `bg-green-50`, `bg-blue-50` gibi **açık tonlar** saf
+siyah temada parlak blok oluyordu. Eşleme: yeşil/emerald → `available`,
+amber/yellow → `busy`, mavi/indigo/mor → `info`, kırmızı/rose → marka rampası.
+Ayrıca `gym-auth-screen.jsx` 16 adet `zinc-*` ve iki `bg-white` ile **kalıcı
+olarak açık** bir ekrandı; token'lara çevrildi, artık temayı takip ediyor.
+
+**Grafik renkleri için token köprüsü: `utils/chartColors.js`.** Recharts, reaviz
+ve `<canvas>` CSS değişkeni kabul etmez, düz renk stringi ister. `useChartColors()`
+token'ları computed style'dan okur ve `themechange` olayını dinler — grafikler
+artık tema değişimini de takip ediyor. Grafiklerde DESIGN.md'nin açıkça
+yasakladığı jenerik `#dc2626` duruyordu (3 admin ekranı + `mock/analytics.js`'teki
+`CHART_COLORS` dizisi); hepsi marka rampasından türeyen `seriesPalette()`'e taşındı.
+
+**§1.1 hata state'i — renk tek başına anlam taşımaz.** Marka rengi kırmızı
+olduğu için validasyon hataları renkle ayırt edilemez. `Input.jsx` ve
+`gym-auth-screen.jsx` hata mesajlarına `alert` ikonu eklendi, input'a
+`aria-invalid` verildi.
+
+**Reduced motion (§DESIGN "zorunlu").** `main.jsx`'te
+`<MotionConfig reducedMotion="user">` — detay için "Ekran Geçişi" bölümü.
 
 **Ölü dosyalar (hiçbir yerde import edilmiyor).** `ui/machine-bucket.jsx` (42
 hardcode renk), `ui/muscle-group-card.jsx`, `ui/workout-builder.jsx`. Token

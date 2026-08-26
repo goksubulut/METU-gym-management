@@ -84,7 +84,7 @@ export default function ProgramItemList({ items, onMoveUp, onMoveDown, onRemove,
                     type="button"
                     aria-label="Kaldır"
                     onClick={() => onRemove(index)}
-                    className="grid h-8 w-8 place-items-center rounded-lg text-red-400 hover:bg-red-50"
+                    className="grid h-8 w-8 place-items-center rounded-lg text-primary-300 hover:bg-primary-50"
                   >
                     <Icon name="x" size={16} />
                   </button>

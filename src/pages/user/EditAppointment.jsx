@@ -205,7 +205,7 @@ export default function EditAppointment() {
             }}
             className={`flex flex-col items-center rounded-xl border px-1 py-2 transition-colors ${
               dateKey === d.key
-                ? "border-emerald-600 bg-emerald-600 text-white"
+                ? "border-available bg-available text-white"
                 : "border-gray-200 bg-surface text-gray-600 hover:border-gray-300"
             }`}
           >
@@ -213,7 +213,7 @@ export default function EditAppointment() {
             <span className="text-sm font-extrabold leading-tight">{d.date}</span>
             <span className={`text-[9px] ${dateKey === d.key ? "text-white/70" : "text-gray-400"}`}>{d.month}</span>
             {d.isToday && (
-              <span className={`mt-0.5 h-1 w-1 rounded-full ${dateKey === d.key ? "bg-white/60" : "bg-emerald-500"}`} />
+              <span className={`mt-0.5 h-1 w-1 rounded-full ${dateKey === d.key ? "bg-white/60" : "bg-available"}`} />
             )}
           </button>
         ))}
@@ -223,11 +223,11 @@ export default function EditAppointment() {
         <h2 className="text-base font-bold text-gray-900">Saat</h2>
         <div className="flex items-center gap-2 text-[10px] text-gray-400">
           <span className="flex items-center gap-1">
-            <i className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
+            <i className="inline-block h-2 w-2 rounded-full bg-available" />
             Seçili
           </span>
           <span className="flex items-center gap-1">
-            <i className="inline-block h-2 w-2 rounded-full bg-red-500" />
+            <i className="inline-block h-2 w-2 rounded-full bg-primary-600" />
             Dolu / geçmiş
           </span>
         </div>
@@ -262,7 +262,7 @@ export default function EditAppointment() {
           {machines.map((mid) => (
             <div
               key={mid}
-              className="flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2.5"
+              className="flex items-center justify-between rounded-xl border border-available bg-available-soft px-3 py-2.5"
             >
               <div>
                 <p className="text-sm font-semibold text-gray-900">
@@ -275,7 +275,7 @@ export default function EditAppointment() {
               <button
                 type="button"
                 onClick={() => removeMachine(mid)}
-                className="grid h-8 w-8 place-items-center rounded-full text-red-600 hover:bg-red-100"
+                className="grid h-8 w-8 place-items-center rounded-full text-accent hover:bg-primary-50"
                 aria-label="Makineyi kaldır"
               >
                 <Icon name="x" size={16} />
@@ -295,7 +295,7 @@ export default function EditAppointment() {
             onClick={() => setGroups((prev) => toggle(prev, g.id))}
             className={`rounded-xl border px-4 py-2 text-sm font-semibold ${
               groups.includes(g.id)
-                ? "border-emerald-600 bg-emerald-50 text-emerald-800"
+                ? "border-available bg-available-soft text-available"
                 : "border-gray-200 text-gray-600"
             }`}
           >
@@ -313,7 +313,7 @@ export default function EditAppointment() {
                 key={m.id}
                 className={`flex items-center gap-3 rounded-xl border p-3 ${
                   machines.includes(m.id)
-                    ? "border-emerald-600 bg-emerald-50"
+                    ? "border-available bg-available-soft"
                     : "border-gray-200 bg-surface"
                 }`}
               >
@@ -343,7 +343,7 @@ export default function EditAppointment() {
         </div>
       )}
 
-      <div className="sticky bottom-24 flex gap-2 border-t border-gray-100 bg-[#f7f7f8] pt-4">
+      <div className="sticky bottom-24 flex gap-2 border-t border-hairline bg-bg pt-4">
         <Button variant="ghost" full onClick={() => setCancelOpen(true)} disabled={submitting}>
           Vazgeç
         </Button>

@@ -38,7 +38,7 @@ export default function ForgotPassword() {
 
       {sent ? (
         <div className="space-y-4">
-          <div className="rounded-xl bg-green-50 p-4 text-sm text-green-700">
+          <div className="rounded-xl bg-available-soft p-4 text-sm text-available">
             Eğer bu e-posta sistemde kayıtlıysa, parola sıfırlama bağlantısı gönderildi.
             Gelen kutunu (ve spam klasörünü) kontrol et. Bağlantı 30 dakika geçerlidir.
           </div>

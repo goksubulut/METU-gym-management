@@ -70,7 +70,7 @@ export default function ResetPassword() {
         </form>
       ) : (
         <div className="space-y-4">
-          <div className="rounded-xl bg-red-50 p-4 text-sm text-red-700">
+          <div className="rounded-xl bg-primary-50 p-4 text-sm text-accent">
             Geçersiz bağlantı. Lütfen parola sıfırlama isteğini yeniden başlat.
           </div>
           <Link to="/forgot-password" className="block">

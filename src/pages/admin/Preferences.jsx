@@ -16,11 +16,13 @@ import { Select } from "../../components/Input.jsx";
 import {
   machinePreference as mockMachinePref,
   muscleGroupPopularity as mockMusclePop,
-  CHART_COLORS,
 } from "../../mock/analytics.js";
 import { fetchAdminPreferences } from "../../api/admin.js";
+import { useChartColors, seriesPalette } from "../../utils/chartColors.js";
 
 export default function Preferences() {
+  // Grafik renkleri token'lardan; tema değişince otomatik güncellenir
+  const chart = useChartColors();
   const [range, setRange] = useState("30");
   const [machinePreference, setMachinePreference] = useState(mockMachinePref);
   const [muscleGroupPopularity, setMuscleGroupPopularity] = useState(mockMusclePop);
@@ -36,7 +38,7 @@ export default function Preferences() {
 
   const radial = muscleGroupPopularity.map((m, i) => ({
     ...m,
-    fill: CHART_COLORS[i % CHART_COLORS.length],
+    fill: seriesPalette()[i % 6],
   }));
 
   return (
@@ -59,11 +61,11 @@ export default function Preferences() {
         <h2 className="mb-4 text-base font-bold text-gray-900">Makine Türü Bazlı Tercih</h2>
         <ResponsiveContainer width="100%" height={320}>
           <BarChart data={machinePreference}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
             <XAxis dataKey="name" tick={{ fontSize: 11 }} />
             <YAxis tick={{ fontSize: 12 }} />
             <Tooltip />
-            <Bar dataKey="count" fill="#dc2626" radius={[6, 6, 0, 0]} name="Kullanım" />
+            <Bar dataKey="count" fill={chart.brand} radius={[6, 6, 0, 0]} name="Kullanım" />
           </BarChart>
         </ResponsiveContainer>
       </Card>

@@ -19,6 +19,7 @@ import {
   topMachines as mockTop,
 } from "../../mock/analytics.js";
 import { fetchAdminDashboard, fetchAdminOccupancy } from "../../api/admin.js";
+import { useChartColors } from "../../utils/chartColors.js";
 
 const OCCUPANCY_TABS = [
   { value: "weekly", label: "Haftalık" },
@@ -38,6 +39,8 @@ function mapOccupancyTrend(data, period) {
 }
 
 export default function AdminDashboard() {
+  // Grafik renkleri token'lardan; tema değişince otomatik güncellenir
+  const chart = useChartColors();
   const [summary, setSummary] = useState(mockSummary);
   const [occupancyPeriod, setOccupancyPeriod] = useState("weekly");
   const [periodOccupancy, setPeriodOccupancy] = useState(averageOccupancy(mockTrend));
@@ -111,18 +114,18 @@ export default function AdminDashboard() {
             <AreaChart data={occupancyTrend}>
               <defs>
                 <linearGradient id="occ" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#dc2626" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#dc2626" stopOpacity={0} />
+                  <stop offset="5%" stopColor={chart.brand} stopOpacity={0.3} />
+                  <stop offset="95%" stopColor={chart.brand} stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
               <XAxis dataKey="day" tick={{ fontSize: 12 }} />
               <YAxis tick={{ fontSize: 12 }} unit="%" />
               <Tooltip />
               <Area
                 type="monotone"
                 dataKey="occupancy"
-                stroke="#dc2626"
+                stroke={chart.brand}
                 strokeWidth={2.5}
                 fill="url(#occ)"
                 name="Doluluk"

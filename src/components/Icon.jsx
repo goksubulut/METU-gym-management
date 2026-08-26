@@ -206,6 +206,14 @@ const PATHS = {
       <path d="M8.5 9.2 6 2.5h12l-2.5 6.7" />
     </>
   ),
+  // METU MOTION §1.1 — hata/uyarı state'i renkten bağımsız okunabilsin diye
+  alert: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7.5v5" />
+      <path d="M12 16.2v.3" />
+    </>
+  ),
 };
 
 export default function Icon({ name, size = 20, strokeWidth = 1.8, className = "" }) {

@@ -13,8 +13,8 @@ export function ToastProvider({ children }) {
 
   const tones = {
     primary: "bg-primary-600",
-    success: "bg-emerald-600",
-    error: "bg-red-600",
+    success: "bg-available",
+    error: "bg-primary-600",
     dark: "bg-ink-900",
   };
 

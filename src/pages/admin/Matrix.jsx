@@ -18,6 +18,7 @@ import StarRating from "../../components/StarRating.jsx";
 import Badge from "../../components/Badge.jsx";
 import { matrixData as mockMatrix, maintenancePriorityDemo } from "../../mock/analytics.js";
 import { fetchAdminMatrix } from "../../api/admin.js";
+import { useChartColors, categoricalPalette } from "../../utils/chartColors.js";
 
 const USE_MID = 110;
 const RATE_MID = 4.5;
@@ -44,7 +45,7 @@ const QUADRANTS = [
   {
     title: "Başarılı",
     desc: "Yüksek tercih + yüksek memnuniyet",
-    tone: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    tone: "bg-available-soft text-available border-available/40",
     pos: "Sürdür",
     hint: {
       title: "Başarılı kadran",
@@ -55,15 +56,15 @@ const QUADRANTS = [
     modalDesc:
       "Yüksek kullanım ve yüksek memnuniyet alan makineler. Mevcut bakım planını sürdürün, kapasiteyi koruyun.",
     badge: { label: "Sürdür", tone: "green" },
-    rowClass: "border-emerald-100 bg-emerald-50/50",
-    ringClass: "focus-visible:ring-emerald-400/50",
-    clickHintClass: "text-emerald-600/80",
+    rowClass: "border-available/25 bg-available-soft/50",
+    ringClass: "focus-visible:ring-available/50",
+    clickHintClass: "text-available/80",
     emptyText: "Bu kadranda makine yok.",
   },
   {
     title: "Bakım Önceliği",
     desc: "Yüksek tercih + düşük memnuniyet",
-    tone: "bg-red-50 text-red-700 border-red-200",
+    tone: "bg-primary-50 text-accent border-primary-600/40",
     pos: "Acil iyileştir",
     hint: {
       title: "Bakım önceliği kadranı",
@@ -74,15 +75,15 @@ const QUADRANTS = [
     modalDesc:
       "Bu makineler salonun en çok kullanılanları arasında ancak düşük puan alıyor. Bakım, parça değişimi veya kullanım eğitimi önceliklendirilmeli.",
     badge: { label: "Acil iyileştir", tone: "red" },
-    rowClass: "border-red-100 bg-red-50/50",
-    ringClass: "focus-visible:ring-red-400/50",
-    clickHintClass: "text-red-600/80",
+    rowClass: "border-primary-600/25 bg-primary-50/50",
+    ringClass: "focus-visible:ring-glow/50",
+    clickHintClass: "text-accent/80",
     emptyText: "Şu an acil iyileştirme gerektiren makine yok.",
   },
   {
     title: "Görünürlük Artır",
     desc: "Düşük tercih + yüksek memnuniyet",
-    tone: "bg-blue-50 text-blue-700 border-blue-200",
+    tone: "bg-info-soft text-info border-info/40",
     pos: "Tanıt",
     hint: {
       title: "Görünürlük artır kadranı",
@@ -93,9 +94,9 @@ const QUADRANTS = [
     modalDesc:
       "Kaliteli puan alan ancak az tercih edilen makineler. Konum, etiketleme veya antrenör yönlendirmesiyle görünürlük artırılabilir.",
     badge: { label: "Tanıt", tone: "blue" },
-    rowClass: "border-blue-100 bg-blue-50/50",
-    ringClass: "focus-visible:ring-blue-400/50",
-    clickHintClass: "text-blue-600/80",
+    rowClass: "border-info/25 bg-info-soft/50",
+    ringClass: "focus-visible:ring-info/50",
+    clickHintClass: "text-info/80",
     emptyText: "Bu kadranda makine yok.",
   },
   {
@@ -129,6 +130,8 @@ function classify(d) {
 }
 
 export default function Matrix() {
+  // Grafik renkleri token'lardan; tema değişince otomatik güncellenir
+  const chart = useChartColors();
   const [matrixData, setMatrixData] = useState(() => withMaintenanceDemo(mockMatrix));
   const [activeQuadrant, setActiveQuadrant] = useState(null);
 
@@ -154,7 +157,7 @@ export default function Matrix() {
     activeQuadrant !== null
       ? grouped[activeQuadrant].slice().sort((a, b) => b.uses - a.uses)
       : [];
-  const colors = ["#059669", "#dc2626", "#2563eb", "#9ca3af"];
+  const colors = categoricalPalette(chart);
 
   return (
     <div className="space-y-6">
@@ -206,17 +209,17 @@ export default function Matrix() {
         <button
           type="button"
           onClick={() => setActiveQuadrant(MAINTENANCE_INDEX)}
-          className="flex w-full items-center justify-between gap-4 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-left transition-[box-shadow,transform] hover:-translate-y-0.5 hover:shadow-pop focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50"
+          className="flex w-full items-center justify-between gap-4 rounded-2xl border border-primary-600/40 bg-primary-50 px-5 py-4 text-left transition-[box-shadow,transform] hover:-translate-y-0.5 hover:shadow-pop focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-glow/50"
         >
           <div>
-            <p className="text-sm font-bold text-red-800">Acil İyileştirme Gereken Makineler</p>
-            <p className="mt-0.5 text-xs text-red-700/80">
+            <p className="text-sm font-bold text-accent">Acil İyileştirme Gereken Makineler</p>
+            <p className="mt-0.5 text-xs text-accent/80">
               Yüksek kullanım + düşük memnuniyet — bakım veya müdahale önceliği
             </p>
           </div>
           <div className="flex items-center gap-3">
             <Badge tone="red">{maintenanceMachines.length} makine</Badge>
-            <span className="text-sm font-semibold text-red-700">Detay →</span>
+            <span className="text-sm font-semibold text-accent">Detay →</span>
           </div>
         </button>
       )}
@@ -224,7 +227,7 @@ export default function Matrix() {
       <Card className="p-6">
         <ResponsiveContainer width="100%" height={420}>
           <ScatterChart margin={{ top: 20, right: 30, bottom: 20, left: 10 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
             <XAxis
               type="number"
               dataKey="uses"
@@ -242,8 +245,8 @@ export default function Matrix() {
               label={{ value: "Memnuniyet (puan)", angle: -90, position: "insideLeft", fontSize: 12 }}
             />
             <ZAxis range={[120, 120]} />
-            <ReferenceLine x={USE_MID} stroke="#cbd5e1" strokeDasharray="4 4" />
-            <ReferenceLine y={RATE_MID} stroke="#cbd5e1" strokeDasharray="4 4" />
+            <ReferenceLine x={USE_MID} stroke={chart.grid} strokeDasharray="4 4" />
+            <ReferenceLine y={RATE_MID} stroke={chart.grid} strokeDasharray="4 4" />
             <Tooltip
               cursor={{ strokeDasharray: "3 3" }}
               formatter={(v, n) => [v, n]}

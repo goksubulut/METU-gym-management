@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Icon from "../Icon.jsx";
 import { Mail, Lock, User, Phone, Eye, EyeOff } from "lucide-react";
 
 // ─── Icon-wrapped input ───────────────────────────────────────────────────────
@@ -8,25 +9,25 @@ function IconInput({ label, id, icon: Icon, suffix, error, className = "", ...pr
   return (
     <div>
       {label && (
-        <label htmlFor={inputId} className="mb-1.5 block text-sm font-medium text-zinc-700">
+        <label htmlFor={inputId} className="mb-1.5 block text-sm font-medium text-content">
           {label}
         </label>
       )}
       <div className="relative">
         {Icon && (
-          <span aria-hidden="true" className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400">
+          <span aria-hidden="true" className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-faint">
             <Icon size={16} strokeWidth={2} />
           </span>
         )}
         <input
           id={inputId}
           className={[
-            "w-full rounded-xl border bg-zinc-50 py-3 text-sm text-zinc-900 outline-none",
-            "transition-[border-color,box-shadow] placeholder:text-zinc-400",
-            "focus:border-red-500 focus:ring-2 focus:ring-red-500/20",
+            "w-full rounded-xl border bg-surface-2 py-3 text-sm text-content outline-none",
+            "transition-[border-color,box-shadow] placeholder:text-faint",
+            "focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20",
             Icon ? "pl-10" : "pl-4",
             suffix ? "pr-12" : "pr-4",
-            error ? "border-red-400 bg-red-50/40" : "border-zinc-200",
+            error ? "border-primary-600 bg-primary-50/40" : "border-line",
             className,
           ]
             .filter(Boolean)
@@ -37,9 +38,12 @@ function IconInput({ label, id, icon: Icon, suffix, error, className = "", ...pr
           <span className="absolute right-3 top-1/2 -translate-y-1/2">{suffix}</span>
         )}
       </div>
+      {/* §1.1 — marka rengi kırmızı olduğu için hata SADECE renkle gösterilemez:
+          uyarı ikonu + açık metin birlikte. */}
       {error && (
-        <p role="alert" className="mt-1 text-xs text-red-600">
-          {error}
+        <p role="alert" className="mt-1.5 flex items-start gap-1.5 text-xs text-accent">
+          <Icon name="alert" size={14} strokeWidth={2.2} className="mt-px shrink-0" />
+          <span>{error}</span>
         </p>
       )}
     </div>
@@ -96,14 +100,14 @@ export default function GymAuthScreen({
      * Outer: fills the entire browser window.
      * On desktop this area is visible as a neutral background around the phone.
      */
-    <div className="flex min-h-screen bg-zinc-200">
+    <div className="flex min-h-screen bg-gray-100">
       {/*
        * Phone container: 430 px wide on desktop (matches the rest of the app),
        * full-width on mobile. Uses relative positioning so absolute children
        * are contained — avoiding the full-viewport bleed of position:fixed.
        */}
       <div
-        className="relative mx-auto w-full max-w-[430px] overflow-hidden bg-white shadow-2xl"
+        className="relative mx-auto w-full max-w-[430px] overflow-hidden bg-surface shadow-2xl"
         style={{ height: "100svh" }}
       >
         {/* ── ODTÜ SPOR logo — upper portion, never moves ── */}
@@ -123,7 +127,7 @@ export default function GymAuthScreen({
 
         {/* ── Authentication panel — slides up from below ── */}
         <motion.div
-          className="absolute bottom-0 left-0 right-0 flex flex-col overflow-hidden rounded-t-[2rem] bg-white"
+          className="absolute bottom-0 left-0 right-0 flex flex-col overflow-hidden rounded-t-[2rem] bg-surface"
           style={{
             height: "77%",
             boxShadow: "0 -6px 48px rgba(0,0,0,0.10), 0 -1px 0 rgba(0,0,0,0.06)",
@@ -133,7 +137,7 @@ export default function GymAuthScreen({
           transition={{ type: "spring", stiffness: 78, damping: 21, mass: 1 }}
         >
           {/* Drag handle */}
-          <div aria-hidden="true" className="mx-auto mt-3 h-1 w-10 flex-shrink-0 rounded-full bg-zinc-200" />
+          <div aria-hidden="true" className="mx-auto mt-3 h-1 w-10 flex-shrink-0 rounded-full bg-gray-100" />
 
           {/* Scrollable form area */}
           <div className="no-scrollbar flex-1 overflow-y-auto px-6 pb-10 pt-5">
@@ -147,12 +151,12 @@ export default function GymAuthScreen({
               >
                 {/* Heading */}
                 <h1
-                  className="text-[1.625rem] font-extrabold leading-tight text-zinc-900"
+                  className="text-[1.625rem] font-extrabold leading-tight text-content"
                   style={{ letterSpacing: "-0.025em" }}
                 >
                   {mode === "login" ? "Tekrar hoş geldin!" : "Aramıza katıl"}
                 </h1>
-                <p className="mt-1.5 text-sm leading-relaxed text-zinc-500">
+                <p className="mt-1.5 text-sm leading-relaxed text-muted">
                   {mode === "login"
                     ? "Randevu almak için giriş yapman gerekiyor."
                     : "Birkaç bilgiyle hesabını oluştur."}
@@ -216,7 +220,7 @@ export default function GymAuthScreen({
                         type="button"
                         onClick={() => setShowPassword((v) => !v)}
                         aria-label={showPassword ? "Şifreyi gizle" : "Şifreyi göster"}
-                        className="rounded p-0.5 text-zinc-400 transition-colors hover:text-zinc-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40"
+                        className="rounded p-0.5 text-faint transition-colors hover:text-content focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600/40"
                       >
                         {showPassword ? <EyeOff size={16} strokeWidth={2} /> : <Eye size={16} strokeWidth={2} />}
                       </button>
@@ -228,7 +232,7 @@ export default function GymAuthScreen({
                       <button
                         type="button"
                         onClick={onForgotPassword}
-                        className="rounded text-xs font-semibold text-red-700 transition-colors hover:text-red-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40"
+                        className="rounded text-xs font-semibold text-accent transition-colors hover:text-primary-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600/40"
                       >
                         Şifremi unuttum?
                       </button>
@@ -250,7 +254,7 @@ export default function GymAuthScreen({
                 </form>
 
                 {/* Mode switch */}
-                <p className="mt-6 text-center text-sm text-zinc-500">
+                <p className="mt-6 text-center text-sm text-muted">
                   {mode === "login" ? (
                     <>
                       Hesabın yok mu?{" "}

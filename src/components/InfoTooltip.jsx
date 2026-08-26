@@ -15,7 +15,7 @@ export default function InfoTooltip({ title, body, formula, content, className =
           </p>
         )}
         {formula && (
-          <p className="mt-2.5 rounded-lg border border-white/10 bg-white/5 px-2.5 py-2 text-center font-mono text-[11px] leading-snug text-emerald-300">
+          <p className="mt-2.5 rounded-lg border border-white/10 bg-white/5 px-2.5 py-2 text-center font-mono text-[11px] leading-snug text-available">
             {formula}
           </p>
         )}

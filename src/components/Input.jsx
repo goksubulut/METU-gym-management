@@ -1,4 +1,9 @@
 // Apple form stili: hafif dolu yüzey, hairline çerçeve, kırmızı focus ring.
+//
+// METU MOTION §1.1 — HATA STATE'İ: marka rengi zaten kırmızı olduğu için
+// validasyon hataları SADECE renkle gösterilemez. Her hata mesajı bir uyarı
+// ikonu VE açık metin taşır; ayrıca aria-invalid ile ekran okuyucuya bildirilir.
+import Icon from "./Icon.jsx";
 const FIELD =
   "w-full rounded-xl border border-line bg-surface-2 text-content outline-none transition-[border-color,box-shadow] duration-150 ease-smooth placeholder:text-faint focus:border-primary-500 focus:ring-2 focus:ring-primary-500/25";
 
@@ -11,10 +16,16 @@ export function Input({ label, hint, error, className = "", ...props }) {
         </span>
       )}
       <input
-        className={`h-12 px-4 text-sm ${FIELD} ${error ? "border-red-500 focus:border-red-500 focus:ring-red-500/25" : ""} ${className}`}
+        className={`h-12 px-4 text-sm ${FIELD} ${error ? "border-primary-600 focus:border-primary-600 focus:ring-primary-600/30" : ""} ${className}`}
+        aria-invalid={error ? "true" : undefined}
         {...props}
       />
-      {error && <span className="mt-1 block text-xs text-accent">{error}</span>}
+      {error && (
+        <span className="mt-1.5 flex items-start gap-1.5 text-xs text-accent">
+          <Icon name="alert" size={14} strokeWidth={2.2} className="mt-px shrink-0" />
+          <span>{error}</span>
+        </span>
+      )}
       {hint && !error && (
         <span className="mt-1 block text-xs text-muted">{hint}</span>
       )}

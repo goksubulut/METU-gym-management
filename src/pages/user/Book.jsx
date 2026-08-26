@@ -51,8 +51,8 @@ function occupancyPct(s) {
 }
 
 function occupancyStyle(pct) {
-  if (pct <= 50) return { bar: "bg-green-500", text: "text-green-600 dark:text-green-400" };
-  if (pct <= 80) return { bar: "bg-amber-400", text: "text-amber-500 dark:text-amber-400" };
+  if (pct <= 50) return { bar: "bg-available", text: "text-available dark:text-available" };
+  if (pct <= 80) return { bar: "bg-busy", text: "text-busy dark:text-busy" };
   return { bar: "bg-primary-600", text: "text-accent" };
 }
 
@@ -405,7 +405,7 @@ export default function Book() {
 
         {/* Error fallback (shown momentarily before redirect to step 3) */}
         {appointmentError && (
-          <p className="mt-6 text-center text-sm font-medium text-red-500">
+          <p className="mt-6 text-center text-sm font-medium text-accent">
             {appointmentError}
           </p>
         )}
