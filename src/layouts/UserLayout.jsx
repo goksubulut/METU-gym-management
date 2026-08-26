@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { NavLink, Outlet, useLocation, Link } from "react-router-dom";
+import { NavLink, useLocation, Link } from "react-router-dom";
 import Icon from "../components/Icon.jsx";
 import Logo from "../components/Logo.jsx";
 import { getAccessToken } from "../api/client.js";
@@ -8,6 +8,7 @@ import { loadMyNotifications, hasUnreadNotifications, NOTIFICATIONS_READ_EVENT }
 import { getAuthUser, initialsFromName } from "../utils/authUser.js";
 import { hasUnreadAnnouncements } from "../utils/announcementRead.js";
 import { useTheme } from "../utils/theme.js";
+import ScreenTransition from "../components/motion/ScreenTransition.jsx";
 
 const NAV = [
   { to: "/home", label: "Ana Sayfa", icon: "home" },
@@ -59,7 +60,7 @@ export default function UserLayout() {
     };
   }, [bare, pathname]);
 
-  if (bare) return <Outlet />;
+  if (bare) return <ScreenTransition />;
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -95,45 +96,37 @@ export default function UserLayout() {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto pb-28">
-          <Outlet />
+        <main className="flex-1 overflow-y-auto pb-24">
+          <ScreenTransition />
         </main>
 
-        {/* Yüzen hap navigasyon — translucent (Apple malzeme) */}
-        <nav className="glass fixed bottom-4 left-1/2 z-20 flex w-[calc(100%-2rem)] max-w-[398px] -translate-x-1/2 items-center justify-around rounded-3xl border border-hairline px-2 py-2 shadow-nav-float">
-          {NAV.map((n) =>
-            n.primary ? (
-              <NavLink key={n.to} to={n.to} className="relative -mt-8 flex flex-col items-center">
-                <span className="grid h-14 w-14 place-items-center rounded-full bg-primary-600 text-white shadow-cta ring-4 ring-bg transition-transform active:scale-[0.92]">
-                  <Icon name={n.icon} size={24} strokeWidth={2.2} />
-                </span>
-                <span className="mt-1 text-[10px] font-semibold text-accent">{n.label}</span>
-              </NavLink>
-            ) : (
-              <NavLink
-                key={n.to}
-                to={n.to}
-                className={({ isActive }) =>
-                  `flex flex-1 flex-col items-center gap-1 py-1 text-[10px] font-semibold transition-colors ${
-                    isActive ? "text-accent" : "text-muted hover:text-content"
-                  }`
-                }
-              >
-                {({ isActive }) => (
-                  <>
-                    <span
-                      className={`grid h-9 w-9 place-items-center rounded-xl transition-[background-color,transform] duration-200 active:scale-[0.88] ${
-                        isActive ? "bg-primary-50" : ""
-                      }`}
-                    >
-                      <Icon name={n.icon} size={20} strokeWidth={isActive ? 2.2 : 1.8} />
-                    </span>
-                    <span className={isActive ? "font-bold" : ""}>{n.label}</span>
-                  </>
-                )}
-              </NavLink>
-            ),
-          )}
+        {/* METU MOTION §2.6 — Bottom Tab Bar.
+            Yüzen translucent hap yerine düz bar: 56px + safe-area, üstte 1px
+            border, opak --color-bg zemin. Aktif ikon+etiket --color-brand-red,
+            pasif --color-text-secondary. Spec: "Ekstra efekt yok (sade
+            tutulmalı, sık kullanılan alan; gösterişli animasyon dikkat dağıtır)". */}
+        <nav
+          className="fixed bottom-0 left-1/2 z-20 flex w-full max-w-[430px] -translate-x-1/2 items-stretch border-t border-subtle bg-bg pb-[env(safe-area-inset-bottom)]"
+          aria-label="Ana gezinme"
+        >
+          {NAV.map((n) => (
+            <NavLink
+              key={n.to}
+              to={n.to}
+              className={({ isActive }) =>
+                `flex flex-1 flex-col items-center justify-center gap-1 py-2 text-tab transition-colors duration-150 ease-standard ${
+                  isActive ? "text-primary-600" : "text-muted opacity-60 hover:opacity-100"
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <Icon name={n.icon} size={24} strokeWidth={isActive ? 2.2 : 1.8} />
+                  <span className={isActive ? "font-semibold" : ""}>{n.label}</span>
+                </>
+              )}
+            </NavLink>
+          ))}
         </nav>
       </div>
     </div>

@@ -460,6 +460,66 @@ Tüm yüzeyler aynı token sistemini paylaşır; tema (koyu/açık) global.
 
 ---
 
+## Ekran Geçişi & Dashboard (METU MOTION §4.1, §3.5, §2.6, §2.7)
+
+### Dip-to-Black geçiş (§4.1)
+
+`components/motion/ScreenTransition.jsx` — tek ortak wrapper, `UserLayout`
+içinde hem `bare` hem kromlu akışı sarar. Ekrana özel geçiş kodu yazılmaz (§5.1).
+Giden ekran 150ms'te söner, zemin zaten saf siyah olduğu için ekran kendiliğinden
+kararır; gelen ekran 380ms'te açılır, ardından kendi `<Stagger>`'ı devreye girer.
+
+**İki tuzak, ikisi de kod yorumlarında açıklandı:**
+
+1. **`filter` wrapper'a verilmez.** §4.1 FAZ 2 hero görseline
+   `brightness(0.3 → 1)` uygular. Bunu ekranın tamamına veren bir wrapper CSS'te
+   `position: fixed` çocukları için yeni bir *containing block* yaratır — alt tab
+   bar viewport yerine wrapper'a göre konumlanır ve kayar. Bu yüzden brightness
+   rampası wrapper'da değil, hero'yu taşıyan ekranın kendisinde uygulanır
+   (`Splash.jsx`). Wrapper sadece `opacity` taşır; opacity containing block
+   yaratmaz, tab bar güvende.
+
+2. **`children` değil `useOutlet()`.** `<Outlet />` bir yer tutucudur, render
+   anında router context'inden o anki rotayı okur. AnimatePresence çıkış için eski
+   elemanı DOM'da tutar, ama o eleman yeniden render olduğunda context artık YENİ
+   rotayı gösterir — çıkış animasyonu eski ekranı değil yeni ekranı soldurur.
+   `useOutlet()` çözülmüş eleman ağacını kendi RouteContext'iyle döndürdüğü için
+   eski ekran eski kalır.
+
+### Reduced motion — Framer kapsam dışıydı
+
+`index.css`'teki `@media (prefers-reduced-motion: reduce)` kuralı yalnızca CSS
+animasyon ve transition'larını susturur. Framer Motion inline style ile JS'ten
+animasyon yaptığı için o kuralın **dışında** kalıyordu. `main.jsx`'te
+`<MotionConfig reducedMotion="user">` ile Framer işletim sistemi ayarına uyar:
+transform/layout hareketi kalkar, opacity crossfade korunur.
+
+### Bottom Tab Bar (§2.6)
+
+Yüzen translucent hap navigasyon **düz bara** çevrildi: 56px + safe-area, üstte
+1px `--border-subtle`, opak `--color-bg` zemin (şeffaf değil), aktif ikon+etiket
+`--color-brand-red`, pasif `--color-text-secondary` %60 opacity. Ortadaki
+yükseltilmiş "Randevu" butonu kaldırıldı — spec: *"Ekstra efekt yok; bu alan sık
+kullanıldığı için gösterişli animasyon dikkat dağıtır."* Beş hedefin hepsi
+korundu (spec 4 item gösteriyor ama sayı ürüne bağlı).
+
+### Görev Kartı (§2.7)
+
+`components/QuestCard.jsx` — uygulamadaki **tek altın aksanlı yüzey** ve bilinçli
+olarak marka kırmızısı kullanmaz; kırmızı yoğunluğu içinde bir nefes alma alanı.
+Keskin diagonal `clip-path` ile iki bölge (gradient/blur yok). Altın zeminde beyaz
+metin 1.9:1 kaldığı için metin `--gold-ink` (#1A1206) ile yazılır.
+
+### Dashboard (§3.5)
+
+Giriş sırası: başlık bloğu → arama çubuğu → "Günlük Görevler" + banner →
+yaklaşan randevu → "Öne Çıkan Antrenmanlar" + "Tümünü Gör" → ipucu kartı.
+Eski `animate-rise` / `stagger-N` CSS sınıfları `<Stagger>`/`<StaggerItem>` ile
+değiştirildi. Wave randevu kartındaki 11 adet Tailwind `indigo-*` sınıfı
+`--glow` token'ına taşındı.
+
+---
+
 ## Token Disiplini (Part 3.5 denetimi)
 
 Token'lar CSS değişkeni olduğu için `index.css` değiştiğinde tüm ekranlara

@@ -5,6 +5,8 @@ import Card from "../../components/Card.jsx";
 import Badge from "../../components/Badge.jsx";
 import Icon from "../../components/Icon.jsx";
 import Skeleton from "../../components/Skeleton.jsx";
+import QuestCard from "../../components/QuestCard.jsx";
+import { Stagger, StaggerItem } from "../../components/motion/Stagger.jsx";
 import { appointments as mockAppointments } from "../../mock/appointments.js";
 import { machineById, MUSCLE_GROUPS } from "../../mock/machines.js";
 import { getAccessToken } from "../../api/client.js";
@@ -127,10 +129,10 @@ function WaveAppointmentCard({ active, nav }) {
               }}
             />
             <div className="absolute inset-0 flex flex-col justify-between p-4">
-              <span className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-indigo-300">
+              <span className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-glow">
                 <span className="relative flex h-2 w-2 shrink-0">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-60" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-indigo-400" />
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-glow opacity-60" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-glow" />
                 </span>
                 Yaklaşan Randevu
               </span>
@@ -155,7 +157,7 @@ function WaveAppointmentCard({ active, nav }) {
         {/* Bottom content */}
         <div className="flex flex-col gap-3 p-4">
           <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-3 py-1 text-xs font-semibold text-indigo-300">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-glow/30 bg-glow/10 px-3 py-1 text-xs font-semibold text-glow">
               <Icon name="dumbbell" size={12} />
               METU Spor Merkezi
             </span>
@@ -185,7 +187,7 @@ function WaveAppointmentCard({ active, nav }) {
                     key={m}
                     type="button"
                     onClick={() => nav(`/machines/${m}`)}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold text-white/70 transition-colors hover:border-indigo-400/40 hover:text-white"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold text-white/70 transition-colors hover:border-glow/40 hover:text-white"
                   >
                     <Icon name="dumbbell" size={12} />
                     {machineById(m)?.name ?? m}
@@ -200,7 +202,7 @@ function WaveAppointmentCard({ active, nav }) {
             <button
               type="button"
               onClick={() => nav("/appointments")}
-              className="flex-1 rounded-xl border border-indigo-500/30 bg-indigo-500/10 py-2.5 text-sm font-semibold text-indigo-300 transition-colors hover:bg-indigo-500/20 active:scale-[0.97]"
+              className="flex-1 rounded-xl border border-glow/30 bg-glow/10 py-2.5 text-sm font-semibold text-glow transition-colors hover:bg-glow/20 active:scale-[0.97]"
             >
               Yönet →
             </button>
@@ -267,93 +269,130 @@ export default function Dashboard() {
     load();
   }, [load, location.pathname]);
 
+  const firstName = profile.name.split(" ")[0];
+
   return (
-    <div className="px-4 py-5">
-      <div className="animate-rise mb-6 flex items-end justify-between">
+    // §3.5 — giriş sırası: başlık bloğu → arama → "Günlük Görevler" → banner →
+    // "Öne Çıkan Antrenmanlar" → kart listesi. Tab bar stagger'a dahil değil.
+    <Stagger className="px-screen py-5">
+      {/* 1 — Başlık bloğu + puan rozeti */}
+      <StaggerItem className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-[11px] font-semibold text-gray-400">Merhaba,</p>
-          <h1 className="font-display text-3xl font-bold tracking-tight text-gray-900 leading-tight">
-            {profile.name.split(" ")[0]}
-          </h1>
+          <h1 className="text-h1 font-extrabold text-content">Kampüste Güçlen</h1>
+          <p className="mt-1 text-caption text-muted">
+            Bugünün antrenmanı seni bekliyor{firstName ? `, ${firstName}` : ""}.
+          </p>
         </div>
         <button
           type="button"
-          onClick={() => nav("/scan")}
-          className="flex items-center gap-1.5 rounded-xl border border-hairline bg-surface px-3.5 py-2 text-sm font-semibold text-content transition-transform active:scale-95"
+          onClick={() => nav("/profile")}
+          aria-label="Puanın"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-gold/30 bg-gold/10 px-3 py-1.5 text-caption font-bold text-gold transition-transform duration-instant active:scale-95"
         >
-          <Icon name="qr" size={15} className="text-accent" />
-          QR Tara
+          <Icon name="medal" size={14} strokeWidth={2} />
+          <span className="tabular-nums">200</span>
         </button>
-      </div>
+      </StaggerItem>
 
-      {loading ? (
-        <div className="card-border animate-rise flex flex-col overflow-hidden rounded-2xl">
-          <div className="p-4">
-            <div className="gradient-border inner-glow relative h-40 w-full overflow-hidden rounded-xl px-4 py-4">
-              <Skeleton className="h-2.5 w-28 bg-white/10" />
-              <div className="absolute bottom-4 left-4 flex items-baseline gap-2">
-                <Skeleton className="h-9 w-20 bg-white/10" />
-                <Skeleton className="h-4 w-24 bg-white/10" />
+      {/* 2 — Arama çubuğu */}
+      <StaggerItem className="mt-4">
+        <button
+          type="button"
+          onClick={() => nav("/exercises")}
+          className="flex h-11 w-full items-center gap-2.5 rounded-full bg-surface px-4 text-left text-body text-muted transition-colors duration-instant hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-glow/60"
+        >
+          <Icon name="search" size={18} />
+          Antrenman ara
+        </button>
+      </StaggerItem>
+
+      {/* 3 + 4 — Günlük Görevler + banner kartı */}
+      <StaggerItem className="mt-6">
+        <h2 className="mb-2 text-body font-bold text-content">Günlük Görevler</h2>
+        <QuestCard
+          title="Son antrenmanın gibi devam et"
+          subtitle="20 squat seni bir adım öne taşır"
+          actionLabel="Squat Yap"
+          onAction={() => nav("/exercises")}
+        />
+      </StaggerItem>
+
+      {/* 5 — Yaklaşan randevu */}
+      <StaggerItem className="mt-6">
+        <h2 className="mb-2 text-body font-bold text-content">Yaklaşan Randevun</h2>
+        {loading ? (
+          <div className="card-border flex flex-col overflow-hidden rounded-card">
+            <div className="p-4">
+              <div className="gradient-border inner-glow relative h-40 w-full overflow-hidden rounded-xl px-4 py-4">
+                <Skeleton className="h-2.5 w-28 bg-white/10" />
+                <div className="absolute bottom-4 left-4 flex items-baseline gap-2">
+                  <Skeleton className="h-9 w-20 bg-white/10" />
+                  <Skeleton className="h-4 w-24 bg-white/10" />
+                </div>
+              </div>
+            </div>
+            <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+            <div className="flex flex-col gap-3 p-4">
+              <Skeleton className="h-6 w-36 rounded-full bg-white/10" />
+              <div className="flex gap-1.5">
+                <Skeleton className="h-5 w-14 rounded-full bg-white/10" />
+                <Skeleton className="h-5 w-20 rounded-full bg-white/10" />
               </div>
             </div>
           </div>
-          <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-          <div className="flex flex-col gap-3 p-4">
-            <Skeleton className="h-6 w-36 rounded-full bg-white/10" />
-            <div className="flex gap-1.5">
-              <Skeleton className="h-5 w-14 rounded-full bg-white/10" />
-              <Skeleton className="h-5 w-20 rounded-full bg-white/10" />
-            </div>
-            <div className="flex gap-2 pt-1">
-              <Skeleton className="h-10 flex-1 rounded-xl bg-white/10" />
-              <Skeleton className="h-10 flex-1 rounded-xl bg-white/10" />
-            </div>
-          </div>
-        </div>
-      ) : active ? (
-        <div className="animate-rise">
+        ) : active ? (
           <WaveAppointmentCard active={active} nav={nav} />
-        </div>
-      ) : (
-        <Card soft className="animate-rise p-5 text-center">
-          <p className="text-sm text-gray-500">Yaklaşan randevun yok.</p>
-          <Button size="sm" className="mt-3" onClick={() => nav("/book")}>
-            Randevu Al
-          </Button>
-        </Card>
-      )}
-
-      <div className="mt-5 grid grid-cols-2 gap-3">
-        {QUICK_ACTIONS.map((a, i) => (
-          <Card key={a.to} onClick={() => nav(a.to)} className={`animate-rise stagger-${i + 1} p-4`}>
-            <div
-              className={`mb-3 grid h-11 w-11 place-items-center rounded-xl ${a.iconBg} ${a.iconFg}`}
-            >
-              <Icon name={a.icon} size={20} />
-            </div>
-            <p className="text-sm font-bold text-gray-900">{a.title}</p>
-            <p className="text-xs text-gray-500">{a.desc}</p>
+        ) : (
+          <Card soft className="p-5 text-center">
+            <p className="text-caption text-muted">Yaklaşan randevun yok.</p>
+            <Button size="sm" className="mt-3" onClick={() => nav("/book")}>
+              Randevu Al
+            </Button>
           </Card>
-        ))}
-      </div>
+        )}
+      </StaggerItem>
 
-      <div className="animate-rise-late mt-6">
+      {/* 6 — Öne Çıkan Antrenmanlar + Tümünü Gör */}
+      <StaggerItem className="mt-6">
         <div className="mb-2 flex items-center justify-between">
-          <h2 className="text-base font-bold text-gray-900">İpuçları</h2>
-          <Link to="/exercises" className="text-xs font-semibold text-accent">
-            Tümü
+          <h2 className="text-body font-bold text-content">Öne Çıkan Antrenmanlar</h2>
+          <Link to="/exercises" className="text-caption font-semibold text-glow">
+            Tümünü Gör
           </Link>
         </div>
+        <div className="grid grid-cols-2 gap-3">
+          {QUICK_ACTIONS.map((a) => (
+            <Card key={a.to} onClick={() => nav(a.to)} className="p-4">
+              <div className={`mb-3 grid h-11 w-11 place-items-center rounded-xl ${a.iconBg} ${a.iconFg}`}>
+                <Icon name={a.icon} size={20} />
+              </div>
+              <p className="text-body font-bold text-content">{a.title}</p>
+              <p className="text-caption text-muted">{a.desc}</p>
+            </Card>
+          ))}
+        </div>
+      </StaggerItem>
+
+      {/* 7 — QR kısayolu + ipucu */}
+      <StaggerItem className="mt-6">
         <Card className="flex items-center gap-3 p-4">
           <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary-50 text-accent">
             <Icon name="flame" size={19} />
           </div>
-          <p className="text-sm text-gray-600">
-            Antrenmandan önce 5-10 dk ısınmayı unutma. Kas grubuna özel ısınma listeni
-            egzersizler ekranından görebilirsin.
+          <p className="text-caption text-muted">
+            Antrenmandan önce 5-10 dk ısınmayı unutma. Makinenin QR'ını okutarak
+            kullanım videosuna anında ulaşabilirsin.
           </p>
+          <button
+            type="button"
+            onClick={() => nav("/scan")}
+            aria-label="QR tara"
+            className="ml-auto grid h-9 w-9 shrink-0 place-items-center rounded-full border border-subtle text-accent transition-transform active:scale-95"
+          >
+            <Icon name="qr" size={17} />
+          </button>
         </Card>
-      </div>
-    </div>
+      </StaggerItem>
+    </Stagger>
   );
 }
