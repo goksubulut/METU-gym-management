@@ -5,13 +5,16 @@
 // (object-fit: cover) render edilir ki noktalar fotoğraftan kaymasın (§2.9.2).
 //
 // İki mod:
-//   mode="svg"   (varsayılan) — iskelet kod içinde SVG olarak çizilir. Spec §6
-//                asset tablosu bunu açıkça öneriyor: "SVG (kod içinde çizilebilir,
-//                ayrı bir görsel dosyaya gerek yok)". Koordinatlar 0-100 normalize
-//                uzayda, yani fotoğrafla birlikte ölçeklenir; çözünürlükten bağımsız.
-//   mode="image" — hazır şeffaf PNG overlay katmanı kullanılır. Base ile BİREBİR
-//                aynı piksel boyutunda ve aynı çerçeveleme ile hazırlanmış bir
-//                çift gerektirir.
+//   mode="image" (varsayılan) — pose-overlay.png şeffaf katmanı. Base ile birebir
+//                aynı piksel boyutunda (960x1200) ve aynı çerçevelemede; iskelet
+//                koşucunun anatomisine elle hizalanmış. Nabız SADECE bu katmana
+//                uygulanır, fotoğraf sabit kalır (§2.9 + §4.8).
+//   mode="svg"   — iskelet kod içinde SVG olarak çizilir (spec §6: "SVG — kod
+//                içinde çizilebilir"). Yedek/karşılaştırma modu olarak duruyor.
+//
+// ÖNEMLİ: overlay ile base ASLA tek bir düz görselde birleştirilmemeli. Birleşik
+// bir görselde drop-shadow nabzı fotoğrafın tamamını (koşucunun gövdesini de)
+// parlatır — §4.8'in "yalnızca nokta/çizgi katmanı parlar" kuralı kırılır.
 //
 // Renk (§2.9): Opsiyon A = tek renk (glow kırmızı), Opsiyon B = noktalar altın +
 // çizgiler beyaz. `colorMode` prop'u ile seçilir.
@@ -62,7 +65,7 @@ function usePageVisible() {
 }
 
 export default function PoseOverlay({
-  mode = "svg",                       // "svg" | "image"
+  mode = "image",                     // "image" | "svg"
   colorMode = "A",                    // "A" tek renk | "B" altın nokta + beyaz çizgi
   base = "/images/pose-base.jpg",
   overlay = "/images/pose-overlay.png",

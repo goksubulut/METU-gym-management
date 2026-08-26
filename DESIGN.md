@@ -381,16 +381,20 @@ kullanıcı kaldığı yerden devam eder. Onboarding ekranlarında uygulama krom
 `components/PoseOverlay.jsx` — desatüre koşucu fotoğrafı + üstünde eklem
 nokta-çizgi grafiği. İki katman da `object-fit: cover`, aynı hizada.
 
-**Neden iskelet PNG değil, kod-çizimli SVG:** sağlanan overlay PNG'si
-1920×1080 opak beyaz zeminli, **önden bakan** bir çöp adamdı; fotoğraf ise
-960×1200 ve koşucu **profilden**. Hiçbir ölçek/konum bu ikisini hizalamıyor.
-Spec §6 asset tablosu bu durumu zaten öngörüyor: *"Pose-overlay nokta/çizgi
-grafiği — SVG (kod içinde çizilebilir, ayrı bir görsel dosyaya gerek yok)."*
-İskelet bu yüzden 12 eklemli bir SVG olarak, koşucunun gerçek anatomisine
-hizalanmış koordinatlarla çizilir (`RUNNER_JOINTS`).
+**Katmanlar ayrı tutulur — bu bir tercih değil, zorunluluk.** Nabız yalnızca
+nokta/çizgi katmanına uygulanır; fotoğraf sabit ve animasyonsuzdur (§2.9). İki
+katman tek bir düz görselde birleştirilirse `drop-shadow` nabzı fotoğrafın
+tamamını, yani koşucunun gövdesini de parlatır ve §4.8 kırılır.
 
-`mode="image"` prop'u hâlâ duruyor: base ile **birebir aynı piksel boyutunda ve
-aynı çerçevelemede** hazırlanmış şeffaf bir PNG çifti gelirse o mod kullanılır.
+`pose-overlay.png` (960×1200, şeffaf) base ile birebir aynı çerçevede ve
+iskelet koşucunun anatomisine hizalanmış. Kaynak olarak elle birleştirilmiş bir
+görsel geldiğinde katmanlar geri ayrıştırılabilir: fotoğraf desatüre olduğu için
+(R≈G≈B) `R − max(G,B)` "kırmızılık" değeri iskelette yüksek, fotoğrafta ~0 →
+temiz bir alfa maskesi verir. Sonuç `#FF3B4E` (`--color-glow-red`) ile boyanır.
+
+`mode="svg"` yedek olarak duruyor: iskelet 12 eklemli bir SVG olarak koda
+çizilir (spec §6: *"SVG — kod içinde çizilebilir, ayrı bir görsel dosyaya gerek
+yok"*). Overlay asseti olmadan da ekran çalışsın diye korundu.
 
 **viewBox tuzağı:** SVG `viewBox`'ı fotoğrafın en-boy oranıyla birebir aynı
 olmalı (`baseWidth`/`baseHeight` prop'ları). Kare bir viewBox kullanılırsa

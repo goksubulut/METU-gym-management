@@ -36,7 +36,7 @@ export default function MotionGallery() {
   const [step, setStep] = useState(1);
   const [revealKey, setRevealKey] = useState(0);
   const [m, setM] = useState(5), [d, setD] = useState(14), [y, setY] = useState(2003);
-  const [poseMode, setPoseMode] = useState("svg");
+  const [poseMode, setPoseMode] = useState("image");
   const [poseColor, setPoseColor] = useState("A");
   const [breathe, setBreathe] = useState(false);
 
@@ -184,7 +184,7 @@ export default function MotionGallery() {
               />
               <div className="mt-3 grid grid-cols-2 gap-2">
                 <SegmentedControl
-                  options={[{ value: "svg", label: "SVG (kod)" }, { value: "image", label: "PNG" }]}
+                  options={[{ value: "image", label: "PNG katman" }, { value: "svg", label: "SVG (yedek)" }]}
                   value={poseMode}
                   onChange={setPoseMode}
                   className="w-full"
