@@ -166,10 +166,10 @@ export default function AppointmentHeatmap() {
     try {
       const apiRows = await fetchMyAppointments();
       const mapped = apiRows.map(mapAppointmentFromApi);
-      const withFallback = mapped.length >= 5 ? mapped : [...mapped, ...generateDemoHistory()];
-      setAppointments(withFallback);
+      // Giriş yapmış gerçek hesap: yalnızca kendi geçmişi (demo history enjekte edilmez).
+      setAppointments(mapped);
     } catch {
-      setAppointments([...mockSeed, ...generateDemoHistory()]);
+      setAppointments([]);
     } finally {
       setLoading(false);
     }

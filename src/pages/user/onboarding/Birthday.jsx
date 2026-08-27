@@ -1,11 +1,12 @@
 // METU MOTION §3.3 — "Doğum Tarihiniz" ekranı (onboarding adım 3/4)
 //
-// Buton HER ZAMAN aktif (§3.3): picker zaten bir varsayılan değerle geliyor,
-// seçim zorunlu değil, bekletmeye gerek yok.
+// Eski form yapısı: başlık + açıklama + çark seçici + buton. Arka planda
+// kısılmış spatial aura durur; çark okunurluğu için hafif cam bir zemin taşır.
+// Buton HER ZAMAN aktif (§3.3): picker varsayılan bir değerle gelir.
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import PoseOverlay from "../../../components/PoseOverlay.jsx";
+import AmbientBackdrop from "../../../components/AmbientBackdrop.jsx";
 import ProgressDots from "../../../components/ProgressDots.jsx";
 import WheelPicker from "../../../components/WheelPicker.jsx";
 import PillButton from "../../../components/PillButton.jsx";
@@ -34,37 +35,40 @@ export default function Birthday() {
   };
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-[430px] flex-col bg-bg">
-      <div className="px-screen pb-4 pt-4">
+    <div className="relative mx-auto flex min-h-screen max-w-[430px] flex-col overflow-hidden bg-bg">
+      <AmbientBackdrop />
+
+      <div className="relative z-10 flex min-h-screen flex-col px-screen pb-8 pt-4">
         <ProgressDots total={ONBOARDING_TOTAL} current={2} />
+
+        <Stagger className="mt-10 flex flex-1 flex-col" delay={0.15}>
+          <StaggerItem>
+            <h1 className="text-h1 text-content">Doğum Tarihiniz</h1>
+          </StaggerItem>
+          <StaggerItem>
+            <p className="mt-2 text-caption text-white/70">
+              METU MOTION'ı <span className="text-glow">size özel</span> hale getirmek için.
+            </p>
+          </StaggerItem>
+
+          <StaggerItem className="mt-6">
+            <div className="glass-tile rounded-[22px] px-3 py-2">
+              <WheelPicker
+                bandClassName="bg-white/12 ring-1 ring-inset ring-white/15"
+                columns={[
+                  { key: "m", label: "Ay",  value: month, onChange: setMonth, items: MONTHS.map((l, i) => ({ value: i + 1, label: l })) },
+                  { key: "d", label: "Gün", value: safeDay, onChange: setDay, items: range(1, maxDay) },
+                  { key: "y", label: "Yıl", value: year, onChange: setYear, items: range(1940, THIS_YEAR - 12) },
+                ]}
+              />
+            </div>
+          </StaggerItem>
+
+          <div className="mt-auto pt-8">
+            <PillButton onClick={handleNext} revealDelay={0.3}>Devam Et</PillButton>
+          </div>
+        </Stagger>
       </div>
-
-      <PoseOverlay className="h-[35vh] w-full shrink-0" objectPosition="top" />
-
-      <Stagger className="flex flex-1 flex-col px-screen pb-8 pt-6" delay={0.15}>
-        <StaggerItem>
-          <h1 className="text-h1 text-content">Doğum Tarihiniz</h1>
-        </StaggerItem>
-        <StaggerItem>
-          <p className="mt-2 text-caption text-muted">
-            METU MOTION'ı <span className="text-glow">size özel</span> hale getirmek için.
-          </p>
-        </StaggerItem>
-
-        <StaggerItem className="mt-6">
-          <WheelPicker
-            columns={[
-              { key: "m", label: "Ay",  value: month, onChange: setMonth, items: MONTHS.map((l, i) => ({ value: i + 1, label: l })) },
-              { key: "d", label: "Gün", value: safeDay, onChange: setDay, items: range(1, maxDay) },
-              { key: "y", label: "Yıl", value: year, onChange: setYear, items: range(1940, THIS_YEAR - 12) },
-            ]}
-          />
-        </StaggerItem>
-
-        <div className="mt-auto pt-8">
-          <PillButton onClick={handleNext} revealDelay={0.35}>Devam Et</PillButton>
-        </div>
-      </Stagger>
     </div>
   );
 }

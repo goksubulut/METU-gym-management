@@ -48,7 +48,7 @@ export function BottomNavBar({
       role="navigation"
       aria-label={ariaLabel}
       className={cn(
-        "flex h-[52px] min-w-[320px] max-w-[95vw] items-center space-x-1 rounded-full border border-subtle bg-surface p-2 shadow-nav-float",
+        "flex h-[56px] min-w-[320px] max-w-[95vw] items-center space-x-1 rounded-full border border-white/12 bg-[rgb(var(--surface)/0.55)] p-2 shadow-nav-float [backdrop-filter:blur(24px)_saturate(170%)] [-webkit-backdrop-filter:blur(24px)_saturate(170%)]",
         stickyBottom && "fixed inset-x-0 bottom-4 z-20 mx-auto w-fit",
         className,
       )}

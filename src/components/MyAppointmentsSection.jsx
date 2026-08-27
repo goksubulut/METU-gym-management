@@ -53,9 +53,10 @@ export default function MyAppointmentsSection({ className = "" }) {
     try {
       const apiRows = await fetchMyAppointments();
       const mapped = apiRows.map(mapAppointmentFromApi);
-      setList(mapped.length ? mapped : mockSeed);
+      // Giriş yapmış gerçek hesap: yalnızca kendi randevuları (mock fallback yok).
+      setList(mapped);
     } catch {
-      setList(mockSeed);
+      setList([]);
     } finally {
       setLoading(false);
     }

@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import Button from "../../components/Button.jsx";
 import Card from "../../components/Card.jsx";
-import Badge from "../../components/Badge.jsx";
 import Icon from "../../components/Icon.jsx";
 import Skeleton from "../../components/Skeleton.jsx";
 import { Stagger, StaggerItem } from "../../components/motion/Stagger.jsx";
@@ -15,209 +14,207 @@ import { getAuthUser } from "../../utils/authUser.js";
 
 const labelOf = (id) => MUSCLE_GROUPS.find((m) => m.id === id)?.label || id;
 
-// Navbar'da zaten olan (Makineler, Kas Grubu, Randevu) burada gösterilmez.
+// Hızlı erişim — bento içinde farklı boyutlarda dizilir (tekdüze grid yok).
+// size: "feature" büyük/uzun tile · "compact" küçük · "wide" tam genişlik.
 const QUICK_ACTIONS = [
-  { to: "/appointments", icon: "calendar", title: "Randevularım", desc: "Geçmiş & gelecek", iconBg: "bg-ink-900", iconFg: "text-white" },
-  { to: "/exercises", icon: "flame", title: "Egzersizler", desc: "Serbest & ısınma", iconBg: "bg-primary-600", iconFg: "text-white" },
-  { to: "/programs", icon: "clipboard", title: "Programlarım", desc: "Oluştur & yönet", iconBg: "bg-primary-50", iconFg: "text-accent" },
-  { to: "/feedback", icon: "message", title: "Geri Bildirim", desc: "Arıza & öneri", iconBg: "bg-gray-100", iconFg: "text-gray-500" },
+  { to: "/exercises", icon: "flame", title: "Egzersizler", desc: "Serbest & ısınma", size: "feature", accent: true },
+  { to: "/appointments", icon: "calendar", title: "Randevularım", desc: "Geçmiş & gelecek", size: "compact" },
+  { to: "/programs", icon: "clipboard", title: "Programlarım", desc: "Oluştur & yönet", size: "compact" },
+  { to: "/feedback", icon: "message", title: "Geri Bildirim", desc: "Arıza & öneri", size: "wide" },
 ];
 
-function WaveAppointmentCard({ active, nav }) {
-  const canvasRef = useRef(null);
+// ── Hero: yaklaşan randevu — en büyük cam konteyner, en güçlü hiyerarşi ──
+function AppointmentHero({ active, nav }) {
+  const d = new Date(`${active.date}T12:00:00`);
+  const dayNum = d.toLocaleDateString("tr-TR", { day: "numeric" });
+  const monthShort = d.toLocaleDateString("tr-TR", { month: "short" });
+  const weekday = d.toLocaleDateString("tr-TR", { weekday: "long" });
+  const muscleCount = active.muscleGroups?.length ?? 0;
+  const machineCount = active.machines?.length ?? 0;
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    let time = 0;
-    let rafId;
-
-    // Canvas 2D context CSS değişkeni okuyamaz; token'ları computed style'dan
-    // bir kez okuyup sayıya çeviriyoruz. Böylece dalga rengi tema/marka
-    // token'ı değişince otomatik takip eder, hardcode hex kalmaz.
-    const readToken = (name, fallback) => {
-      const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-      const p = v.split(/[\s,]+/).map(Number).filter((n) => !Number.isNaN(n));
-      return p.length === 3 ? p : fallback;
-    };
-    const brand = readToken("--primary-600", [227, 24, 55]);
-    const glow = readToken("--glow", [255, 59, 78]);
-    const ink = readToken("--ink-950", [10, 10, 12]);
-    const inkColor = `rgb(${ink[0]},${ink[1]},${ink[2]})`;
-
-    const waveData = Array.from({ length: 8 }).map(() => ({
-      value: Math.random() * 0.5 + 0.1,
-      targetValue: Math.random() * 0.5 + 0.1,
-      speed: Math.random() * 0.02 + 0.01,
-    }));
-
-    function resize() {
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-    }
-
-    function updateWaveData() {
-      waveData.forEach((data) => {
-        if (Math.random() < 0.01) data.targetValue = Math.random() * 0.7 + 0.1;
-        data.value += (data.targetValue - data.value) * data.speed;
-      });
-    }
-
-    function draw() {
-      ctx.fillStyle = inkColor;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      waveData.forEach((data, i) => {
-        const freq = data.value * 7;
-        ctx.beginPath();
-        for (let x = 0; x < canvas.width; x++) {
-          const nx = (x / canvas.width) * 2 - 1;
-          const px = nx + i * 0.04 + freq * 0.03;
-          const py = Math.sin(px * 10 + time) * Math.cos(px * 2) * freq * 0.1 * ((i + 1) / 8);
-          const y = (py + 1) * (canvas.height / 2);
-          x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-        }
-        const intensity = Math.min(1, freq * 0.3);
-        ctx.lineWidth = 1 + i * 0.3;
-        // Marka kırmızısı → glow kırmızısı arası, yoğunluğa göre (§1.1 tek aksan)
-        const wr = brand[0] + (glow[0] - brand[0]) * intensity;
-        const wg = brand[1] + (glow[1] - brand[1]) * intensity;
-        const wb = brand[2] + (glow[2] - brand[2]) * intensity;
-        ctx.strokeStyle = `rgba(${wr},${wg},${wb},0.6)`;
-        ctx.shadowColor = `rgba(${wr},${wg},${wb},0.5)`;
-        ctx.shadowBlur = 5;
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-      });
-    }
-
-    function animate() {
-      time += 0.02;
-      updateWaveData();
-      draw();
-      rafId = requestAnimationFrame(animate);
-    }
-
-    const ro = new ResizeObserver(resize);
-    ro.observe(canvas);
-    resize();
-    animate();
-
-    return () => {
-      cancelAnimationFrame(rafId);
-      ro.disconnect();
-    };
-  }, []);
+  // Randevuya kalan gün — referanstaki üçlü istatistiğin bir ayağı.
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const diffDays = Math.round((new Date(`${active.date}T00:00:00`) - today) / 86400000);
+  const stats = [
+    diffDays <= 0
+      ? { icon: "clock", value: "Bugün", unit: "randevu günü" }
+      : { icon: "calendar", value: String(diffDays), unit: "gün kala" },
+    { icon: "body", value: muscleCount, unit: "kas grubu" },
+    { icon: "dumbbell", value: machineCount, unit: "makine" },
+  ];
 
   return (
     <div className="relative">
-      {/* Wave canvas — sits behind the glass card */}
-      <canvas ref={canvasRef} className="absolute inset-0 h-full w-full rounded-2xl" />
+      {/* Kart dışına taşan yumuşak kırmızı hale */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-[-20%] left-1/2 -z-0 h-32 w-[82%] -translate-x-1/2 rounded-full blur-3xl"
+        style={{ background: "radial-gradient(circle, rgb(var(--glow) / 0.42), transparent 66%)" }}
+      />
 
-      {/* Glass card with gradient border */}
-      <div className="card-border animate-float relative z-10 flex flex-col overflow-hidden rounded-2xl">
+      {/* Yatay orta-boy kart: koyu üst, alttan yükselen kırmızı glow */}
+      <div className="relative z-10 overflow-hidden rounded-[26px] ring-1 ring-white/10">
+        <div
+          aria-hidden="true"
+          className="absolute inset-0"
+          style={{ background: "linear-gradient(180deg, #151013 0%, #180a0e 40%, #2c0a12 100%)" }}
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(130% 105% at 50% 138%, rgb(var(--glow) / 0.95), rgb(var(--primary-600) / 0.66) 22%, rgb(var(--primary-800) / 0.28) 44%, transparent 62%)",
+          }}
+        />
 
-        {/* Inner preview area */}
-        <div className="p-4">
-          <div className="gradient-border inner-glow relative h-40 w-full overflow-hidden rounded-xl">
-            {/* Animated grid overlay */}
+        <div className="relative z-10 p-4">
+          {/* Üst satır: ikon + başlık | tarih */}
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center gap-2.5">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-black/45 text-white ring-1 ring-white/15">
+                <Icon name="dumbbell" size={20} />
+              </span>
+              <div className="leading-tight">
+                <p className="text-body font-bold text-white">Yaklaşan Randevu</p>
+                <p className="text-caption text-white/60">METU Spor Merkezi</p>
+              </div>
+            </div>
+            <div className="text-right leading-tight">
+              <p className="text-body font-bold tabular-nums text-white">
+                {dayNum} {monthShort}
+              </p>
+              <p className="text-caption capitalize text-white/55">{weekday}</p>
+            </div>
+          </div>
+
+          {/* İstatistik satırı — ikon + rakam + birim */}
+          <div className="mt-3 flex items-end gap-6">
+            {stats.map((s) => (
+              <div key={s.unit}>
+                <div className="flex items-center gap-1.5">
+                  <Icon name={s.icon} size={15} className="text-glow" />
+                  <span className="font-display text-2xl font-bold leading-none tabular-nums text-white">
+                    {s.value}
+                  </span>
+                </div>
+                <p className="mt-1 text-[11px] text-white/55">{s.unit}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Parlak kırmızı aksan bandı (referanstaki çubuk) */}
+          <div className="mt-3 h-2.5 w-[78%] overflow-hidden rounded-full">
             <div
-              className="absolute inset-0 opacity-10"
+              className="h-full w-full"
               style={{
-                backgroundImage:
-                  "linear-gradient(rgb(var(--primary-600) / 0.45) 1px, transparent 1px), linear-gradient(90deg, rgb(var(--primary-600) / 0.45) 1px, transparent 1px)",
-                backgroundSize: "24px 24px",
+                background:
+                  "repeating-linear-gradient(115deg, rgb(var(--glow)) 0 10px, rgb(var(--primary-600)) 10px 20px)",
+                boxShadow: "0 0 16px rgb(var(--glow) / 0.7)",
               }}
             />
-            <div className="absolute inset-0 flex flex-col justify-between p-4">
-              <span className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-glow">
-                <span className="relative flex h-2 w-2 shrink-0">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-glow opacity-60" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-glow" />
-                </span>
-                Yaklaşan Randevu
+          </div>
+
+          {/* Alt satır: büyük saat | çipler + aksiyonlar */}
+          <div className="mt-3 flex items-end justify-between gap-3">
+            <div>
+              <span className="font-display text-[40px] font-bold leading-[0.9] tracking-tight tabular-nums text-white">
+                {active.time}
               </span>
-              <div className="flex items-baseline gap-2">
-                <span className="tabular-nums font-mono text-4xl font-bold tracking-tight text-white">
-                  {active.time}
-                </span>
-                <span className="text-sm text-white/50">
-                  {new Date(`${active.date}T12:00:00`).toLocaleDateString("tr-TR", {
-                    day: "numeric",
-                    month: "long",
-                  })}
-                </span>
-              </div>
+              <p className="mt-0.5 text-caption text-white/60">randevu saati</p>
             </div>
-          </div>
-        </div>
-
-        {/* Separator */}
-        <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-
-        {/* Bottom content */}
-        <div className="flex flex-col gap-3 p-4">
-          <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-glow/30 bg-glow/10 px-3 py-1 text-xs font-semibold text-glow">
-              <Icon name="dumbbell" size={12} />
-              METU Spor Merkezi
-            </span>
-          </div>
-
-          {active.muscleGroups?.length > 0 && (
-            <div>
-              <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-white/40">
-                Kas Grupları
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                {active.muscleGroups.map((g) => (
-                  <Badge key={g} tone="primary">{labelOf(g)}</Badge>
-                ))}
-              </div>
+            <div className="flex shrink-0 gap-2">
+              <button
+                type="button"
+                onClick={() => nav("/appointments")}
+                className="rounded-full bg-white/22 px-4 py-2 text-caption font-bold text-white backdrop-blur-sm transition-colors hover:bg-white/30 active:scale-95"
+              >
+                Yönet
+              </button>
+              <button
+                type="button"
+                onClick={() => nav("/machines")}
+                className="rounded-full bg-black/30 px-4 py-2 text-caption font-bold text-white/85 transition-colors hover:bg-black/40 active:scale-95"
+              >
+                Makineler
+              </button>
             </div>
-          )}
-
-          {active.machines?.length > 0 && (
-            <div>
-              <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-white/40">
-                Planlanan Makineler
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                {active.machines.map((m) => (
-                  <button
-                    key={m}
-                    type="button"
-                    onClick={() => nav(`/machines/${m}`)}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold text-white/70 transition-colors hover:border-glow/40 hover:text-white"
-                  >
-                    <Icon name="dumbbell" size={12} />
-                    {machineById(m)?.name ?? m}
-                    <Icon name="chevronRight" size={12} className="text-white/30" />
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="flex gap-2 pt-1">
-            <button
-              type="button"
-              onClick={() => nav("/appointments")}
-              className="flex-1 rounded-xl border border-glow/30 bg-glow/10 py-2.5 text-sm font-semibold text-glow transition-colors hover:bg-glow/20 active:scale-[0.97]"
-            >
-              Yönet →
-            </button>
-            <button
-              type="button"
-              onClick={() => nav("/machines")}
-              className="flex-1 rounded-xl border border-white/10 bg-white/5 py-2.5 text-sm font-semibold text-white/60 transition-colors hover:bg-white/10 active:scale-[0.97]"
-            >
-              Makinelere Göz At
-            </button>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+// ── Bento hızlı erişim tile'ı ──
+function ActionTile({ action, nav }) {
+  const { size, accent, icon, title, desc } = action;
+  const base =
+    "glass-card glass-card--interactive relative flex rounded-[22px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-glow/50";
+  const iconChip = accent
+    ? "bg-primary-600 text-white"
+    : "bg-white/10 text-white";
+
+  if (size === "feature") {
+    return (
+      <button
+        type="button"
+        onClick={() => nav(action.to)}
+        className={`${base} row-span-2 min-h-[168px] flex-col justify-between overflow-hidden p-4 text-left`}
+      >
+        {accent && (
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full blur-2xl"
+            style={{ background: "radial-gradient(circle, rgb(var(--glow) / 0.28), transparent 65%)" }}
+          />
+        )}
+        <span className={`grid h-12 w-12 place-items-center rounded-2xl ${iconChip}`}>
+          <Icon name={icon} size={24} />
+        </span>
+        <div>
+          <p className="text-body font-bold text-content">{title}</p>
+          <p className="mt-0.5 text-caption text-muted">{desc}</p>
+        </div>
+      </button>
+    );
+  }
+
+  if (size === "wide") {
+    return (
+      <button
+        type="button"
+        onClick={() => nav(action.to)}
+        className={`${base} col-span-2 items-center gap-3 p-3.5 text-left`}
+      >
+        <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl ${iconChip}`}>
+          <Icon name={icon} size={20} />
+        </span>
+        <div className="min-w-0">
+          <p className="text-body font-bold text-content">{title}</p>
+          <p className="text-caption text-muted">{desc}</p>
+        </div>
+        <Icon name="chevron-right" size={18} className="ml-auto text-faint" />
+      </button>
+    );
+  }
+
+  // compact
+  return (
+    <button
+      type="button"
+      onClick={() => nav(action.to)}
+      className={`${base} h-[78px] items-center gap-3 p-3.5 text-left`}
+    >
+      <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${iconChip}`}>
+        <Icon name={icon} size={19} />
+      </span>
+      <div className="min-w-0">
+        <p className="text-body font-bold leading-tight text-content">{title}</p>
+        <p className="truncate text-caption text-muted">{desc}</p>
+      </div>
+    </button>
   );
 }
 
@@ -256,9 +253,10 @@ export default function Dashboard() {
       ]);
       if (me) setProfile(me);
       const mapped = apiRows.map(mapAppointmentFromApi);
-      setActive(pickNextUpcoming(mapped.length ? mapped : mockAppointments));
+      // Giriş yapmış gerçek hesap: yalnızca kendi randevuları (mock fallback yok).
+      setActive(pickNextUpcoming(mapped));
     } catch {
-      setActive(pickNextUpcoming(mockAppointments));
+      setActive(null);
     } finally {
       setLoading(false);
     }
@@ -271,68 +269,35 @@ export default function Dashboard() {
   const firstName = profile.name.split(" ")[0];
 
   return (
-    // §3.5 — giriş sırası: başlık bloğu → arama → "Günlük Görevler" → banner →
-    // "Öne Çıkan Antrenmanlar" → kart listesi. Tab bar stagger'a dahil değil.
-    <Stagger className="px-screen py-5">
-      {/* 1 — Başlık bloğu + puan rozeti */}
-      <StaggerItem className="flex items-start justify-between gap-3">
-        <div>
-          <h1 className="text-h1 font-extrabold text-content">Kampüste Güçlen</h1>
-          <p className="mt-1 text-caption text-muted">
-            Bugünün antrenmanı seni bekliyor{firstName ? `, ${firstName}` : ""}.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={() => nav("/profile")}
-          aria-label="Puanın"
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-gold/30 bg-gold/10 px-3 py-1.5 text-caption font-bold text-gold transition-transform duration-instant active:scale-95"
-        >
-          <Icon name="medal" size={14} strokeWidth={2} />
-          <span className="tabular-nums">{profile.points ?? 200}</span>
-        </button>
+    <Stagger className="px-screen pb-8 pt-6">
+      {/* 1 — Başlık: geniş negatif boşluk, güçlü hiyerarşi */}
+      <StaggerItem>
+        <p className="text-caption font-semibold uppercase tracking-[0.18em] text-glow/90">
+          {firstName ? `Merhaba, ${firstName}` : "METU Motion"}
+        </p>
+        <h1 className="mt-2 text-[30px] font-extrabold leading-[1.05] tracking-tight text-content">
+          Kampüste Güçlen
+        </h1>
+        <p className="mt-1.5 text-body text-muted">Bugünün antrenmanı seni bekliyor.</p>
       </StaggerItem>
 
-      {/* 2 — Arama çubuğu */}
-      <StaggerItem className="mt-4">
-        <button
-          type="button"
-          onClick={() => nav("/exercises")}
-          className="flex h-11 w-full items-center gap-2.5 rounded-full bg-surface px-4 text-left text-body text-muted transition-colors duration-instant hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-glow/60"
-        >
-          <Icon name="search" size={18} />
-          Antrenman ara
-        </button>
-      </StaggerItem>
-
-      {/* 3 — Yaklaşan randevu */}
+      {/* HERO: yaklaşan randevu (en büyük konteyner) */}
       <StaggerItem className="mt-6">
-        <h2 className="mb-2 text-body font-bold text-content">Yaklaşan Randevun</h2>
         {loading ? (
-          <div className="card-border flex flex-col overflow-hidden rounded-card">
-            <div className="p-4">
-              <div className="gradient-border inner-glow relative h-40 w-full overflow-hidden rounded-xl px-4 py-4">
-                <Skeleton className="h-2.5 w-28 bg-white/10" />
-                <div className="absolute bottom-4 left-4 flex items-baseline gap-2">
-                  <Skeleton className="h-9 w-20 bg-white/10" />
-                  <Skeleton className="h-4 w-24 bg-white/10" />
-                </div>
-              </div>
-            </div>
-            <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-            <div className="flex flex-col gap-3 p-4">
-              <Skeleton className="h-6 w-36 rounded-full bg-white/10" />
-              <div className="flex gap-1.5">
-                <Skeleton className="h-5 w-14 rounded-full bg-white/10" />
-                <Skeleton className="h-5 w-20 rounded-full bg-white/10" />
-              </div>
+          <div className="glass-panel rounded-[30px] p-6">
+            <Skeleton className="h-2.5 w-32 bg-white/10" />
+            <Skeleton className="mt-6 h-12 w-28 bg-white/10" />
+            <div className="mt-6 flex gap-3">
+              <Skeleton className="h-10 flex-1 bg-white/10" />
+              <Skeleton className="h-10 flex-1 bg-white/10" />
+              <Skeleton className="h-10 flex-1 bg-white/10" />
             </div>
           </div>
         ) : active ? (
-          <WaveAppointmentCard active={active} nav={nav} />
+          <AppointmentHero active={active} nav={nav} />
         ) : (
-          <Card soft className="p-5 text-center">
-            <p className="text-caption text-muted">Yaklaşan randevun yok.</p>
+          <Card soft className="p-6 text-center">
+            <p className="text-body text-muted">Yaklaşan randevun yok.</p>
             <Button size="sm" className="mt-3" onClick={() => nav("/book")}>
               Randevu Al
             </Button>
@@ -340,9 +305,9 @@ export default function Dashboard() {
         )}
       </StaggerItem>
 
-      {/* 4 — Öne Çıkan Antrenmanlar + Tümünü Gör */}
-      <StaggerItem className="mt-6">
-        <div className="mb-2 flex items-center justify-between">
+      {/* 4 — Hızlı erişim: asimetrik bento */}
+      <StaggerItem className="mt-8">
+        <div className="mb-3 flex items-center justify-between">
           <h2 className="text-body font-bold text-content">Öne Çıkan Antrenmanlar</h2>
           <Link to="/exercises" className="text-caption font-semibold text-glow">
             Tümünü Gör
@@ -350,36 +315,30 @@ export default function Dashboard() {
         </div>
         <div className="grid grid-cols-2 gap-3">
           {QUICK_ACTIONS.map((a) => (
-            <Card key={a.to} onClick={() => nav(a.to)} className="p-4">
-              <div className={`mb-3 grid h-11 w-11 place-items-center rounded-xl ${a.iconBg} ${a.iconFg}`}>
-                <Icon name={a.icon} size={20} />
-              </div>
-              <p className="text-body font-bold text-content">{a.title}</p>
-              <p className="text-caption text-muted">{a.desc}</p>
-            </Card>
+            <ActionTile key={a.to} action={a} nav={nav} />
           ))}
         </div>
       </StaggerItem>
 
-      {/* 5 — QR kısayolu + ipucu */}
+      {/* 5 — QR kısayolu + ısınma ipucu (geniş cam kart) */}
       <StaggerItem className="mt-6">
-        <Card className="flex items-center gap-3 p-4">
-          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary-50 text-accent">
-            <Icon name="flame" size={19} />
+        <div className="glass-card flex items-center gap-3.5 rounded-[22px] p-4">
+          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary-600/15 text-glow">
+            <Icon name="flame" size={20} />
           </div>
-          <p className="text-caption text-muted">
-            Antrenmandan önce 5-10 dk ısınmayı unutma. Makinenin QR'ını okutarak
-            kullanım videosuna anında ulaşabilirsin.
+          <p className="text-caption leading-relaxed text-muted">
+            Antrenmandan önce 5-10 dk ısın. Makinenin QR'ını okutarak kullanım
+            videosuna anında ulaş.
           </p>
           <button
             type="button"
             onClick={() => nav("/scan")}
             aria-label="QR tara"
-            className="ml-auto grid h-9 w-9 shrink-0 place-items-center rounded-full border border-subtle text-accent transition-transform active:scale-95"
+            className="glass-tile ml-auto grid h-10 w-10 shrink-0 place-items-center rounded-full text-white transition-transform active:scale-95"
           >
-            <Icon name="qr" size={17} />
+            <Icon name="qr" size={18} />
           </button>
-        </Card>
+        </div>
       </StaggerItem>
     </Stagger>
   );

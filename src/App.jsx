@@ -52,9 +52,6 @@ import AppointmentDetail from "./pages/reception/AppointmentDetail.jsx";
 
 import RequireRole from "./components/RequireRole.jsx";
 
-// Geliştirici önizlemesi — METU MOTION bileşen galerisi (ürün akışının parçası değil)
-import MotionGallery from "./pages/dev/MotionGallery.jsx";
-
 export default function App() {
   return (
     <Routes>
@@ -127,9 +124,6 @@ export default function App() {
         <Route index element={<CheckIn />} />
         <Route path="appointment/:id" element={<AppointmentDetail />} />
       </Route>
-
-      {/* D. Geliştirici önizlemesi */}
-      <Route path="/dev/motion" element={<MotionGallery />} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

@@ -81,13 +81,13 @@ function Column({ items, value, onChange, ariaLabel }) {
   );
 }
 
-export default function WheelPicker({ columns, className = "" }) {
+export default function WheelPicker({ columns, className = "", bandClassName = "bg-surface" }) {
   return (
     <div className={`relative ${className}`}>
       {/* Merkez seçim bandı — 3 kolonu birden kapsar, nötr zemin (§2.4) */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 rounded-band bg-surface"
+        className={`pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 rounded-band ${bandClassName}`}
         style={{ height: ROW }}
       />
       <div className="relative flex gap-2">

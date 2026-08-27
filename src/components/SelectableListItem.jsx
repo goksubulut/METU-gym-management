@@ -23,10 +23,17 @@ export default function SelectableListItem({
   type = "checkbox",   // "radio" | "checkbox"
   disabled = false,
   full = false,
+  glass = false,        // Spatial Glassmorphism — buzlu cam tile stili
   size = "md",          // "md" 48px (§2.2 varsayılan) | "sm" 44px, dar sütunlar için
   className = "",
 }) {
   const dims = size === "sm" ? "h-11 gap-2.5 px-3 text-caption" : "h-12 gap-3 px-4 text-body";
+  // Cam varyantta zemin/kenar .glass-tile'dan gelir; nötr varyantta token'lardan.
+  const surface = glass
+    ? `glass-tile text-white ${selected ? "is-selected" : ""}`
+    : `border text-content transition-[border-color,background-color,transform] ${
+        selected ? "border-primary-600 bg-primary-50" : "border-subtle bg-transparent"
+      }`;
   return (
     <button
       type="button"
@@ -34,15 +41,19 @@ export default function SelectableListItem({
       aria-checked={selected}
       disabled={disabled}
       onClick={() => !disabled && onChange?.(!selected)}
-      className={`flex items-center rounded-full border text-left text-content outline-none transition-[border-color,background-color,transform] duration-fast ease-standard active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-glow/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg ${dims} ${
-        selected ? "border-primary-600 bg-primary-50" : "border-subtle bg-transparent"
-      } ${disabled ? "pointer-events-none opacity-40" : ""} ${full ? "w-full" : ""} ${className}`}
+      className={`flex items-center rounded-full text-left outline-none duration-fast ease-standard active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-glow/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg ${dims} ${surface} ${disabled ? "pointer-events-none opacity-40" : ""} ${full ? "w-full" : ""} ${className}`}
     >
       {/* §4.4 liste tarafı — indicator dolgusu (CSS) + pop'u (Framer) */}
       <motion.span
         className={`grid h-5 w-5 shrink-0 place-items-center border-[1.5px] transition-colors duration-fast ease-standard ${
           type === "radio" ? "rounded-full" : "rounded-md"
-        } ${selected ? "border-primary-600 bg-primary-600" : "border-subtle bg-transparent"}`}
+        } ${
+          selected
+            ? "border-primary-600 bg-primary-600"
+            : glass
+              ? "border-white/40 bg-transparent"
+              : "border-subtle bg-transparent"
+        }`}
         animate={{ scale: selected ? 1 : 0.85 }}
         transition={{ duration: D.fast, ease: EASE_POP }}
       >

@@ -83,7 +83,29 @@ export default function UserLayout() {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Mobil çerçeve: geniş ekranda ortada telefon görünümü */}
-      <div className="relative mx-auto flex min-h-screen max-w-[430px] flex-col bg-bg shadow-xl">
+      <div className="relative mx-auto flex min-h-screen max-w-[430px] flex-col overflow-hidden bg-bg shadow-xl">
+        {/* Sinematik, kısık dark-red atmosfer — cam yüzeylerin arkasında yüzer */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+          <img
+            src="/images/onboarding-hero.jpg"
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover opacity-[0.16]"
+            style={{ filter: "blur(64px) saturate(120%) brightness(0.5)" }}
+            onError={(e) => {
+              if (e.currentTarget.src.indexOf("pose-base.jpg") === -1)
+                e.currentTarget.src = "/images/pose-base.jpg";
+            }}
+          />
+          <div className="absolute inset-0 bg-bg/72" />
+          <div
+            className="absolute -right-[20%] -top-[15%] h-[55%] w-[75%] rounded-full blur-3xl"
+            style={{ background: "radial-gradient(circle, rgb(var(--primary-700) / 0.3), transparent 62%)" }}
+          />
+          <div
+            className="absolute -bottom-[12%] -left-[20%] h-[52%] w-[72%] rounded-full blur-3xl"
+            style={{ background: "radial-gradient(circle, rgb(var(--glow) / 0.12), transparent 64%)" }}
+          />
+        </div>
         <header className="glass sticky top-0 z-20 flex items-center justify-between border-b border-hairline px-4 py-3">
           <Logo size={24} />
           <div className="flex items-center gap-1.5">

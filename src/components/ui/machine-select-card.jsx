@@ -15,15 +15,15 @@ export default function MachineSelectCard({ machine, selected, onToggle, section
       whileTap={{ scale: 0.98 }}
       aria-pressed={selected}
       className={[
-        "flex w-full items-center gap-3 rounded-xl border px-3 py-3 text-left transition-all duration-150",
-        selected ? "border-primary-600 bg-primary-600/10" : "border-hairline bg-surface",
+        "glass-tile flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left",
+        selected ? "is-selected" : "",
       ].join(" ")}
     >
       {/* Photo / icon */}
       <div
         className={[
-          "relative grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-xl",
-          selected ? "bg-primary-600/20" : "bg-surface-3",
+          "relative grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-xl ring-1 ring-white/10",
+          selected ? "bg-primary-600/25" : "bg-white/8",
         ].join(" ")}
       >
         {machine.photoUrl ? (

@@ -10,7 +10,7 @@ const TYPE_LABEL = { FREE: "Serbest", WARMUP: "Isınma", COOLDOWN: "Soğuma", MA
 export function ExerciseGridCard({ exercise, onClick, className = "" }) {
   const muscles = exercise.muscles ?? [];
   return (
-    <Card soft onClick={onClick} className={`overflow-hidden ${className}`}>
+    <Card onClick={onClick} className={`overflow-hidden ${className}`}>
       <div className="hero-sheen grid h-24 place-items-center bg-ink-900 bg-gradient-to-br from-ink-800 to-ink-950 text-white/85">
         <Icon name={TYPE_ICON[exercise.type] ?? "dumbbell"} size={30} strokeWidth={1.4} />
       </div>

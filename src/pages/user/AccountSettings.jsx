@@ -57,7 +57,9 @@ export default function AccountSettings() {
   const [profile, setProfile] = useState(getAuthUser);
   const [email, setEmail] = useState(profile?.email ?? "");
   const [gender, setGender] = useState(profile?.gender ?? "");
-  const [birthDate, setBirthDate] = useState(profile?.birthDate ?? "");
+  // Doğum tarihi parçaları ayrı tutulur; birleşik ISO değeri yalnızca üçü de
+  // dolunca üretilir. (Aksi halde kısmi seçimler kaybolur ve tarih girilemez.)
+  const [birthParts, setBirthParts] = useState(() => splitBirthDate(profile?.birthDate));
   const [heightCm, setHeightCm] = useState(profile?.heightCm != null ? String(profile.heightCm) : "");
   const [weightKg, setWeightKg] = useState(profile?.weightKg != null ? String(profile.weightKg) : "");
   const [currentPassword, setCurrentPassword] = useState("");
@@ -73,7 +75,7 @@ export default function AccountSettings() {
     setProfile(user);
     setEmail(user.email ?? "");
     setGender(user.gender ?? "");
-    setBirthDate(user.birthDate ?? "");
+    setBirthParts(splitBirthDate(user.birthDate));
     setHeightCm(user.heightCm != null ? String(user.heightCm) : "");
     setWeightKg(user.weightKg != null ? String(user.weightKg) : "");
   };
@@ -99,6 +101,7 @@ export default function AccountSettings() {
     e.preventDefault();
     setSavingProfile(true);
     try {
+      const birthDate = joinBirthDate(birthParts.year, birthParts.month, birthParts.day);
       const payload = {
         gender: gender || undefined,
         birthDate: birthDate || undefined,
@@ -164,19 +167,21 @@ export default function AccountSettings() {
     }
   };
 
-  const parts = splitBirthDate(birthDate);
+  const parts = birthParts;
   const maxDay = daysInMonth(parts.month || 1, parts.year || THIS_YEAR);
   const dayOptions = Array.from({ length: maxDay }, (_, i) => {
     const d = String(i + 1).padStart(2, "0");
     return { value: d, label: String(i + 1) };
   });
-  const age = ageFromBirthDate(birthDate);
+  const age = ageFromBirthDate(joinBirthDate(parts.year, parts.month, parts.day));
 
   const setBirthPart = (part, value) => {
-    const next = { ...splitBirthDate(birthDate), [part]: value };
-    const cap = daysInMonth(next.month || 1, next.year || THIS_YEAR);
-    if (next.day && Number(next.day) > cap) next.day = String(cap).padStart(2, "0");
-    setBirthDate(joinBirthDate(next.year, next.month, next.day));
+    setBirthParts((prev) => {
+      const next = { ...prev, [part]: value };
+      const cap = daysInMonth(next.month || 1, next.year || THIS_YEAR);
+      if (next.day && Number(next.day) > cap) next.day = String(cap).padStart(2, "0");
+      return next;
+    });
   };
 
   return (

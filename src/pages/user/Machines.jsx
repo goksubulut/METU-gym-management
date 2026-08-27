@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Card from "../../components/Card.jsx";
-import Badge from "../../components/Badge.jsx";
 import Tabs from "../../components/Tabs.jsx";
 import EmptyState from "../../components/EmptyState.jsx";
 import Icon from "../../components/Icon.jsx";
@@ -98,32 +97,40 @@ export default function Machines() {
         <>
           <div className="grid grid-cols-2 gap-3">
             {paged.map((m) => (
-              <Card key={m.id} soft onClick={() => nav(`/machines/${m.id}`)} className="overflow-hidden">
-                <div className="relative grid h-40 place-items-center overflow-hidden bg-ink-900 text-white/85">
+              <Card
+                key={m.id}
+                onClick={() => nav(`/machines/${m.id}`)}
+                className="group overflow-hidden !rounded-[22px] p-0"
+              >
+                <div className="relative h-36 overflow-hidden">
                   {m.photoUrl ? (
-                    <>
-                      <img src={m.photoUrl} alt={m.name} className="absolute inset-0 h-full w-full object-cover" />
-                      <span className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-black/10" aria-hidden="true" />
-                    </>
+                    <img
+                      src={m.photoUrl}
+                      alt={m.name}
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
                   ) : (
-                    <Icon name="dumbbell" size={34} strokeWidth={1.4} />
+                    <div className="grid h-full place-items-center bg-gradient-to-br from-ink-800 to-ink-950 text-white/70">
+                      <Icon name="dumbbell" size={34} strokeWidth={1.4} />
+                    </div>
+                  )}
+                  {/* Okunurluk için alt karartma */}
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/65 via-black/15 to-transparent" />
+                  {/* Puan — cam pill (iOS) */}
+                  <span className="absolute bottom-2 left-2 inline-flex items-center gap-1 rounded-full bg-black/35 px-2 py-0.5 text-[11px] font-bold text-white ring-1 ring-white/20 backdrop-blur-md">
+                    <Icon name="star" size={11} className="fill-glow text-glow" />
+                    {m.rating}
+                  </span>
+                  {/* Video — cam pill */}
+                  {m.hasVideo && (
+                    <span className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-black/35 px-2 py-0.5 text-[10px] font-semibold text-white ring-1 ring-white/20 backdrop-blur-md">
+                      <Icon name="video" size={10} /> video
+                    </span>
                   )}
                 </div>
                 <div className="p-3">
-                  <p className="truncate text-sm font-bold text-gray-900">{m.name}</p>
-                  <p className="mb-2 text-[11px] text-gray-400">{m.category}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-1 text-xs font-bold text-accent">
-                      <Icon name="star" size={12} className="fill-primary-600" /> {m.rating}
-                    </span>
-                    {m.hasVideo && (
-                      <Badge tone="gray">
-                        <span className="inline-flex items-center gap-1">
-                          <Icon name="video" size={11} /> video
-                        </span>
-                      </Badge>
-                    )}
-                  </div>
+                  <p className="truncate text-sm font-bold text-content">{m.name}</p>
+                  <p className="mt-0.5 text-[11px] text-muted">{m.category}</p>
                 </div>
               </Card>
             ))}
@@ -140,8 +147,8 @@ export default function Machines() {
         <>
           <div className="space-y-2">
             {paged.map((m) => (
-              <Card key={m.id} onClick={() => nav(`/machines/${m.id}`)} className="flex items-center gap-3 p-3">
-                <div className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-xl bg-ink-900 text-white">
+              <Card key={m.id} onClick={() => nav(`/machines/${m.id}`)} className="flex items-center gap-3 p-2.5">
+                <div className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-2xl bg-gradient-to-br from-ink-800 to-ink-950 text-white/80 ring-1 ring-white/10">
                   {m.photoUrl ? (
                     <img src={m.photoUrl} alt={m.name} className="h-full w-full object-cover" />
                   ) : (
@@ -149,13 +156,13 @@ export default function Machines() {
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-bold text-gray-900">{m.name}</p>
-                  <p className="text-xs text-gray-400">
+                  <p className="truncate text-sm font-bold text-content">{m.name}</p>
+                  <p className="text-xs text-muted">
                     {m.category} · {m.location}
                   </p>
                 </div>
-                <span className="flex items-center gap-1 text-sm font-bold text-accent">
-                  <Icon name="star" size={14} className="fill-primary-600" /> {m.rating}
+                <span className="inline-flex items-center gap-1 rounded-full bg-white/8 px-2.5 py-1 text-xs font-bold text-content ring-1 ring-white/10">
+                  <Icon name="star" size={13} className="fill-glow text-glow" /> {m.rating}
                 </span>
               </Card>
             ))}

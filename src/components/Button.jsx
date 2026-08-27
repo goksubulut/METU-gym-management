@@ -20,6 +20,8 @@ const VARIANTS = {
   danger: "bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800",
   // Yüksek vurgulu nötr — temaya göre tersine döner
   dark: "bg-content text-bg hover:opacity-90 active:opacity-80",
+  // Spatial Glassmorphism — buzlu cam ikincil buton (renkli/koyu zeminler üstünde)
+  glass: "glass-tile text-white hover:brightness-110",
 };
 
 // §2.1: ana CTA 52px. sm/md yardımcı eylemler için orantılı küçültme.
