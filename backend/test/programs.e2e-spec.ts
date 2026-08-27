@@ -93,6 +93,7 @@ describe('Workout Programs (e2e)', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({
           name: 'Göğüs günü',
+          targetMuscles: ['chest'],
           items: [
             { itemType: 'EXERCISE', exerciseId: warmupId },
             { itemType: 'MACHINE', machineId },
@@ -104,6 +105,7 @@ describe('Workout Programs (e2e)', () => {
 
       programId = res.body.data.id;
       expect(res.body.data.name).toBe('Göğüs günü');
+      expect(res.body.data.targetMuscles).toEqual(['chest']);
       expect(res.body.data.items).toHaveLength(4);
       expect(res.body.data.items[0].sortOrder).toBe(0);
       expect(res.body.data.items[0].exerciseType).toBe('WARMUP');
@@ -146,6 +148,7 @@ describe('Workout Programs (e2e)', () => {
 
       expect(res.body.data.items[0].itemType).toBe('MACHINE');
       expect(res.body.data.items[1].exerciseType).toBe('WARMUP');
+      expect(res.body.data.targetMuscles).toEqual(['chest']);
     });
 
     it('başka kullanıcı programa erişemez (404)', async () => {

@@ -152,6 +152,7 @@ export default function Book() {
   const [bucketDone, setBucketDone] = useState(false);
   const [appointmentResult, setAppointmentResult] = useState(null);
   const [appointmentError, setAppointmentError] = useState(null);
+  const [expandedMachineGroups, setExpandedMachineGroups] = useState(() => new Set());
 
   // Broad groups derived from selected fine-grained slugs
   const broadGroups = useMemo(
@@ -250,7 +251,8 @@ export default function Book() {
     setMuscleSlugs((prev) =>
       prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug],
     );
-    setMachines([]); // reset machine selection on muscle change
+    setMachines([]);
+    setExpandedMachineGroups(new Set());
   };
 
   const toggleMachine = (id) =>
@@ -459,14 +461,24 @@ export default function Book() {
                   <Badge tone="primary">{list.length}</Badge>
                 </div>
                 <div className="space-y-2">
-                  {list.map((m) => (
+                  {(expandedMachineGroups.has(id) ? list : list.slice(0, 6)).map((m) => (
                     <MachineSelectCard
                       key={m.id}
                       machine={m}
                       selected={machines.includes(m.id)}
                       onToggle={toggleMachine}
+                      sectionGroup={id}
                     />
                   ))}
+                  {list.length > 6 && !expandedMachineGroups.has(id) && (
+                    <button
+                      type="button"
+                      onClick={() => setExpandedMachineGroups((s) => new Set([...s, id]))}
+                      className="w-full py-1.5 text-center text-xs font-semibold text-accent"
+                    >
+                      +{list.length - 6} makine daha göster
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

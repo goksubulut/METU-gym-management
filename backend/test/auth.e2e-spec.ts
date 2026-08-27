@@ -55,6 +55,8 @@ describe('Auth (e2e)', () => {
       expect(res.body.data.user.role).toBe('USER');
       expect(res.body.data.user.gender).toBeNull();
       expect(res.body.data.user.birthDate).toBeNull();
+      expect(res.body.data.user.heightCm).toBeNull();
+      expect(res.body.data.user.weightKg).toBeNull();
       expect(res.body.data.user.points).toBe(200);
       expect(res.body.data.user.pointsIsDemo).toBe(true);
       expect(res.body.data.accessToken).toBeDefined();
@@ -151,6 +153,23 @@ describe('Auth (e2e)', () => {
       expect(res.body.data.email).toBe(testUser.email);
       expect(res.body.data.points).toBe(200);
       expect(res.body.data.pointsIsDemo).toBe(true);
+    });
+
+    it('PATCH /api/auth/me cinsiyet, doğum tarihi, boy ve kiloyu günceller', async () => {
+      const res = await request(app.getHttpServer())
+        .patch('/api/auth/me')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          gender: 'MALE',
+          birthDate: '2000-03-20',
+          heightCm: 178,
+          weightKg: 74.5,
+        })
+        .expect(200);
+      expect(res.body.data.gender).toBe('MALE');
+      expect(res.body.data.birthDate).toBe('2000-03-20');
+      expect(res.body.data.heightCm).toBe(178);
+      expect(res.body.data.weightKg).toBe(74.5);
     });
 
     it('POST /api/auth/refresh yeni token çifti döner (rotasyon)', async () => {

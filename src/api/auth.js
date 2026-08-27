@@ -41,13 +41,17 @@ export async function logout() {
   clearSession();
 }
 
-export async function updateEmail(email) {
+export async function updateProfile(payload) {
   const user = await apiFetch("/auth/me", {
     method: "PATCH",
-    body: JSON.stringify({ email }),
+    body: JSON.stringify(payload),
   });
   setAuthUser(user);
   return user;
+}
+
+export async function updateEmail(email) {
+  return updateProfile({ email });
 }
 
 export async function changePassword(currentPassword, newPassword) {

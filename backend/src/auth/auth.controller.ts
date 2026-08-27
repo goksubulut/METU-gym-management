@@ -87,7 +87,7 @@ export class AuthController {
   @Patch('me')
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'E-posta güncelle' })
+  @ApiOperation({ summary: 'Profil bilgilerini güncelle (e-posta, cinsiyet, doğum tarihi, boy, kilo)' })
   updateProfile(
     @CurrentUser() user: AccessTokenPayload,
     @Body() dto: UpdateProfileDto,

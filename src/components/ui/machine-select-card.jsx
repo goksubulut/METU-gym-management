@@ -2,9 +2,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Check, Dumbbell, MapPin } from "lucide-react";
 import { MUSCLE_GROUPS } from "../../mock/machines.js";
 
-export default function MachineSelectCard({ machine, selected, onToggle }) {
-  const groupLabel = machine.muscles?.[0]
-    ? (MUSCLE_GROUPS.find((g) => g.id === machine.muscles[0])?.label ?? "")
+export default function MachineSelectCard({ machine, selected, onToggle, sectionGroup }) {
+  const groupId = sectionGroup || machine.muscles?.[0];
+  const groupLabel = groupId
+    ? (MUSCLE_GROUPS.find((g) => g.id === groupId)?.label ?? "")
     : "";
 
   return (

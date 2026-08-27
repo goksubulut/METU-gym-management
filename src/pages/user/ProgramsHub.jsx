@@ -87,8 +87,8 @@ export default function ProgramsHub() {
         <ul className="space-y-3">
           {programs.map((p) => (
             <li key={p.id}>
-              <Link to={`/programs/${p.id}`}>
-                <Card className="flex items-center gap-3 p-4">
+              <Card className="flex items-center gap-3 p-4">
+                <Link to={`/programs/${p.id}`} className="flex min-w-0 flex-1 items-center gap-3">
                   <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gray-100 text-gray-600">
                     <Icon name="clipboard" size={18} />
                   </div>
@@ -98,9 +98,14 @@ export default function ProgramsHub() {
                       {p.itemCount} öğe · {formatDate(p.updatedAt)}
                     </p>
                   </div>
-                  <Icon name="chevronRight" size={18} className="shrink-0 text-gray-300" />
-                </Card>
-              </Link>
+                </Link>
+                <Link
+                  to={`/programs/${p.id}/edit`}
+                  className="shrink-0 text-xs font-semibold text-accent"
+                >
+                  Düzenle
+                </Link>
+              </Card>
             </li>
           ))}
         </ul>

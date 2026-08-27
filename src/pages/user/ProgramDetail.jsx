@@ -268,7 +268,11 @@ export default function ProgramDetail() {
 
       </button>
 
-
+      <div className="mb-5">
+        <Button variant="outline" full onClick={() => nav(`/programs/${id}/edit`)}>
+          Programı düzenle
+        </Button>
+      </div>
 
       <label className="mb-2 block text-xs font-bold text-gray-400">Program adı</label>
 

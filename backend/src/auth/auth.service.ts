@@ -110,8 +110,8 @@ export class AuthService {
       throw new UnauthorizedException('Kullanıcı bulunamadı');
     }
 
-    const email = dto.email.trim().toLowerCase();
-    if (email !== user.email) {
+    const email = dto.email?.trim().toLowerCase();
+    if (email && email !== user.email) {
       const taken = await this.prisma.user.findUnique({ where: { email } });
       if (taken) {
         throw new ConflictException('Bu e-posta ile kayıtlı bir hesap zaten var');
@@ -121,9 +121,11 @@ export class AuthService {
     const updated = await this.prisma.user.update({
       where: { id: userId },
       data: {
-        email,
-        gender: dto.gender,
-        birthDate: dto.birthDate !== undefined ? parseDateOnly(dto.birthDate) : undefined,
+        ...(email ? { email } : {}),
+        ...(dto.gender !== undefined ? { gender: dto.gender } : {}),
+        ...(dto.birthDate !== undefined ? { birthDate: parseDateOnly(dto.birthDate) } : {}),
+        ...(dto.heightCm !== undefined ? { heightCm: dto.heightCm } : {}),
+        ...(dto.weightKg !== undefined ? { weightKg: dto.weightKg } : {}),
       },
     });
     return this.toView(updated);
@@ -269,7 +271,9 @@ export class AuthService {
       phone: user.phone,
       role: user.role,
       gender: user.gender,
-      birthDate: user.birthDate ? toDateKey(user.birthDate) : null,
+      birthDate: user.birthDate ? toCalendarDateKey(user.birthDate) : null,
+      heightCm: user.heightCm ?? null,
+      weightKg: user.weightKg != null ? Number(user.weightKg) : null,
       points,
       pointsIsDemo,
     };
@@ -290,4 +294,15 @@ export class AuthService {
 function parseDateOnly(value?: string): Date | undefined {
   if (!value) return undefined;
   return new Date(`${value}T00:00:00.000Z`);
+}
+
+/** DATE sütunu: UTC gece yarısı veya yerel gece yarısı fark etmeksizin takvim günü. */
+function toCalendarDateKey(date: Date): string {
+  const utcMidnight =
+    date.getUTCHours() === 0 && date.getUTCMinutes() === 0 && date.getUTCSeconds() === 0;
+  if (utcMidnight) return date.toISOString().slice(0, 10);
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 }

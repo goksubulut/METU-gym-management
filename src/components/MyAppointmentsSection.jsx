@@ -91,7 +91,7 @@ export default function MyAppointmentsSection({ className = "" }) {
         {[
           ["Toplam", list.length],
           ["Yaklaşan", list.filter(isUpcomingTab).length],
-          ["Tamamlanan", list.filter((a) => a.status === "completed").length],
+          ["Geçmiş", list.filter((a) => !isUpcomingTab(a)).length],
         ].map(([l, v]) => (
           <Card key={l} soft className="p-3 text-center">
             <p className="text-xl font-extrabold text-accent">{v}</p>

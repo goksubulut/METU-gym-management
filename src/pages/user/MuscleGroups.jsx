@@ -25,12 +25,27 @@ const SECTIONS = [
 ];
 
 const muscleEntries = Object.entries(MUSCLES); // [slug, {label, group, color}]
+const STORAGE_KEY = "metu-muscle-map-selection";
+
+function readMuscleMapSelection() {
+  try {
+    const parsed = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || "null");
+    if (!parsed || typeof parsed !== "object") return { selected: [], cardio: false };
+    return {
+      selected: Array.isArray(parsed.selected) ? parsed.selected.filter((s) => MUSCLES[s]) : [],
+      cardio: Boolean(parsed.cardio),
+    };
+  } catch {
+    return { selected: [], cardio: false };
+  }
+}
 
 export default function MuscleGroups() {
   const nav = useNavigate();
-  const [selected, setSelected] = useState([]); // ince kas slug'ları
+  const initialSelection = useMemo(() => readMuscleMapSelection(), []);
+  const [selected, setSelected] = useState(initialSelection.selected); // ince kas slug'ları
   const [hovered, setHovered] = useState(null);
-  const [cardio, setCardio] = useState(false);
+  const [cardio, setCardio] = useState(initialSelection.cardio);
   const [apiMachines, setApiMachines] = useState(null); // null = API henüz gelmedi
   const [apiExercises, setApiExercises] = useState([]);
   const [exercisesFromApi, setExercisesFromApi] = useState(false);
@@ -52,11 +67,20 @@ export default function MuscleGroups() {
   const toggle = (slug) =>
     setSelected((s) => (s.includes(slug) ? s.filter((x) => x !== slug) : [...s, slug]));
 
+  useEffect(() => {
+    if (selected.length === 0 && !cardio) {
+      sessionStorage.removeItem(STORAGE_KEY);
+      return;
+    }
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ selected, cardio }));
+  }, [selected, cardio]);
+
   const clearAll = () => {
     setSelected([]);
     setCardio(false);
     setExpandedMachineGroups(new Set());
     setExpandedExerciseGroups(new Set());
+    sessionStorage.removeItem(STORAGE_KEY);
   };
 
   // Seçili kaslardan ana gruplar türetilir; makine eşleşmesi grup bazlıdır.

@@ -45,6 +45,8 @@
 
   /* --- Pose-overlay renk modu (Bölüm 2.9): 'A' tek renk | 'B' kontrast --- */
   --pose-overlay-mode: "A";
+
+  accent-color: rgb(var(--primary-600));
 }
 
 /* --------------------------- KOYU TEMA (varsayılan) --------------------------- */

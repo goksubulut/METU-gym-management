@@ -43,6 +43,8 @@ export default function Alternatives() {
   const nav = useNavigate();
   const source = machineById(id);
   const [result, setResult] = useState(() => (source ? mockAlternatives(source) : null));
+  const [showAllMachines, setShowAllMachines] = useState(false);
+  const [showAllExercises, setShowAllExercises] = useState(false);
 
   // Gerçek öneri motoru (FR-RC-1..4): ortak kas grubu sayısı + puana göre sıralı.
   useEffect(() => {
@@ -56,6 +58,8 @@ export default function Alternatives() {
 
   const alts = result.alternativeMachines;
   const exercises = result.alternativeExercises;
+  const visibleAlts = showAllMachines ? alts : alts.slice(0, 6);
+  const visibleExercises = showAllExercises ? exercises : exercises.slice(0, 6);
 
   return (
     <div className="px-4 py-5">
@@ -100,7 +104,7 @@ export default function Alternatives() {
       </h2>
       {/* Liste formatı — kart değil */}
       <ul className="mb-6 divide-y divide-gray-100 rounded-2xl border border-gray-100 bg-surface">
-        {alts.map((m) => (
+        {visibleAlts.map((m) => (
           <li
             key={m.id}
             onClick={() => nav(`/machines/${m.id}`)}
@@ -127,19 +131,37 @@ export default function Alternatives() {
           </li>
         ))}
       </ul>
+      {alts.length > 6 && !showAllMachines && (
+        <button
+          type="button"
+          onClick={() => setShowAllMachines(true)}
+          className="-mt-4 mb-6 w-full py-1.5 text-center text-xs font-semibold text-accent"
+        >
+          +{alts.length - 6} makine daha göster
+        </button>
+      )}
 
       <h2 className="mb-2 text-base font-bold text-gray-900">Egzersiz alternatifleri</h2>
       {exercises.length === 0 ? (
         <p className="text-sm text-gray-400">Bu makine için egzersiz alternatifi bulunamadı.</p>
       ) : (
         <div className="space-y-2">
-          {exercises.map((e) => (
+          {visibleExercises.map((e) => (
             <ExerciseMatchListCard
               key={e.id}
               exercise={e}
               onClick={() => nav(`/exercises/${e.id}`)}
             />
           ))}
+          {exercises.length > 6 && !showAllExercises && (
+            <button
+              type="button"
+              onClick={() => setShowAllExercises(true)}
+              className="w-full py-1.5 text-center text-xs font-semibold text-accent"
+            >
+              +{exercises.length - 6} egzersiz daha göster
+            </button>
+          )}
         </div>
       )}
     </div>

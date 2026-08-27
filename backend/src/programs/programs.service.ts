@@ -25,6 +25,7 @@ export interface ProgramSummaryView {
 }
 
 export interface ProgramDetailView extends ProgramSummaryView {
+  targetMuscles: string[];
   items: ProgramItemView[];
 }
 
@@ -84,6 +85,7 @@ export class ProgramsService {
       data: {
         userId,
         name: dto.name.trim(),
+        targetMuscles: dto.targetMuscles ?? [],
         items: {
           create: dto.items.map((item, index) => ({
             sortOrder: index,
@@ -119,10 +121,13 @@ export class ProgramsService {
     }
 
     await this.prisma.$transaction(async (tx) => {
-      if (dto.name !== undefined) {
+      if (dto.name !== undefined || dto.targetMuscles !== undefined) {
         await tx.workoutProgram.update({
           where: { id },
-          data: { name: dto.name.trim() },
+          data: {
+            ...(dto.name !== undefined ? { name: dto.name.trim() } : {}),
+            ...(dto.targetMuscles !== undefined ? { targetMuscles: dto.targetMuscles } : {}),
+          },
         });
       }
 
@@ -177,6 +182,7 @@ export class ProgramsService {
     program: {
       id: string;
       name: string;
+      targetMuscles: string[];
       createdAt: Date;
       updatedAt: Date;
       _count: { items: number };
@@ -186,6 +192,7 @@ export class ProgramsService {
     return {
       id: program.id,
       name: program.name,
+      targetMuscles: program.targetMuscles ?? [],
       itemCount: program._count.items,
       createdAt: program.createdAt.toISOString(),
       updatedAt: program.updatedAt.toISOString(),

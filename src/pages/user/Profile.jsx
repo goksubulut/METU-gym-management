@@ -9,7 +9,7 @@ import { useToast } from "../../components/Toast.jsx";
 import { getAccessToken } from "../../api/client.js";
 import { fetchMe, logout } from "../../api/auth.js";
 import { getAuthUser, initialsFromName } from "../../utils/authUser.js";
-import { ageFromBirthDate, GENDER_LABELS } from "../../utils/profile.js";
+import { profileDetailLine } from "../../utils/profile.js";
 
 export default function Profile() {
   const nav = useNavigate();
@@ -62,16 +62,17 @@ export default function Profile() {
         </div>
         <h1 className="text-xl font-extrabold text-gray-900">{profile.name}</h1>
         <p className="text-sm text-gray-400">{profile.email}</p>
-        {(profile.gender && profile.gender !== "UNSPECIFIED") || profile.birthDate ? (
-          <p className="mt-1 text-sm text-gray-500">
-            {[
-              profile.gender && profile.gender !== "UNSPECIFIED" ? GENDER_LABELS[profile.gender] : null,
-              ageFromBirthDate(profile.birthDate) != null ? `${ageFromBirthDate(profile.birthDate)} yaş` : null,
-            ]
-              .filter(Boolean)
-              .join(" · ")}
-          </p>
-        ) : null}
+        {profileDetailLine(profile) ? (
+          <p className="mt-1 text-sm text-gray-500">{profileDetailLine(profile)}</p>
+        ) : (
+          <button
+            type="button"
+            onClick={() => nav("/account-settings")}
+            className="mt-1 text-sm font-medium text-accent"
+          >
+            Yaş, boy ve kilo ekle
+          </button>
+        )}
       </div>
 
       <AppointmentHeatmap />
@@ -103,7 +104,7 @@ export default function Profile() {
             </div>
             <div>
               <p className="text-sm font-bold text-gray-900">Hesap Ayarları</p>
-              <p className="text-xs text-gray-400">E-posta, parola ve hesap yönetimi</p>
+              <p className="text-xs text-gray-400">Kişisel bilgiler, e-posta ve parola</p>
             </div>
           </div>
           <Icon name="chevronRight" size={18} className="text-gray-300" />

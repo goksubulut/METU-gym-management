@@ -90,6 +90,7 @@ export default function App() {
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/programs" element={<ProgramsHub />} />
         <Route path="/programs/new" element={<ProgramCreate />} />
+        <Route path="/programs/:id/edit" element={<ProgramCreate />} />
         <Route path="/programs/:id" element={<ProgramDetail />} />
       </Route>
 

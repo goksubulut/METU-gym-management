@@ -25,6 +25,8 @@ export interface UserView {
   role: Role;
   gender: Gender | null;
   birthDate: string | null;
+  heightCm: number | null;
+  weightKg: number | null;
   points: number;
   pointsIsDemo: boolean;
 }

@@ -17,6 +17,7 @@ export function mapProgramFromApi(p) {
   return {
     id: p.id,
     name: p.name,
+    targetMuscles: p.targetMuscles ?? [],
     itemCount: p.itemCount,
     createdAt: p.createdAt,
     updatedAt: p.updatedAt,
@@ -32,10 +33,14 @@ export function fetchProgram(id) {
   return apiFetch(`/programs/${id}`).then(mapProgramFromApi);
 }
 
-export function createProgram({ name, items }) {
+export function createProgram({ name, items, targetMuscles }) {
   return apiFetch("/programs", {
     method: "POST",
-    body: JSON.stringify({ name, items }),
+    body: JSON.stringify({
+      name,
+      items,
+      ...(targetMuscles ? { targetMuscles } : {}),
+    }),
   }).then(mapProgramFromApi);
 }
 
