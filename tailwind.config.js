@@ -7,7 +7,7 @@ const ch = (name) => `rgb(var(${name}) / <alpha-value>)`;
 
 export default {
   darkMode: ["selector", '[data-theme="dark"]'],
-  content: ["./index.html", "./src/**/*.{js,jsx}"],
+  content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
       colors: {

@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
-import { NavLink, useLocation, Link } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
+import { Home, Dumbbell, Plus, BicepsFlexed, User } from "lucide-react";
 import Icon from "../components/Icon.jsx";
 import Logo from "../components/Logo.jsx";
+import BottomNavBar from "@/components/ui/bottom-nav-bar";
 import { getAccessToken } from "../api/client.js";
 import { loadActiveAnnouncements } from "../api/announcements.js";
 import { loadMyNotifications, hasUnreadNotifications, NOTIFICATIONS_READ_EVENT } from "../api/notifications.js";
@@ -11,15 +13,31 @@ import { useTheme } from "../utils/theme.js";
 import ScreenTransition from "../components/motion/ScreenTransition.jsx";
 
 const NAV = [
-  { to: "/home", label: "Ana Sayfa", icon: "home" },
-  { to: "/machines", label: "Makineler", icon: "dumbbell" },
-  { to: "/book", label: "Randevu", icon: "plus", primary: true },
-  { to: "/muscle-groups", label: "Kas Grubu", icon: "body" },
-  { to: "/profile", label: "Profil", icon: "user" },
+  { to: "/home", label: "Ana Sayfa", icon: Home },
+  { to: "/machines", label: "Makineler", icon: Dumbbell },
+  { to: "/book", label: "Randevu", icon: Plus, primary: true },
+  { to: "/muscle-groups", label: "Kas Grubu", icon: BicepsFlexed },
+  { to: "/profile", label: "Profil", icon: User },
 ];
+
+function navIndexForPath(pathname) {
+  let best = -1;
+  let bestLen = -1;
+  NAV.forEach((item, i) => {
+    if (pathname === item.to || pathname.startsWith(`${item.to}/`)) {
+      if (item.to.length > bestLen) {
+        best = i;
+        bestLen = item.to.length;
+      }
+    }
+  });
+  return best;
+}
 
 export default function UserLayout() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const activeNavIndex = navIndexForPath(pathname);
   // Onboarding ve tam ekran akışlarında uygulama kromu (header + tab bar) gizlenir.
   const bare =
     pathname === "/" ||
@@ -100,34 +118,14 @@ export default function UserLayout() {
           <ScreenTransition />
         </main>
 
-        {/* METU MOTION §2.6 — Bottom Tab Bar.
-            Yüzen translucent hap yerine düz bar: 56px + safe-area, üstte 1px
-            border, opak --color-bg zemin. Aktif ikon+etiket --color-brand-red,
-            pasif --color-text-secondary. Spec: "Ekstra efekt yok (sade
-            tutulmalı, sık kullanılan alan; gösterişli animasyon dikkat dağıtır)". */}
-        <nav
-          className="fixed bottom-0 left-1/2 z-20 flex w-full max-w-[430px] -translate-x-1/2 items-stretch border-t border-subtle bg-bg pb-[env(safe-area-inset-bottom)]"
-          aria-label="Ana gezinme"
-        >
-          {NAV.map((n) => (
-            <NavLink
-              key={n.to}
-              to={n.to}
-              className={({ isActive }) =>
-                `flex flex-1 flex-col items-center justify-center gap-1 py-2 text-tab transition-colors duration-150 ease-standard ${
-                  isActive ? "text-primary-600" : "text-muted opacity-60 hover:opacity-100"
-                }`
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  <Icon name={n.icon} size={24} strokeWidth={isActive ? 2.2 : 1.8} />
-                  <span className={isActive ? "font-semibold" : ""}>{n.label}</span>
-                </>
-              )}
-            </NavLink>
-          ))}
-        </nav>
+        <BottomNavBar
+          items={NAV}
+          activeIndex={activeNavIndex}
+          onItemSelect={(_, item) => navigate(item.to)}
+          stickyBottom
+          ariaLabel="Ana gezinme"
+          className="min-w-0 bottom-[calc(1rem+env(safe-area-inset-bottom))]"
+        />
       </div>
     </div>
   );
