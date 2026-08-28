@@ -1,6 +1,8 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import Icon from "../components/Icon.jsx";
 import Logo from "../components/Logo.jsx";
+import AdminAmbientGlow from "../components/AdminAmbientGlow.jsx";
+import { AdminSurfaceContext } from "../components/adminSurface.js";
 import { logout } from "../api/auth.js";
 
 const NAV = [
@@ -23,11 +25,14 @@ export default function AdminLayout() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <aside className="fixed inset-y-0 left-0 flex w-64 flex-col border-r border-gray-100 bg-surface">
-        <div className="border-b border-gray-100 px-6 py-5">
+    <AdminSurfaceContext.Provider value={true}>
+    <div className="admin-scope relative flex min-h-screen">
+      <AdminAmbientGlow />
+
+      <aside className="glass fixed inset-y-0 left-0 z-10 flex w-64 flex-col border-r border-hairline">
+        <div className="border-b border-hairline px-6 py-5">
           <Logo />
-          <p className="mt-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+          <p className="mt-1 text-[11px] font-semibold uppercase tracking-wider text-muted">
             Yönetici Paneli
           </p>
         </div>
@@ -38,10 +43,10 @@ export default function AdminLayout() {
               to={n.to}
               end={n.end}
               className={({ isActive }) =>
-                `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+                `flex items-center gap-3 rounded-pill px-4 py-2.5 text-sm font-medium transition-colors ${
                   isActive
-                    ? "bg-primary-600 text-white"
-                    : "text-gray-600 hover:bg-primary-50"
+                    ? "bg-[rgb(var(--admin-red))] text-white shadow-[0_6px_18px_rgb(var(--admin-red)/0.32)]"
+                    : "text-muted hover:bg-surface-2 hover:text-content"
                 }`
               }
             >
@@ -50,11 +55,11 @@ export default function AdminLayout() {
             </NavLink>
           ))}
         </nav>
-        <div className="border-t border-gray-100 p-3">
+        <div className="border-t border-hairline p-3">
           <button
             type="button"
             onClick={handleLogout}
-            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-gray-500 hover:bg-gray-100"
+            className="flex w-full items-center gap-3 rounded-pill px-4 py-2.5 text-left text-sm font-medium text-muted hover:bg-surface-2 hover:text-content"
           >
             <Icon name="logout" size={17} /> Çıkış Yap
           </button>
@@ -62,29 +67,33 @@ export default function AdminLayout() {
       </aside>
 
       <div className="ml-64 flex-1">
-        <header className="flex items-center justify-between border-b border-gray-100 bg-surface px-8 py-4">
-          <div>
-            <p className="text-xs text-gray-400">METU GYM Merkez Şube</p>
-            <p className="text-sm font-semibold text-gray-800">
-              {new Date().toLocaleDateString("tr-TR", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-                weekday: "long",
-              })}
-            </p>
+        <header className="glass sticky top-0 z-10 flex items-center justify-between border-b border-hairline px-8 py-4">
+          <div className="flex items-center gap-2.5 rounded-pill bg-surface-2/70 py-1.5 pl-2.5 pr-4">
+            <span className="h-2 w-2 rounded-full bg-available shadow-[0_0_8px_rgb(var(--available)/0.7)]" />
+            <div>
+              <p className="text-[11px] leading-tight text-muted">METU GYM Merkez Şube</p>
+              <p className="text-xs font-semibold leading-tight text-content">
+                {new Date().toLocaleDateString("tr-TR", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                  weekday: "long",
+                })}
+              </p>
+            </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-500">Admin</span>
-            <div className="grid h-9 w-9 place-items-center rounded-full bg-ink-900 text-xs font-bold text-white">
+            <span className="text-sm text-muted">Admin</span>
+            <div className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-ink-800 to-ink-950 text-xs font-bold text-white ring-1 ring-hairline">
               AD
             </div>
           </div>
         </header>
-        <div className="p-8">
+        <div className="relative p-8">
           <Outlet />
         </div>
       </div>
     </div>
+    </AdminSurfaceContext.Provider>
   );
 }

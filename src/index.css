@@ -70,6 +70,13 @@
   --glow: 255 59 78;
   --accent: 255 59 78;        /* metin/link vurgusu — koyuda glow ile aynı */
 
+  /* Editoryal admin — kısık (muted) kırmızı. Ana eylemler nötr (beyaz/siyah);
+     kırmızı yalnızca aksan (yıkıcı buton + tablo içi linkler) ve dozu düşük. */
+  --admin-red: 178 76 84;             /* #B24C54 — danger dolgu, muted brick */
+  --admin-red-strong: 196 88 96;      /* danger hover */
+  --admin-red-text: 216 128 136;      /* koyu üstünde okunur muted kırmızı (inline) */
+  --admin-red-text-strong: 232 154 162;
+
   /* Aksan altın #F2A93B — SADECE görev kartı + puan rozeti */
   --gold: 242 169 59;
   --gold-ink: 26 18 6;        /* #1A1206 — gold zemin üstü koyu metin */
@@ -140,6 +147,12 @@
 
   --glow: 214 20 48;          /* açıkta glow biraz koyulaşır — beyaz üstünde okunur */
   --accent: 158 13 37;        /* beyaz üstünde ≥6:1 */
+
+  /* Editoryal admin — kısık kırmızı (açık temada daha koyu, kontrast için) */
+  --admin-red: 168 66 74;
+  --admin-red-strong: 148 52 60;
+  --admin-red-text: 158 58 66;
+  --admin-red-text-strong: 130 44 52;
 
   --gold: 191 124 15;         /* açıkta koyulaştırılmış altın — kontrast için */
   --gold-ink: 26 18 6;
@@ -364,6 +377,123 @@ h1, h2, h3 {
     0 12px 32px rgb(var(--glow) / 0.22);
 }
 
+/* ==========================================================================
+   ADMIN — Editoryal butonlar: MONOKROM (beyaz/siyah) + kısık kırmızı aksan
+   Yalnızca admin kabuğunda uygulanır (Button.jsx AdminSurfaceContext ile seçer).
+   Butonların yeri/boyutu Button.jsx SIZES'tan gelir; burada SADECE yüzey stili.
+
+   Marka kırmızısı renkli/warm zeminle çakıştığı için ana eylemler NÖTR:
+   - primary  → beyaz pill + ink metin (koyu bölgelerde yüksek kontrast)
+   - secondary/dark → ink (siyah) cam pill (açık aurora bölgeleri için)
+   - outline/ghost  → hairline / çerçevesiz sessiz nötr
+   Kırmızı yalnızca YIKICI eylemde ve orada da kısık (muted): --admin-red.
+   ========================================================================== */
+.admin-btn {
+  position: relative;
+  border: 1px solid transparent;
+  font-weight: 600;
+  letter-spacing: -0.006em;
+  transition:
+    filter var(--duration-fast) var(--ease-standard),
+    background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard),
+    transform var(--duration-instant) var(--ease-pop);
+}
+
+/* Beyaz — ana eylem. Koyu bölgelerin (üst/modallar/sidebar-yanı) üstünde
+   editoryal, yüksek kontrastlı. */
+.admin-btn-light {
+  background: rgb(255 255 255 / 0.95);
+  color: rgb(var(--ink-900));
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.22), 0 10px 26px rgb(0 0 0 / 0.26);
+}
+.admin-btn-light:hover {
+  background: #fff;
+  box-shadow: 0 2px 5px rgb(0 0 0 / 0.2), 0 14px 32px rgb(0 0 0 / 0.32);
+}
+.admin-btn-light:active {
+  background: rgb(238 238 240);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.16);
+}
+
+/* Siyah / ink cam — açık (aurora) bölgeler için alternatif nötr eylem */
+.admin-btn-dark {
+  background: rgb(14 14 16 / 0.72);
+  color: #fff;
+  border-color: rgb(255 255 255 / 0.14);
+  backdrop-filter: blur(8px) saturate(140%);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
+  box-shadow: 0 8px 22px rgb(0 0 0 / 0.3);
+}
+.admin-btn-dark:hover {
+  background: rgb(14 14 16 / 0.86);
+  border-color: rgb(255 255 255 / 0.22);
+}
+
+/* Outline — hairline çerçeveli sessiz nötr (referanstaki outline pill) */
+.admin-btn-outline {
+  background: rgb(255 255 255 / 0.05);
+  color: #fff;
+  border-color: rgb(255 255 255 / 0.26);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.admin-btn-outline:hover {
+  background: rgb(255 255 255 / 0.11);
+  border-color: rgb(255 255 255 / 0.4);
+}
+
+/* Ghost — çerçevesiz minimal (İptal vb.) */
+.admin-btn-ghost {
+  background: transparent;
+  color: rgb(255 255 255 / 0.74);
+}
+.admin-btn-ghost:hover {
+  background: rgb(255 255 255 / 0.08);
+  color: #fff;
+}
+
+/* Yıkıcı — KISIK (muted) kırmızı, hâlâ kırmızı. Tek editoryal kırmızı aksan. */
+.admin-btn-danger {
+  background: rgb(var(--admin-red));
+  color: #fff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.24), 0 10px 24px rgb(var(--admin-red) / 0.34);
+}
+.admin-btn-danger:hover { background: rgb(var(--admin-red-strong)); }
+.admin-btn-danger:active { filter: brightness(0.94); }
+
+/* Erişilebilirlik: şeffaflık azaltıldığında donuk yüzeye düş */
+@media (prefers-reduced-transparency: reduce) {
+  .admin-btn-dark {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgb(14 14 16 / 0.94);
+  }
+  .admin-btn-outline {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgb(var(--surface-3));
+  }
+}
+
+/* Tablo içi metin-eylem linkleri (Düzenle / Sil …) — kırmızıları kısılır. */
+.admin-scope button.text-accent {
+  color: rgb(var(--admin-red-text));
+  transition: color var(--duration-fast) var(--ease-standard);
+}
+.admin-scope button.text-accent:hover {
+  color: rgb(var(--admin-red-text-strong));
+}
+
+/* Segmented control (Tabs) aktif sekmesi de admin'de kısık kırmızı — canlı
+   marka kırmızısı yerine editoryal muted ton (bileşenin kendisi paylaşımlı,
+   yalnızca admin kabuğunda override edilir). */
+.admin-scope [role="tab"][aria-selected="true"] {
+  background-color: rgb(var(--admin-red));
+}
+
 /* Cam input — form alanları */
 .glass-input {
   background: rgba(255, 255, 255, 0.06);
@@ -439,6 +569,15 @@ h1, h2, h3 {
   background:
     radial-gradient(70% 45% at 85% -5%, rgb(var(--glow) / 0.10), transparent 60%),
     radial-gradient(65% 40% at -10% 8%, rgb(var(--primary-600) / 0.08), transparent 60%);
+}
+
+/* İnce tane/grenli doku — camın arkasındaki zemine "hero" referansındaki grain
+   hissini verir. Nötr/gri (feColorMatrix saturate=0) → temadan bağımsız,
+   sadece opacity ile kısılarak kullanılır (bkz. AdminLayout). */
+.bg-noise {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 140px 140px;
 }
 
 /* Spatial aura — arka planda bulanıklaştırılmış renkli sahne (koşucu fotoğrafı) */
