@@ -1,9 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Button from "../../components/Button.jsx";
-import Logo from "../../components/Logo.jsx";
-import { Input } from "../../components/Input.jsx";
 import { useToast } from "../../components/Toast.jsx";
+import {
+  Eyebrow,
+  GlassButton,
+  GlassField,
+  Panel,
+  ReceptionShell,
+} from "../../components/reception/ReceptionUI.jsx";
 import { login } from "../../api/auth.js";
 import { homePathForRole } from "../../utils/authUser.js";
 
@@ -32,14 +36,38 @@ export default function ReceptionLogin() {
   };
 
   return (
-    <div className="grid min-h-screen place-items-center bg-primary-600 p-6">
-      <div className="w-full max-w-md rounded-2xl bg-surface p-8 shadow-pop">
-        <div className="mb-6 flex flex-col items-center">
-          <Logo size={40} />
-          <p className="mt-2 text-sm text-gray-400">Resepsiyon / Check-in Girişi</p>
+    <ReceptionShell className="grid place-items-center p-6">
+      <Panel className="w-full max-w-md p-9">
+        <div className="flex items-center gap-3.5">
+          <img
+            src="/images/metumotion.jpg"
+            alt="METU Motion"
+            width={36}
+            height={36}
+            className="h-9 w-9 rounded-xl object-cover ring-1 ring-white/20"
+          />
+          <div className="leading-none">
+            <p className="font-display text-[15px] font-semibold tracking-[-0.01em] text-white">
+              METU Motion
+            </p>
+            <p className="mt-1 text-[9px] font-bold uppercase tracking-[0.24em] text-white/60">
+              ODTÜ Spor Merkezi
+            </p>
+          </div>
         </div>
-        <form onSubmit={submit} className="space-y-4">
-          <Input
+
+        <div className="mt-9">
+          <Eyebrow>Resepsiyon</Eyebrow>
+          <h1 className="mt-3 font-display text-[30px] font-medium leading-none tracking-[-0.03em] text-white">
+            Vardiya girişi
+          </h1>
+          <p className="mt-3 text-[13px] font-medium leading-relaxed text-white/65">
+            Check-in masasını açmak için resepsiyon hesabınızla oturum açın.
+          </p>
+        </div>
+
+        <form onSubmit={submit} className="mt-8 space-y-5">
+          <GlassField
             name="email"
             label="E-posta"
             type="email"
@@ -47,15 +75,22 @@ export default function ReceptionLogin() {
             defaultValue="reception@metugym.local"
             required
           />
-          <Input name="password" label="Şifre" type="password" placeholder="••••••••" required />
-          <Button full size="lg" type="submit" disabled={loading}>
+          <GlassField
+            name="password"
+            label="Şifre"
+            type="password"
+            placeholder="••••••••"
+            required
+          />
+          <GlassButton variant="solid" size="lg" full type="submit" disabled={loading}>
             {loading ? "Giriş yapılıyor…" : "Giriş Yap"}
-          </Button>
+          </GlassButton>
         </form>
-        <p className="mt-4 text-center text-xs text-gray-400">
-          Vardiya başında giriş yapmayı unutmayın.
+
+        <p className="mt-7 border-t border-white/10 pt-5 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">
+          Vardiya başında giriş yapmayı unutmayın
         </p>
-      </div>
-    </div>
+      </Panel>
+    </ReceptionShell>
   );
 }

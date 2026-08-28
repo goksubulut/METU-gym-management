@@ -719,3 +719,352 @@ h1, h2, h3 {
     scroll-behavior: auto !important;
   }
 }
+
+/* ==========================================================================
+   RESEPSİYON — "Editorial Glass"
+   Tüm /reception ekranları prizmatik bir fotoğraf zemininin
+   (public/images/receptionist-background.jpg) üstünde yaşar. Zemin renkli
+   olduğu için cam highlight'ları temadan BAĞIMSIZ beyaz tutulur (uygulama
+   genelindeki .glass-* ile aynı gerekçe). Palet kasıtlı olarak renksizdir:
+   marka kırmızısı bu panelde kullanılmaz, hiyerarşi kontrast + boşluk +
+   tipografi ile kurulur. Tek "dolu" yüzey ana eylem butonudur.
+   ========================================================================== */
+
+.rc-shell {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  color: rgba(255, 255, 255, 0.92);
+}
+.rc-layer { position: relative; z-index: 1; }
+
+/* --- Zemin --------------------------------------------------------------- */
+.rc-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background-color: #0a0a0c;
+}
+.rc-backdrop__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transform: scale(1.06);
+  filter: saturate(112%) contrast(102%) brightness(0.88);
+}
+/* Okunurluk perdesi — fotoğrafın pastel prizması korunur, parlaklık düşer */
+.rc-backdrop__scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(110% 80% at 76% 0%, rgba(255, 255, 255, 0.08), transparent 54%),
+    linear-gradient(197deg, rgba(8, 8, 11, 0.52) 0%, rgba(8, 8, 11, 0.66) 48%, rgba(5, 5, 8, 0.82) 100%);
+}
+/* Kenar vinyeti — editoryal derinlik */
+.rc-backdrop__vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(115% 92% at 50% 38%, transparent 42%, rgba(0, 0, 0, 0.42) 100%);
+}
+
+/* --- Kroma (sticky masthead) --------------------------------------------- */
+.rc-topbar {
+  background: linear-gradient(180deg, rgba(11, 11, 14, 0.66), rgba(11, 11, 14, 0.34));
+  backdrop-filter: blur(26px) saturate(140%);
+  -webkit-backdrop-filter: blur(26px) saturate(140%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+.rc-nav {
+  position: relative;
+  padding-bottom: 3px;
+  color: rgba(255, 255, 255, 0.64);
+  transition: color var(--duration-fast) var(--ease-standard);
+}
+.rc-nav:hover { color: rgba(255, 255, 255, 0.86); }
+.rc-nav.is-active { color: #fff; }
+.rc-nav.is-active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.75);
+}
+
+/* --- Paneller ------------------------------------------------------------ */
+.rc-panel {
+  position: relative;
+  /* Dumanlı cam: beyaz sheen + koyu taban. Taban, panelin fotoğrafın parlak
+     (krem/lavanta) bölgelerine denk geldiği yerde bile beyaz metnin kontrastını
+     garanti eder — cam etkisi renk geçirmeye devam eder. */
+  background:
+    linear-gradient(
+      158deg,
+      rgba(255, 255, 255, 0.10),
+      rgba(255, 255, 255, 0.035) 46%,
+      rgba(255, 255, 255, 0.02)
+    ),
+    rgba(12, 12, 15, 0.52);
+  backdrop-filter: blur(30px) saturate(150%);
+  -webkit-backdrop-filter: blur(30px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 28px 70px rgba(0, 0, 0, 0.40),
+    0 2px 10px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.20);
+}
+/* köşeden gelen spekülar ışık — camın "kalınlık" hissi */
+.rc-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(120% 72% at 8% -10%, rgba(255, 255, 255, 0.15), transparent 54%);
+}
+.rc-panel > * { position: relative; z-index: 1; }
+
+/* Sessiz varyant — ikincil bloklar, arka planı ezmez */
+.rc-panel--quiet {
+  background: linear-gradient(rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.045)),
+    rgba(12, 12, 15, 0.44);
+  border-color: rgba(255, 255, 255, 0.10);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10);
+}
+.rc-panel--quiet::before { background: none; }
+
+/* --- Butonlar ------------------------------------------------------------ */
+.rc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  outline: none;
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard),
+    transform var(--duration-instant) var(--ease-standard);
+}
+.rc-btn:active:not(:disabled) { transform: scale(0.975); }
+.rc-btn:focus-visible {
+  box-shadow: 0 0 0 2px rgba(10, 10, 12, 0.75), 0 0 0 4px rgba(255, 255, 255, 0.55);
+}
+.rc-btn:disabled { opacity: 0.42; cursor: not-allowed; }
+
+/* Ana eylem — markanın koyulaştırılmış, doygunluğu kısılmış kırmızısı (#E31837
+   yerine şarap tonu). Fotoğrafın pastel olive/lavanta bölgeleriyle çakışmaz,
+   beyaz metinle 8:1 üzeri kontrast verir. Ekranda tek dolu yüzey olarak kalır. */
+.rc-btn--solid {
+  background: linear-gradient(168deg, #b0263a, #8c1a2b);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 10px 26px rgba(0, 0, 0, 0.34),
+    0 4px 14px rgba(140, 26, 43, 0.40),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+.rc-btn--solid:hover:not(:disabled) {
+  background: linear-gradient(168deg, #c02a41, #9a1e30);
+  box-shadow:
+    0 14px 34px rgba(0, 0, 0, 0.38),
+    0 6px 18px rgba(140, 26, 43, 0.48),
+    inset 0 1px 0 rgba(255, 255, 255, 0.20);
+}
+.rc-btn--solid:focus-visible {
+  box-shadow: 0 0 0 2px rgba(10, 10, 12, 0.75), 0 0 0 4px rgba(214, 90, 108, 0.75);
+}
+
+/* Kırmızı camlı eylem — listede tekrar eden satır aksiyonu için. Aynı ton,
+   dolu CTA'nın ağırlığı olmadan: 10 satırda 10 dolu kırmızı hap gürültü olurdu. */
+.rc-btn--tint {
+  background: linear-gradient(rgba(196, 44, 66, 0.26), rgba(160, 30, 48, 0.26)),
+    rgba(13, 13, 16, 0.42);
+  border-color: rgba(224, 108, 124, 0.46);
+  color: #ffe6e9;
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 8px 20px rgba(0, 0, 0, 0.26);
+}
+.rc-btn--tint:hover:not(:disabled) {
+  background: linear-gradient(rgba(206, 52, 74, 0.40), rgba(170, 34, 54, 0.40)),
+    rgba(13, 13, 16, 0.42);
+  border-color: rgba(232, 128, 142, 0.62);
+  color: #fff;
+}
+
+/* İkincil — buzlu cam */
+.rc-btn--glass {
+  background: linear-gradient(rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.08)),
+    rgba(13, 13, 16, 0.52);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 8px 20px rgba(0, 0, 0, 0.20);
+}
+.rc-btn--glass:hover:not(:disabled) {
+  background: linear-gradient(rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.14)),
+    rgba(13, 13, 16, 0.52);
+  border-color: rgba(255, 255, 255, 0.34);
+}
+
+/* Üçüncül — yalnız metin */
+.rc-btn--ghost { color: rgba(255, 255, 255, 0.68); }
+.rc-btn--ghost:hover:not(:disabled) {
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* --- Form alanları ------------------------------------------------------- */
+.rc-field {
+  width: 100%;
+  color: #fff;
+  background: linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06)),
+    rgba(13, 13, 16, 0.40);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  outline: none;
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard);
+}
+.rc-field::placeholder { color: rgba(255, 255, 255, 0.34); }
+.rc-field:focus {
+  background: linear-gradient(rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.11)),
+    rgba(13, 13, 16, 0.44);
+  border-color: rgba(255, 255, 255, 0.42);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.10);
+}
+
+/* --- Durum çipleri — düşük doygunluk, renk yalnızca işaret düzeyinde ------ */
+.rc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 9999px;
+  border: 1px solid;
+  padding: 0.2rem 0.6rem;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.rc-chip__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 9999px;
+  background: currentColor;
+}
+.rc-chip--neutral {
+  color: rgba(255, 255, 255, 0.82);
+  border-color: rgba(255, 255, 255, 0.20);
+  background: rgba(255, 255, 255, 0.05);
+}
+.rc-chip--positive {
+  color: #BCD9C6;
+  border-color: rgba(188, 217, 198, 0.32);
+  background: rgba(188, 217, 198, 0.10);
+}
+.rc-chip--absent {
+  color: #DEB9AF;
+  border-color: rgba(222, 185, 175, 0.32);
+  background: rgba(222, 185, 175, 0.10);
+}
+
+/* Nötr etiket — kas grubu / makine adları */
+.rc-tag {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0.28rem 0.7rem;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* --- Segment kontrolü (saat filtresi) ------------------------------------ */
+.rc-seg {
+  display: inline-flex;
+  gap: 4px;
+  max-width: 100%;
+  overflow-x: auto;
+  border-radius: 9999px;
+  padding: 4px;
+  background: linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05)),
+    rgba(13, 13, 16, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
+.rc-seg__item {
+  white-space: nowrap;
+  border-radius: 9999px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.68);
+  outline: none;
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
+}
+.rc-seg__item:hover { color: rgba(255, 255, 255, 0.95); }
+.rc-seg__item[aria-selected="true"] {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 2px 10px rgba(0, 0, 0, 0.18);
+}
+.rc-seg__item:focus-visible { box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5); }
+
+/* --- Liste satırları ------------------------------------------------------ */
+.rc-row { transition: background-color var(--duration-fast) var(--ease-standard); }
+.rc-row:hover { background: rgba(255, 255, 255, 0.05); }
+.rc-row.is-active { background: rgba(255, 255, 255, 0.09); }
+
+/* Erişilebilirlik: şeffaflık azaltıldığında cam donuk yüzeye döner */
+@media (prefers-reduced-transparency: reduce) {
+  .rc-topbar,
+  .rc-panel,
+  .rc-panel--quiet,
+  .rc-btn--glass,
+  .rc-field,
+  .rc-seg {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(18, 18, 21, 0.95);
+  }
+  .rc-backdrop__img { filter: saturate(116%) brightness(0.55); }
+}
+
+/* Boş durum kutusu — panellerle aynı dumanlı taban */
+.rc-empty {
+  background: linear-gradient(rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.04)),
+    rgba(13, 13, 16, 0.36);
+  backdrop-filter: blur(22px) saturate(140%);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .rc-empty {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(18, 18, 21, 0.95);
+  }
+}

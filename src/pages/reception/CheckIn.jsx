@@ -1,21 +1,21 @@
 import { useCallback, useEffect, useState } from "react";
-import Card from "../../components/Card.jsx";
-import Badge from "../../components/Badge.jsx";
-import Button from "../../components/Button.jsx";
-import Tabs from "../../components/Tabs.jsx";
-import EmptyState from "../../components/EmptyState.jsx";
-import { Input } from "../../components/Input.jsx";
 import { useToast } from "../../components/Toast.jsx";
+import {
+  Eyebrow,
+  Figure,
+  GlassButton,
+  GlassField,
+  Panel,
+  Placeholder,
+  Segmented,
+  StatusChip,
+  Tag,
+} from "../../components/reception/ReceptionUI.jsx";
 import { todaysCheckins as mockRows } from "../../mock/appointments.js";
 import { machineById, MUSCLE_GROUPS } from "../../mock/machines.js";
 import { fetchTodayAppointments, updateReceptionStatus } from "../../api/reception.js";
 import { isMockRowId, mergeById } from "../../api/client.js";
 
-const ST = {
-  pending: { tone: "yellow", label: "Bekliyor" },
-  "checked-in": { tone: "green", label: "Geldi" },
-  "no-show": { tone: "red", label: "Gelmedi" },
-};
 const labelOf = (id) => MUSCLE_GROUPS.find((m) => m.id === id)?.label || id;
 
 function sortByTime(rows) {
@@ -86,63 +86,65 @@ export default function CheckIn() {
   };
 
   return (
-    <div className="flex gap-6">
-      <div className="flex-1 space-y-5">
-        <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-8 lg:flex-row">
+      <div className="min-w-0 flex-1 space-y-7">
+        {/* Manşet */}
+        <div className="flex items-end justify-between gap-6">
           <div>
-            <h1 className="text-2xl font-extrabold text-gray-900">Bugünün Check-in'i</h1>
-            <p className="text-sm text-gray-400">
-              {todayLabel} · {stats.total} randevu
-            </p>
+            <Eyebrow>{todayLabel}</Eyebrow>
+            <h1 className="mt-3 font-display text-[38px] font-medium leading-none tracking-[-0.03em] text-white">
+              Check-in
+            </h1>
           </div>
-          <Button variant="outline" onClick={() => { load(); toast("Liste yenilendi"); }}>
+          <GlassButton
+            onClick={() => {
+              load();
+              toast("Liste yenilendi");
+            }}
+          >
             Yenile
-          </Button>
+          </GlassButton>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
-          <Card soft className="p-4 text-center">
-            <p className="text-2xl font-extrabold text-gray-900">{stats.total}</p>
-            <p className="text-xs text-gray-500">Toplam</p>
-          </Card>
-          <Card soft className="p-4 text-center">
-            <p className="text-2xl font-extrabold text-available">{stats.arrived}</p>
-            <p className="text-xs text-gray-500">Geldi</p>
-          </Card>
-          <Card soft className="p-4 text-center">
-            <p className="text-2xl font-extrabold text-busy">{stats.pending}</p>
-            <p className="text-xs text-gray-500">Bekliyor</p>
-          </Card>
+        {/* Rakamlar — tek panel, ince dikey ayraçlarla bölünmüş gazete künyesi */}
+        <Panel quiet className="grid grid-cols-3 divide-x divide-white/10">
+          <Figure value={stats.total} label="Toplam" />
+          <Figure value={stats.arrived} label="Geldi" />
+          <Figure value={stats.pending} label="Bekliyor" />
+        </Panel>
+
+        {/* Filtreler */}
+        <div className="space-y-4">
+          <GlassField
+            placeholder="İsim veya telefon ile ara"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            aria-label="İsim veya telefon ile ara"
+          />
+          <Segmented
+            ariaLabel="Saat filtresi"
+            items={hours.map((h) => ({ value: h, label: h === "all" ? "Tüm saatler" : h }))}
+            value={hour}
+            onChange={setHour}
+          />
         </div>
 
-        <div className="flex items-center gap-4">
-          <div className="flex-1">
-            <Input
-              placeholder="İsim veya telefon ile ara..."
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-            />
-          </div>
-        </div>
-
-        <Tabs
-          tabs={hours.map((h) => ({ value: h, label: h === "all" ? "Tüm saatler" : h }))}
-          active={hour}
-          onChange={setHour}
-        />
-
+        {/* Liste */}
         {filtered.length === 0 ? (
-          <EmptyState icon="search" title="Randevu bulunamadı" />
+          <Placeholder
+            title="Randevu bulunamadı"
+            description="Arama veya saat filtresini değiştirerek tekrar deneyin."
+          />
         ) : (
-          <Card className="overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 text-left text-xs text-gray-400">
-                <tr>
-                  <th className="px-5 py-3 font-medium">Saat</th>
-                  <th className="px-5 py-3 font-medium">İsim</th>
-                  <th className="px-5 py-3 font-medium">Telefon</th>
-                  <th className="px-5 py-3 font-medium">Durum</th>
-                  <th className="px-5 py-3 font-medium text-right">İşlem</th>
+          <Panel className="overflow-hidden">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-white/[0.12] text-[10px] font-bold uppercase tracking-[0.2em] text-white/55">
+                  <th className="px-6 py-4 font-semibold">Saat</th>
+                  <th className="px-6 py-4 font-semibold">Üye</th>
+                  <th className="hidden px-6 py-4 font-semibold md:table-cell">Telefon</th>
+                  <th className="px-6 py-4 font-semibold">Durum</th>
+                  <th className="px-6 py-4 text-right font-semibold">İşlem</th>
                 </tr>
               </thead>
               <tbody>
@@ -150,19 +152,26 @@ export default function CheckIn() {
                   <tr
                     key={r.id}
                     onClick={() => setSelected(r)}
-                    className={`cursor-pointer border-t border-gray-50 hover:bg-primary-50/40 ${
-                      selected?.id === r.id ? "bg-primary-50" : ""
+                    className={`rc-row cursor-pointer border-b border-white/[0.07] last:border-b-0 ${
+                      selected?.id === r.id ? "is-active" : ""
                     }`}
                   >
-                    <td className="px-5 py-3 font-bold text-gray-900">{r.time}</td>
-                    <td className="px-5 py-3 font-semibold text-gray-800">{r.name}</td>
-                    <td className="px-5 py-3 text-gray-500">{r.phone}</td>
-                    <td className="px-5 py-3">
-                      <Badge tone={ST[r.status].tone}>{ST[r.status].label}</Badge>
+                    <td className="px-6 py-4">
+                      <span className="tabular-nums font-display text-[17px] font-semibold tracking-[-0.01em] text-white">
+                        {r.time}
+                      </span>
                     </td>
-                    <td className="px-5 py-3 text-right">
+                    <td className="px-6 py-4 text-[15px] font-semibold text-white">{r.name}</td>
+                    <td className="hidden px-6 py-4 text-[13px] font-medium tabular-nums text-white/65 md:table-cell">
+                      {r.phone}
+                    </td>
+                    <td className="px-6 py-4">
+                      <StatusChip status={r.status} />
+                    </td>
+                    <td className="px-6 py-4 text-right">
                       {r.status !== "checked-in" ? (
-                        <Button
+                        <GlassButton
+                          variant="tint"
                           size="sm"
                           onClick={(e) => {
                             e.stopPropagation();
@@ -170,95 +179,91 @@ export default function CheckIn() {
                           }}
                         >
                           Geldi
-                        </Button>
+                        </GlassButton>
                       ) : (
-                        <span className="text-xs font-semibold text-available">✓</span>
+                        <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/55">
+                          Onaylı
+                        </span>
                       )}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </Card>
+          </Panel>
         )}
       </div>
 
-      <div className="w-80 shrink-0">
-        <div className="sticky top-24">
+      {/* Detay rayı */}
+      <div className="w-full shrink-0 lg:w-[21rem]">
+        <div className="lg:sticky lg:top-28">
           {selected ? (
-            <Card className="p-5">
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
-                Randevu Detayı
+            <Panel className="p-7">
+              <Eyebrow>Randevu Detayı</Eyebrow>
+              <p className="mt-4 font-display text-[26px] font-medium leading-tight tracking-[-0.02em] text-white">
+                {selected.name}
               </p>
-              <p className="mt-1 text-xl font-extrabold text-gray-900">{selected.name}</p>
-              <p className="text-sm text-gray-400">{selected.phone}</p>
+              <p className="mt-1.5 text-[13px] font-medium tabular-nums text-white/65">{selected.phone}</p>
 
-              <div className="my-4 flex items-center gap-2">
-                <Badge tone="primary">{selected.time}</Badge>
-                <Badge tone={ST[selected.status].tone}>{ST[selected.status].label}</Badge>
+              <div className="mt-5 flex items-center gap-3">
+                <span className="tabular-nums font-display text-[15px] font-semibold text-white/90">
+                  {selected.time}
+                </span>
+                <span className="h-3.5 w-px bg-white/20" />
+                <StatusChip status={selected.status} />
               </div>
 
-              <div className="space-y-3 border-t border-gray-100 pt-3 text-sm">
+              <div className="mt-6 space-y-5 border-t border-white/10 pt-6">
                 <div>
-                  <p className="mb-1 text-xs font-semibold text-gray-400">Kas Grupları</p>
-                  <div className="flex flex-wrap gap-1">
+                  <Eyebrow className="!tracking-[0.22em]">Kas Grupları</Eyebrow>
+                  <div className="mt-3 flex flex-wrap gap-1.5">
                     {selected.muscleGroups.map((g) => (
-                      <Badge key={g} tone="primary">
-                        {labelOf(g)}
-                      </Badge>
+                      <Tag key={g}>{labelOf(g)}</Tag>
                     ))}
                   </div>
                 </div>
                 <div>
-                  <p className="mb-1 text-xs font-semibold text-gray-400">Makineler</p>
-                  <div className="flex flex-wrap gap-1">
+                  <Eyebrow className="!tracking-[0.22em]">Makineler</Eyebrow>
+                  <div className="mt-3 flex flex-wrap gap-1.5">
                     {selected.machines.map((m) => (
-                      <Badge key={m} tone="gray">
-                        {machineById(m)?.name}
-                      </Badge>
+                      <Tag key={m}>{machineById(m)?.name}</Tag>
                     ))}
                   </div>
                 </div>
               </div>
 
-              <div className="mt-5 space-y-2">
+              <div className="mt-7 space-y-2.5">
                 {selected.status !== "checked-in" ? (
-                  <Button full onClick={() => checkin(selected)}>
-                    ✓ Gelişi Onayla
-                  </Button>
+                  <GlassButton variant="solid" full onClick={() => checkin(selected)}>
+                    Gelişi Onayla
+                  </GlassButton>
                 ) : (
-                  <Button
-                    variant="outline"
+                  <GlassButton
                     full
                     onClick={() => {
                       applyStatus(selected.id, "pending");
                       toast("Check-in geri alındı", "error");
                     }}
                   >
-                    ↩ Geri Al
-                  </Button>
+                    Geri Al
+                  </GlassButton>
                 )}
                 {selected.status !== "checked-in" && selected.status !== "no-show" && (
-                  <Button
-                    variant="ghost"
-                    full
-                    onClick={() => applyStatus(selected.id, "no-show")}
-                  >
-                    Gelmedi işaretle
-                  </Button>
+                  <GlassButton variant="ghost" full onClick={() => applyStatus(selected.id, "no-show")}>
+                    Gelmedi olarak işaretle
+                  </GlassButton>
                 )}
                 {selected.status === "no-show" && (
-                  <Button full onClick={() => checkin(selected)}>
+                  <GlassButton variant="solid" full onClick={() => checkin(selected)}>
                     Geldi olarak işaretle
-                  </Button>
+                  </GlassButton>
                 )}
               </div>
-            </Card>
+            </Panel>
           ) : (
-            <EmptyState
-              icon="clipboard"
+            <Placeholder
               title="Randevu seç"
-              description="Detayları ve check-in onayını görmek için tablodan bir kayıt seç."
+              description="Detayları ve check-in onayını görmek için listeden bir kayıt seçin."
             />
           )}
         </div>

@@ -1,19 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Card from "../../components/Card.jsx";
-import Badge from "../../components/Badge.jsx";
-import Button from "../../components/Button.jsx";
 import { useToast } from "../../components/Toast.jsx";
+import {
+  Eyebrow,
+  GlassButton,
+  Panel,
+  StatusChip,
+  Tag,
+} from "../../components/reception/ReceptionUI.jsx";
 import { todaysCheckins as mockRows } from "../../mock/appointments.js";
 import { machineById, MUSCLE_GROUPS } from "../../mock/machines.js";
 import { fetchReceptionAppointment, updateReceptionStatus } from "../../api/reception.js";
 import { isMockRowId } from "../../api/client.js";
 
-const ST = {
-  pending: { tone: "yellow", label: "Bekliyor" },
-  "checked-in": { tone: "green", label: "Geldi" },
-  "no-show": { tone: "red", label: "Gelmedi" },
-};
 const labelOf = (id) => MUSCLE_GROUPS.find((m) => m.id === id)?.label || id;
 
 export default function AppointmentDetail() {
@@ -50,78 +49,82 @@ export default function AppointmentDetail() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <button onClick={() => nav("/reception")} className="mb-4 text-sm text-gray-400">
-        ← Check-in listesine dön
+      <button
+        onClick={() => nav("/reception")}
+        className="mb-7 text-[10px] font-bold uppercase tracking-[0.22em] text-white/60 transition-colors duration-fast hover:text-white/85"
+      >
+        ← Check-in listesi
       </button>
 
-      <Card className="overflow-hidden">
-        <div className="flex items-center justify-between bg-primary-600 px-6 py-5 text-white">
-          <div>
-            <p className="text-xs uppercase tracking-wide text-primary-100">Randevu</p>
-            <p className="text-2xl font-extrabold">{row.name}</p>
-            <p className="text-sm text-primary-100">{row.phone}</p>
+      <Panel className="overflow-hidden">
+        {/* Künye — isim solda, saat sağda; ayrım renk değil boşluk ve çizgi */}
+        <div className="flex items-start justify-between gap-6 border-b border-white/10 px-8 pb-7 pt-8">
+          <div className="min-w-0">
+            <Eyebrow>Randevu</Eyebrow>
+            <p className="mt-3.5 truncate font-display text-[30px] font-medium leading-none tracking-[-0.03em] text-white">
+              {row.name}
+            </p>
+            <p className="mt-2.5 text-[13px] font-medium tabular-nums text-white/65">{row.phone}</p>
           </div>
-          <div className="text-right">
-            <p className="text-3xl font-extrabold">{row.time}</p>
-            <Badge tone={ST[status].tone} className="!bg-white/20 !text-white">
-              {ST[status].label}
-            </Badge>
+          <div className="shrink-0 text-right">
+            <p className="tabular-nums font-display text-[38px] font-medium leading-none tracking-[-0.03em] text-white">
+              {row.time}
+            </p>
+            <div className="mt-3.5 flex justify-end">
+              <StatusChip status={status} />
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-6 p-6">
+        <div className="grid gap-8 px-8 py-7 sm:grid-cols-2">
           <div>
-            <p className="mb-2 text-xs font-semibold text-gray-400">Kas Grupları</p>
-            <div className="flex flex-wrap gap-1.5">
+            <Eyebrow className="!tracking-[0.22em]">Kas Grupları</Eyebrow>
+            <div className="mt-3.5 flex flex-wrap gap-1.5">
               {row.muscleGroups.map((g) => (
-                <Badge key={g} tone="primary">
-                  {labelOf(g)}
-                </Badge>
+                <Tag key={g}>{labelOf(g)}</Tag>
               ))}
             </div>
           </div>
           <div>
-            <p className="mb-2 text-xs font-semibold text-gray-400">Planlanan Makineler</p>
-            <div className="flex flex-wrap gap-1.5">
+            <Eyebrow className="!tracking-[0.22em]">Planlanan Makineler</Eyebrow>
+            <div className="mt-3.5 flex flex-wrap gap-1.5">
               {row.machines.map((m) => (
-                <Badge key={m} tone="gray">
-                  {machineById(m)?.name}
-                </Badge>
+                <Tag key={m}>{machineById(m)?.name}</Tag>
               ))}
             </div>
           </div>
         </div>
 
-        <div className="flex gap-3 border-t border-gray-100 px-6 py-4">
+        <div className="flex flex-wrap items-center gap-3 border-t border-white/10 px-8 py-6">
           {status !== "checked-in" ? (
-            <Button
-              full
+            <GlassButton
+              variant="solid"
+              className="flex-1"
               onClick={() => {
                 applyStatus("checked-in");
                 toast(`${row.name} gelişi onaylandı`, "success");
               }}
             >
               Gelişi Onayla
-            </Button>
+            </GlassButton>
           ) : (
-            <Button
-              variant="outline"
-              full
+            <GlassButton
+              className="flex-1"
               onClick={() => {
                 applyStatus("pending");
                 toast("Yanlış işaretleme geri alındı", "error");
               }}
             >
-              ↩ Geri Al (yanlış işaretledim)
-            </Button>
+              Geri Al
+            </GlassButton>
           )}
           {status !== "checked-in" && (
-            <Button variant="ghost" onClick={() => applyStatus("no-show")}>
+            <GlassButton variant="ghost" onClick={() => applyStatus("no-show")}>
               Gelmedi
-            </Button>
+            </GlassButton>
           )}
         </div>
-      </Card>
+      </Panel>
     </div>
   );
 }
