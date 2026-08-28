@@ -106,7 +106,7 @@ export default function Faults() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-extrabold text-gray-900">Arıza Bildirimleri</h1>
-        <p className="text-sm text-gray-400">Bildirimleri filtrele, incele ve durumunu güncelle</p>
+        <p className="text-sm text-gray-600">Bildirimleri filtrele, incele ve durumunu güncelle</p>
       </div>
 
       <StatCard
@@ -136,7 +136,7 @@ export default function Faults() {
 
       <Card className="overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-left text-xs text-gray-400">
+          <thead className="bg-gray-50 text-left text-xs text-gray-600">
             <tr>
               <th className="px-5 py-3 font-medium">Makine</th>
               <th className="px-5 py-3 font-medium">Sorun</th>
@@ -154,7 +154,7 @@ export default function Faults() {
                 <td className="px-5 py-3">
                   <Badge tone={SEV[f.severity].tone}>{SEV[f.severity].label}</Badge>
                 </td>
-                <td className="px-5 py-3 text-gray-500">{f.date}</td>
+                <td className="px-5 py-3 text-gray-700">{f.date}</td>
                 <td className="px-5 py-3">
                   <Badge tone={ST[f.status].tone}>{ST[f.status].label}</Badge>
                 </td>
@@ -213,10 +213,10 @@ export default function Faults() {
               ))}
             </Select>
             <div>
-              <p className="mb-1 text-xs font-semibold text-gray-400">Açıklama</p>
+              <p className="mb-1 text-xs font-semibold text-gray-600">Açıklama</p>
               <p className="rounded-xl bg-gray-50 p-3 text-gray-700">{detail.issue}</p>
             </div>
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-gray-600">
               Yeni bildirimler <b>Beklemede</b> olarak gelir; Açık, İşlemde veya Çözüldü durumunu
               admin belirler.
             </p>
@@ -230,7 +230,7 @@ export default function Faults() {
 function Row({ label, value }) {
   return (
     <div className="flex justify-between border-b border-gray-50 pb-2">
-      <span className="text-gray-400">{label}</span>
+      <span className="text-gray-600">{label}</span>
       <span className="font-semibold text-gray-800">{value}</span>
     </div>
   );

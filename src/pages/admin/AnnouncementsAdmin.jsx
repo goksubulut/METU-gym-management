@@ -135,14 +135,14 @@ export default function AnnouncementsAdmin() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-extrabold text-gray-900">Duyurular</h1>
-          <p className="text-sm text-gray-400">Üyelere bildirim olarak gösterilir</p>
+          <p className="text-sm text-gray-600">Üyelere bildirim olarak gösterilir</p>
         </div>
         <Button onClick={openCreate}>+ Duyuru Paylaş</Button>
       </div>
 
       <Card className="overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-left text-xs text-gray-400">
+          <thead className="bg-gray-50 text-left text-xs text-gray-600">
             <tr>
               <th className="px-5 py-3 font-medium">Başlık</th>
               <th className="px-5 py-3 font-medium">Kategori</th>
@@ -162,7 +162,7 @@ export default function AnnouncementsAdmin() {
                     {CATEGORY_LABELS[a.category]}
                   </Badge>
                 </td>
-                <td className="px-5 py-3 text-gray-500">{a.date}</td>
+                <td className="px-5 py-3 text-gray-700">{a.date}</td>
                 <td className="px-5 py-3">
                   <button
                     type="button"
@@ -255,7 +255,7 @@ export default function AnnouncementsAdmin() {
           </>
         }
       >
-        <p className="text-sm text-gray-500">Bu duyuru kalıcı olarak silinecek.</p>
+        <p className="text-sm text-gray-700">Bu duyuru kalıcı olarak silinecek.</p>
       </Modal>
     </div>
   );

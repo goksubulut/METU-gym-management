@@ -268,7 +268,7 @@ export default function Inventory() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-extrabold text-gray-900">Makine Envanteri</h1>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-gray-600">
             {loading ? "Yükleniyor…" : `${activeCount} aktif / ${list.length} toplam`}
           </p>
         </div>
@@ -277,7 +277,7 @@ export default function Inventory() {
 
       <Card className="overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-left text-xs text-gray-400">
+          <thead className="bg-gray-50 text-left text-xs text-gray-600">
             <tr>
               <th className="px-5 py-3 font-medium">Makine</th>
               <th className="px-5 py-3 font-medium">Kategori</th>
@@ -306,7 +306,7 @@ export default function Inventory() {
                           className="h-full w-full object-cover"
                         />
                       ) : (
-                        <div className="grid h-full w-full place-items-center text-[10px] text-gray-400">
+                        <div className="grid h-full w-full place-items-center text-[10px] text-gray-600">
                           —
                         </div>
                       )}
@@ -317,8 +317,8 @@ export default function Inventory() {
                 <td className="px-5 py-3">
                   <Badge tone="gray">{m.category}</Badge>
                 </td>
-                <td className="px-5 py-3 text-gray-500">{m.location}</td>
-                <td className="px-5 py-3 text-xs text-gray-500">
+                <td className="px-5 py-3 text-gray-700">{m.location}</td>
+                <td className="px-5 py-3 text-xs text-gray-700">
                   {(m.muscles ?? []).length
                     ? (m.muscles ?? [])
                         .map((id) => MUSCLE_GROUPS.find((g) => g.id === id)?.label ?? id)
@@ -335,7 +335,7 @@ export default function Inventory() {
                 </td>
                 <td className="px-5 py-3">
                   <div className="flex justify-end gap-3 text-sm font-semibold">
-                    <button type="button" onClick={() => openQr(m)} className="text-gray-500">
+                    <button type="button" onClick={() => openQr(m)} className="text-gray-700">
                       QR
                     </button>
                     <button
@@ -422,7 +422,7 @@ export default function Inventory() {
                   {previewUrl ? (
                     <img src={previewUrl} alt="" className="h-full w-full object-cover" />
                   ) : (
-                    <div className="grid h-full w-full place-items-center text-xs text-gray-400">
+                    <div className="grid h-full w-full place-items-center text-xs text-gray-600">
                       Yok
                     </div>
                   )}
@@ -461,7 +461,7 @@ export default function Inventory() {
                       Fotoğrafı kaldır
                     </button>
                   )}
-                  <p className="text-[11px] text-gray-400">JPEG / PNG / WebP, max 5 MB</p>
+                  <p className="text-[11px] text-gray-600">JPEG / PNG / WebP, max 5 MB</p>
                 </div>
               </div>
             </div>
@@ -542,18 +542,18 @@ export default function Inventory() {
               {qr.dataUrl ? (
                 <img src={qr.dataUrl} alt={`${qr.name} QR kodu`} className="h-full w-full object-contain" />
               ) : (
-                <p className="text-xs text-gray-400">QR üretiliyor…</p>
+                <p className="text-xs text-gray-600">QR üretiliyor…</p>
               )}
             </div>
             <p className="mt-3 text-sm font-bold text-gray-900">{qr.name}</p>
-            <p className="text-xs text-gray-400">{qr.location}</p>
+            <p className="text-xs text-gray-600">{qr.location}</p>
             <code className="mt-2 rounded-lg bg-gray-100 px-2 py-1 text-[11px] text-gray-600">
               {qr.url ?? `/machine/${qr.id}`}
             </code>
             <Badge tone={qr.custom ? "primary" : "gray"} className="mt-2">
               {qr.custom ? "Özel PNG" : "Otomatik üretilen"}
             </Badge>
-            <p className="mt-2 max-w-[240px] text-center text-[11px] text-gray-400">
+            <p className="mt-2 max-w-[240px] text-center text-[11px] text-gray-600">
               Deep-link her zaman aynı kalır. İstersen baskı için kendi QR PNG&apos;ni
               yükleyebilirsin.
             </p>
@@ -606,7 +606,7 @@ export default function Inventory() {
           </>
         }
       >
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-700">
           <b>{del?.name}</b> katalogdan gizlenecek (soft-delete). İlişkili randevu ve arıza
           kayıtları korunur. Daha sonra düzenlemeden tekrar aktif edebilirsin.
         </p>

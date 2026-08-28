@@ -16,7 +16,7 @@ export default function AdminAmbientGlow() {
         alt=""
         draggable="false"
         className="absolute inset-0 h-full w-full object-cover"
-        style={{ filter: "saturate(1.14) brightness(0.68) contrast(1.0)" }}
+        style={{ filter: "saturate(1.10) brightness(0.56) contrast(1.04)" }}
         onError={(e) => {
           if (e.currentTarget.src.indexOf("admin-background.jpeg") === -1)
             e.currentTarget.src = "/images/admin-background.jpeg";
@@ -24,7 +24,7 @@ export default function AdminAmbientGlow() {
       />
 
       {/* Hafif genel veil — cam yüzeyler ve beyaz metin için kontrast tabanı */}
-      <div className="absolute inset-0" style={{ backgroundColor: "rgb(var(--bg) / 0.26)" }} />
+      <div className="absolute inset-0" style={{ backgroundColor: "rgb(var(--bg) / 0.38)" }} />
 
       {/* Üst/alt karartma — bare başlıklar ve alt kenar okunurluğu (üst korunur) */}
       <div

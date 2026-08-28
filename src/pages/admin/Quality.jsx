@@ -29,7 +29,7 @@ export default function Quality() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-extrabold text-gray-900">Kalite Metrikleri</h1>
-        <p className="text-sm text-gray-400">Puan, arıza ve şikayet göstergeleri</p>
+        <p className="text-sm text-gray-600">Puan, arıza ve şikayet göstergeleri</p>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -47,7 +47,7 @@ export default function Quality() {
           <h2 className="mb-4 text-base font-bold text-gray-900">En Çok Arızalanan Makineler</h2>
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-100 text-left text-xs text-gray-400">
+              <tr className="border-b border-gray-100 text-left text-xs text-gray-600">
                 <th className="pb-2 font-medium">Makine</th>
                 <th className="pb-2 font-medium">Arıza</th>
                 <th className="pb-2 font-medium">Puan</th>
@@ -73,7 +73,7 @@ export default function Quality() {
           <h2 className="mb-4 text-base font-bold text-gray-900">En Çok Şikayet Alan</h2>
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-100 text-left text-xs text-gray-400">
+              <tr className="border-b border-gray-100 text-left text-xs text-gray-600">
                 <th className="pb-2 font-medium">Makine</th>
                 <th className="pb-2 font-medium">Şikayet</th>
                 <th className="pb-2 font-medium">Durum</th>

@@ -37,7 +37,7 @@ export default function FeedbackAdmin() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-extrabold text-gray-900">Geri Bildirim Yönetimi</h1>
-        <p className="text-sm text-gray-400">Öneri ve şikayetler, etiket dağılımı</p>
+        <p className="text-sm text-gray-600">Öneri ve şikayetler, etiket dağılımı</p>
       </div>
 
       <div className="grid grid-cols-3 gap-6">
@@ -55,7 +55,7 @@ export default function FeedbackAdmin() {
             />
           </div>
           <table className="w-full text-sm">
-            <thead className="text-left text-xs text-gray-400">
+            <thead className="text-left text-xs text-gray-600">
               <tr className="border-b border-gray-100">
                 <th className="pb-2 font-medium">Tür</th>
                 <th className="pb-2 font-medium">Konu</th>
@@ -74,8 +74,8 @@ export default function FeedbackAdmin() {
                     <Badge tone="gray">{f.tag}</Badge>
                   </td>
                   <td className="max-w-xs truncate py-3 text-gray-600">{f.text}</td>
-                  <td className="py-3 text-gray-500">{f.user}</td>
-                  <td className="py-3 text-gray-400">{f.date}</td>
+                  <td className="py-3 text-gray-700">{f.user}</td>
+                  <td className="py-3 text-gray-600">{f.date}</td>
                 </tr>
               ))}
             </tbody>

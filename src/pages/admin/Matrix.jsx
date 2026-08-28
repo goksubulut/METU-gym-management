@@ -163,7 +163,7 @@ export default function Matrix() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-extrabold text-gray-900">Tercih × Memnuniyet Matrisi</h1>
-        <p className="text-sm text-gray-400">
+        <p className="text-sm text-gray-600">
           Makineleri kullanım (tercih) ve puan (memnuniyet) eksenlerinde konumlandırır
         </p>
       </div>
@@ -255,8 +255,8 @@ export default function Matrix() {
                 payload && payload.length ? (
                   <div className="rounded-lg bg-surface px-3 py-2 text-xs shadow-pop">
                     <p className="font-bold text-gray-900">{payload[0].payload.name}</p>
-                    <p className="text-gray-500">Kullanım: {payload[0].payload.uses}</p>
-                    <p className="text-gray-500">Puan: {payload[0].payload.rating}</p>
+                    <p className="text-gray-700">Kullanım: {payload[0].payload.uses}</p>
+                    <p className="text-gray-700">Puan: {payload[0].payload.rating}</p>
                   </div>
                 ) : null
               }
@@ -266,7 +266,7 @@ export default function Matrix() {
             ))}
           </ScatterChart>
         </ResponsiveContainer>
-        <p className="mt-2 text-center text-xs text-gray-400">
+        <p className="mt-2 text-center text-xs text-gray-600">
           Kesik çizgiler kadran sınırlarıdır (kullanım ≈ {USE_MID}, puan ≈ {RATE_MID})
         </p>
       </Card>
@@ -284,9 +284,9 @@ export default function Matrix() {
       >
         {activeConfig && (
           <>
-            <p className="mb-4 text-sm text-gray-500">{activeConfig.modalDesc}</p>
+            <p className="mb-4 text-sm text-gray-700">{activeConfig.modalDesc}</p>
             {activeMachines.length === 0 ? (
-              <p className="rounded-xl bg-gray-50 px-4 py-6 text-center text-sm text-gray-500">
+              <p className="rounded-xl bg-gray-50 px-4 py-6 text-center text-sm text-gray-700">
                 {activeConfig.emptyText}
               </p>
             ) : (
@@ -298,7 +298,7 @@ export default function Matrix() {
                   >
                     <div className="min-w-0">
                       <p className="font-semibold text-gray-900">{m.name}</p>
-                      <p className="mt-0.5 text-xs text-gray-500">{m.uses} kullanım</p>
+                      <p className="mt-0.5 text-xs text-gray-700">{m.uses} kullanım</p>
                     </div>
                     <div className="flex items-center gap-3">
                       <StarRating value={m.rating} size="sm" readOnly />

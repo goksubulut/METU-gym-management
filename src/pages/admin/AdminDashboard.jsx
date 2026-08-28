@@ -89,7 +89,7 @@ export default function AdminDashboard() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-extrabold text-gray-900">Genel Bakış</h1>
-        <p className="text-sm text-gray-400">Salonun bugünkü durumu ve doluluk trendleri</p>
+        <p className="text-sm text-gray-600">Salonun bugünkü durumu ve doluluk trendleri</p>
       </div>
 
       <div className="grid grid-cols-4 gap-4">
@@ -150,7 +150,7 @@ export default function AdminDashboard() {
                   <p className="truncate text-sm font-semibold text-gray-800">{m.name}</p>
                   <div className="flex items-center gap-2">
                     <StarRating value={m.rating} size="sm" readOnly />
-                    <span className="text-xs text-gray-400">{m.uses} kullanım</span>
+                    <span className="text-xs text-gray-600">{m.uses} kullanım</span>
                   </div>
                 </div>
               </div>

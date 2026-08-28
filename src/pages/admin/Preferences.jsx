@@ -47,7 +47,7 @@ export default function Preferences() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-extrabold text-gray-900">Tercih Analizi</h1>
-          <p className="text-sm text-gray-400">Makine ve kas grubu tercih dağılımı</p>
+          <p className="text-sm text-gray-600">Makine ve kas grubu tercih dağılımı</p>
         </div>
         <div className="w-48">
           <Select value={range} onChange={(e) => setRange(e.target.value)}>
