@@ -887,6 +887,30 @@ h1, h2, h3 {
   box-shadow: 0 0 0 2px rgba(10, 10, 12, 0.75), 0 0 0 4px rgba(214, 90, 108, 0.75);
 }
 
+/* Geliş onayı — "geldi" durumuna götüren tek eylem. Rengi durum çipiyle aynı:
+   #A8BD4B (fotoğraf zeminindeki olive ile aynı aile). Bu ton AÇIK olduğu için
+   dolgu olarak beyaz metin taşıyamaz (2:1); metin koyu mürekkep — 7.9:1. Aynı
+   zamanda kırmızı CTA'nın tam zıddı: orada koyu dolgu + açık metin. */
+.rc-btn--go {
+  background: linear-gradient(168deg, #b1c655, #a8bd4b);
+  color: #14170a;
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow:
+    0 10px 26px rgba(0, 0, 0, 0.34),
+    0 4px 14px rgba(168, 189, 75, 0.30),
+    inset 0 1px 0 rgba(255, 255, 255, 0.32);
+}
+.rc-btn--go:hover:not(:disabled) {
+  background: linear-gradient(168deg, #bcd162, #b1c655);
+  box-shadow:
+    0 14px 34px rgba(0, 0, 0, 0.38),
+    0 6px 18px rgba(168, 189, 75, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.38);
+}
+.rc-btn--go:focus-visible {
+  box-shadow: 0 0 0 2px rgba(10, 10, 12, 0.75), 0 0 0 4px rgba(168, 189, 75, 0.85);
+}
+
 /* Kırmızı camlı eylem — listede tekrar eden satır aksiyonu için. Aynı ton,
    dolu CTA'nın ağırlığı olmadan: 10 satırda 10 dolu kırmızı hap gürültü olurdu. */
 .rc-btn--tint {
@@ -983,9 +1007,9 @@ h1, h2, h3 {
 }
 /* Geldi — net yeşil */
 .rc-chip--positive {
-  color: #6EE7A8;
-  border-color: rgba(52, 211, 153, 0.62);
-  background: linear-gradient(rgba(16, 185, 129, 0.26), rgba(16, 185, 129, 0.26)),
+  color: #a8bd4b;
+  border-color: rgba(168, 189, 75, 0.66);
+  background: linear-gradient(rgba(168, 189, 75, 0.22), rgba(168, 189, 75, 0.22)),
     rgba(10, 10, 13, 0.55);
 }
 /* Gelmedi — net kırmızı */

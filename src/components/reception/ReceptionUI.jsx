@@ -56,6 +56,7 @@ export function Panel({ quiet, className = "", children, ...props }) {
 
 const BTN_VARIANTS = {
   solid: "rc-btn--solid",   // dolu kırmızı — ekranın tek ana eylemi
+  go: "rc-btn--go",         // dolu yeşil — geliş onayı (durum çipiyle aynı aile)
   tint: "rc-btn--tint",     // kırmızı camlı — listede tekrar eden satır eylemi
   glass: "rc-btn--glass",
   ghost: "rc-btn--ghost",

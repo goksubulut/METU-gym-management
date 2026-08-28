@@ -234,7 +234,7 @@ export default function CheckIn() {
 
               <div className="mt-7 space-y-2.5">
                 {selected.status !== "checked-in" ? (
-                  <GlassButton variant="solid" full onClick={() => checkin(selected)}>
+                  <GlassButton variant="go" full onClick={() => checkin(selected)}>
                     Gelişi Onayla
                   </GlassButton>
                 ) : (
@@ -251,11 +251,6 @@ export default function CheckIn() {
                 {selected.status !== "checked-in" && selected.status !== "no-show" && (
                   <GlassButton variant="ghost" full onClick={() => applyStatus(selected.id, "no-show")}>
                     Gelmedi olarak işaretle
-                  </GlassButton>
-                )}
-                {selected.status === "no-show" && (
-                  <GlassButton variant="solid" full onClick={() => checkin(selected)}>
-                    Geldi olarak işaretle
                   </GlassButton>
                 )}
               </div>

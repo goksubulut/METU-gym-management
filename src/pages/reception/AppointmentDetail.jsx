@@ -98,7 +98,7 @@ export default function AppointmentDetail() {
         <div className="flex flex-wrap items-center gap-3 border-t border-white/30 px-8 py-6">
           {status !== "checked-in" ? (
             <GlassButton
-              variant="solid"
+              variant="go"
               className="flex-1"
               onClick={() => {
                 applyStatus("checked-in");
@@ -118,7 +118,7 @@ export default function AppointmentDetail() {
               Geri Al
             </GlassButton>
           )}
-          {status !== "checked-in" && (
+          {status !== "checked-in" && status !== "no-show" && (
             <GlassButton variant="ghost" onClick={() => applyStatus("no-show")}>
               Gelmedi
             </GlassButton>
