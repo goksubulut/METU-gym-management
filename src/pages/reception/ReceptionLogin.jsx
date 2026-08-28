@@ -44,13 +44,13 @@ export default function ReceptionLogin() {
             alt="METU Motion"
             width={36}
             height={36}
-            className="h-9 w-9 rounded-xl object-cover ring-1 ring-white/20"
+            className="h-9 w-9 rounded-xl object-cover ring-1 ring-white/30"
           />
           <div className="leading-none">
             <p className="font-display text-[15px] font-semibold tracking-[-0.01em] text-white">
               METU Motion
             </p>
-            <p className="mt-1 text-[9px] font-bold uppercase tracking-[0.24em] text-white/60">
+            <p className="mt-1 text-[9px] font-bold uppercase tracking-[0.24em] text-white/75">
               ODTÜ Spor Merkezi
             </p>
           </div>
@@ -61,7 +61,7 @@ export default function ReceptionLogin() {
           <h1 className="mt-3 font-display text-[30px] font-medium leading-none tracking-[-0.03em] text-white">
             Vardiya girişi
           </h1>
-          <p className="mt-3 text-[13px] font-medium leading-relaxed text-white/65">
+          <p className="mt-3 text-[13px] font-medium leading-relaxed text-white/80">
             Check-in masasını açmak için resepsiyon hesabınızla oturum açın.
           </p>
         </div>
@@ -87,7 +87,7 @@ export default function ReceptionLogin() {
           </GlassButton>
         </form>
 
-        <p className="mt-7 border-t border-white/10 pt-5 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">
+        <p className="mt-7 border-t border-white/30 pt-5 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-white/65">
           Vardiya başında giriş yapmayı unutmayın
         </p>
       </Panel>

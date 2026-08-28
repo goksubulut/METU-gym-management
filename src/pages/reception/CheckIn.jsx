@@ -107,7 +107,7 @@ export default function CheckIn() {
         </div>
 
         {/* Rakamlar — tek panel, ince dikey ayraçlarla bölünmüş gazete künyesi */}
-        <Panel quiet className="grid grid-cols-3 divide-x divide-white/10">
+        <Panel quiet className="grid grid-cols-3 divide-x divide-white/20">
           <Figure value={stats.total} label="Toplam" />
           <Figure value={stats.arrived} label="Geldi" />
           <Figure value={stats.pending} label="Bekliyor" />
@@ -139,7 +139,7 @@ export default function CheckIn() {
           <Panel className="overflow-hidden">
             <table className="w-full text-left">
               <thead>
-                <tr className="border-b border-white/[0.12] text-[10px] font-bold uppercase tracking-[0.2em] text-white/55">
+                <tr className="border-b border-white/[0.2] text-[10px] font-bold uppercase tracking-[0.2em] text-white/70">
                   <th className="px-6 py-4 font-semibold">Saat</th>
                   <th className="px-6 py-4 font-semibold">Üye</th>
                   <th className="hidden px-6 py-4 font-semibold md:table-cell">Telefon</th>
@@ -152,7 +152,7 @@ export default function CheckIn() {
                   <tr
                     key={r.id}
                     onClick={() => setSelected(r)}
-                    className={`rc-row cursor-pointer border-b border-white/[0.07] last:border-b-0 ${
+                    className={`rc-row cursor-pointer border-b border-white/[0.12] last:border-b-0 ${
                       selected?.id === r.id ? "is-active" : ""
                     }`}
                   >
@@ -162,7 +162,7 @@ export default function CheckIn() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-[15px] font-semibold text-white">{r.name}</td>
-                    <td className="hidden px-6 py-4 text-[13px] font-medium tabular-nums text-white/65 md:table-cell">
+                    <td className="hidden px-6 py-4 text-[13px] font-medium tabular-nums text-white/80 md:table-cell">
                       {r.phone}
                     </td>
                     <td className="px-6 py-4">
@@ -181,7 +181,7 @@ export default function CheckIn() {
                           Geldi
                         </GlassButton>
                       ) : (
-                        <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/55">
+                        <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/70">
                           Onaylı
                         </span>
                       )}
@@ -203,17 +203,17 @@ export default function CheckIn() {
               <p className="mt-4 font-display text-[26px] font-medium leading-tight tracking-[-0.02em] text-white">
                 {selected.name}
               </p>
-              <p className="mt-1.5 text-[13px] font-medium tabular-nums text-white/65">{selected.phone}</p>
+              <p className="mt-1.5 text-[13px] font-medium tabular-nums text-white/80">{selected.phone}</p>
 
               <div className="mt-5 flex items-center gap-3">
                 <span className="tabular-nums font-display text-[15px] font-semibold text-white/90">
                   {selected.time}
                 </span>
-                <span className="h-3.5 w-px bg-white/20" />
+                <span className="h-3.5 w-px bg-white/30" />
                 <StatusChip status={selected.status} />
               </div>
 
-              <div className="mt-6 space-y-5 border-t border-white/10 pt-6">
+              <div className="mt-6 space-y-5 border-t border-white/30 pt-6">
                 <div>
                   <Eyebrow className="!tracking-[0.22em]">Kas Grupları</Eyebrow>
                   <div className="mt-3 flex flex-wrap gap-1.5">

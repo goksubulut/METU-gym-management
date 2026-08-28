@@ -51,20 +51,20 @@ export default function AppointmentDetail() {
     <div className="mx-auto max-w-2xl">
       <button
         onClick={() => nav("/reception")}
-        className="mb-7 text-[10px] font-bold uppercase tracking-[0.22em] text-white/60 transition-colors duration-fast hover:text-white/85"
+        className="mb-7 text-[10px] font-bold uppercase tracking-[0.22em] text-white/75 transition-colors duration-fast hover:text-white/85"
       >
         ← Check-in listesi
       </button>
 
       <Panel className="overflow-hidden">
         {/* Künye — isim solda, saat sağda; ayrım renk değil boşluk ve çizgi */}
-        <div className="flex items-start justify-between gap-6 border-b border-white/10 px-8 pb-7 pt-8">
+        <div className="flex items-start justify-between gap-6 border-b border-white/30 px-8 pb-7 pt-8">
           <div className="min-w-0">
             <Eyebrow>Randevu</Eyebrow>
             <p className="mt-3.5 truncate font-display text-[30px] font-medium leading-none tracking-[-0.03em] text-white">
               {row.name}
             </p>
-            <p className="mt-2.5 text-[13px] font-medium tabular-nums text-white/65">{row.phone}</p>
+            <p className="mt-2.5 text-[13px] font-medium tabular-nums text-white/80">{row.phone}</p>
           </div>
           <div className="shrink-0 text-right">
             <p className="tabular-nums font-display text-[38px] font-medium leading-none tracking-[-0.03em] text-white">
@@ -95,7 +95,7 @@ export default function AppointmentDetail() {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 border-t border-white/10 px-8 py-6">
+        <div className="flex flex-wrap items-center gap-3 border-t border-white/30 px-8 py-6">
           {status !== "checked-in" ? (
             <GlassButton
               variant="solid"

@@ -41,18 +41,18 @@ export default function ReceptionLayout() {
               alt="METU Motion"
               width={34}
               height={34}
-              className="h-[34px] w-[34px] rounded-xl object-cover ring-1 ring-white/20"
+              className="h-[34px] w-[34px] rounded-xl object-cover ring-1 ring-white/30"
             />
             <div className="leading-none">
               <p className="font-display text-[15px] font-semibold tracking-[-0.01em] text-white">
                 METU Motion
               </p>
-              <p className="mt-1 text-[9px] font-bold uppercase tracking-[0.24em] text-white/60">
+              <p className="mt-1 text-[9px] font-bold uppercase tracking-[0.24em] text-white/75">
                 ODTÜ Spor Merkezi
               </p>
             </div>
-            <span className="hidden h-8 w-px bg-white/[0.12] sm:block" />
-            <p className="hidden text-[10px] font-bold uppercase tracking-[0.28em] text-white/70 sm:block">
+            <span className="hidden h-8 w-px bg-white/30 sm:block" />
+            <p className="hidden text-[10px] font-bold uppercase tracking-[0.28em] text-white/85 sm:block">
               Resepsiyon
             </p>
           </div>
@@ -68,14 +68,14 @@ export default function ReceptionLayout() {
               </NavLink>
             </nav>
 
-            <span className="hidden h-8 w-px bg-white/[0.12] md:block" />
+            <span className="hidden h-8 w-px bg-white/30 md:block" />
             <div className="hidden md:block">
               <DeskClock />
             </div>
 
-            <span className="h-8 w-px bg-white/[0.12]" />
+            <span className="h-8 w-px bg-white/30" />
             <div className="flex items-center gap-3">
-              <div className="grid h-9 w-9 place-items-center rounded-full border border-white/[0.18] bg-white/[0.08] text-[11px] font-semibold tracking-[0.08em] text-white/85">
+              <div className="grid h-9 w-9 place-items-center rounded-full border border-white/30 bg-white/[0.14] text-[11px] font-semibold tracking-[0.08em] text-white/85">
                 RS
               </div>
               <div className="leading-tight">
@@ -83,7 +83,7 @@ export default function ReceptionLayout() {
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="text-[11px] font-medium text-white/60 transition-colors duration-fast hover:text-white/90"
+                  className="text-[11px] font-medium text-white/75 transition-colors duration-fast hover:text-white/90"
                 >
                   Çıkış yap
                 </button>
@@ -98,7 +98,7 @@ export default function ReceptionLayout() {
       </main>
 
       <footer className="mx-auto max-w-6xl px-8 pb-10">
-        <div className="flex items-center justify-between border-t border-white/10 pt-5 text-[10px] font-bold uppercase tracking-[0.24em] text-white/45">
+        <div className="flex items-center justify-between border-t border-white/30 pt-5 text-[10px] font-bold uppercase tracking-[0.24em] text-white/60">
           <span>ODTÜ Spor Merkezi · Check-in Masası</span>
           <span className="hidden sm:block">METU Motion</span>
         </div>

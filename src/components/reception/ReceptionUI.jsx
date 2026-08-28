@@ -98,7 +98,7 @@ export function Eyebrow({ className = "", children }) {
   return (
     <p
       className={cx(
-        "text-[10px] font-bold uppercase tracking-[0.28em] text-white/60",
+        "text-[10px] font-bold uppercase tracking-[0.28em] text-white/75",
         className
       )}
     >
@@ -114,7 +114,7 @@ export function Figure({ value, label, className = "" }) {
       <p className="tabular-nums font-display text-[40px] font-normal leading-none tracking-[-0.03em] text-white">
         {value}
       </p>
-      <p className="mt-2.5 text-[10px] font-bold uppercase tracking-[0.24em] text-white/60">
+      <p className="mt-2.5 text-[10px] font-bold uppercase tracking-[0.24em] text-white/75">
         {label}
       </p>
     </div>
@@ -149,12 +149,12 @@ export function GlassField({ label, hint, className = "", ...props }) {
   return (
     <label className="block">
       {label && (
-        <span className="mb-2 block text-[11px] font-bold uppercase tracking-[0.16em] text-white/70">
+        <span className="mb-2 block text-[11px] font-bold uppercase tracking-[0.16em] text-white/85">
           {label}
         </span>
       )}
       <input className={cx("rc-field h-12 rounded-[14px] px-4 text-sm font-medium", className)} {...props} />
-      {hint && <span className="mt-1.5 block text-xs text-white/60">{hint}</span>}
+      {hint && <span className="mt-1.5 block text-xs text-white/75">{hint}</span>}
     </label>
   );
 }
@@ -190,13 +190,13 @@ export function Placeholder({ title, description, className = "" }) {
   return (
     <div
       className={cx(
-        "rc-empty flex flex-col items-center justify-center rounded-[26px] border border-dashed border-white/15 px-6 py-16 text-center",
+        "rc-empty flex flex-col items-center justify-center rounded-[26px] border border-dashed border-white/25 px-6 py-16 text-center",
         className
       )}
     >
-      <span className="mb-4 block h-px w-10 bg-white/25" />
+      <span className="mb-4 block h-px w-10 bg-white/40" />
       <p className="text-[15px] font-bold text-white/90">{title}</p>
-      {description && <p className="mt-2 max-w-[15rem] text-[13px] font-medium leading-relaxed text-white/60">{description}</p>}
+      {description && <p className="mt-2 max-w-[15rem] text-[13px] font-medium leading-relaxed text-white/75">{description}</p>}
     </div>
   );
 }
