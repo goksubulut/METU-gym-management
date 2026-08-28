@@ -96,6 +96,14 @@ export const maintenancePriorityDemo = [
   { name: "Eliptik Bisiklet", uses: 156, rating: 4.1 },
 ];
 
+// Başarılı kadran demosu — kullanım ≥ 110 ve puan ≥ 4.5 (bkz. Matrix.jsx).
+// Gerçek veride bu kadran boş kaldığında panelin dolu görünmesi için eklenir.
+export const successDemo = [
+  { name: "Chest Press", uses: 168, rating: 4.8 },
+  { name: "Lat Pulldown", uses: 142, rating: 4.7 },
+  { name: "Leg Press", uses: 124, rating: 4.6 },
+];
+
 // Geri bildirim etiket dağılımı (pie)
 export const feedbackTags = [
   { tag: "Ekipman", value: 12 },

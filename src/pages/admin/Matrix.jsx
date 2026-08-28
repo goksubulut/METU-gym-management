@@ -16,7 +16,11 @@ import Button from "../../components/Button.jsx";
 import InfoTooltip from "../../components/InfoTooltip.jsx";
 import StarRating from "../../components/StarRating.jsx";
 import Badge from "../../components/Badge.jsx";
-import { matrixData as mockMatrix, maintenancePriorityDemo } from "../../mock/analytics.js";
+import {
+  matrixData as mockMatrix,
+  maintenancePriorityDemo,
+  successDemo,
+} from "../../mock/analytics.js";
 import { fetchAdminMatrix } from "../../api/admin.js";
 import { useChartColors, categoricalPalette } from "../../utils/chartColors.js";
 
@@ -28,17 +32,28 @@ function isMaintenancePriority(d) {
   return d.uses >= USE_MID && d.rating < RATE_MID;
 }
 
-/** API verisinde bakım kadranı boşsa demo makineleri ekler veya günceller. */
-function withMaintenanceDemo(rows) {
-  const list = rows?.length ? [...rows] : [...mockMatrix];
-  if (list.some(isMaintenancePriority)) return list;
+function isSuccess(d) {
+  return d.uses >= USE_MID && d.rating >= RATE_MID;
+}
+
+/** Boş kalan kadrana demo makineleri ekler veya mevcutların değerlerini günceller. */
+function fillQuadrant(list, isInQuadrant, demos) {
+  if (list.some(isInQuadrant)) return list;
 
   const byName = new Map(list.map((d) => [d.name, d]));
-  for (const demo of maintenancePriorityDemo) {
+  for (const demo of demos) {
     const existing = byName.get(demo.name);
     byName.set(demo.name, existing ? { ...existing, uses: demo.uses, rating: demo.rating } : demo);
   }
   return Array.from(byName.values());
+}
+
+/** API verisinde boş kalan kadranları demo makinelerle doldurur. */
+function withQuadrantDemos(rows) {
+  let list = rows?.length ? [...rows] : [...mockMatrix];
+  list = fillQuadrant(list, isMaintenancePriority, maintenancePriorityDemo);
+  list = fillQuadrant(list, isSuccess, successDemo);
+  return list;
 }
 
 const QUADRANTS = [
@@ -132,16 +147,16 @@ function classify(d) {
 export default function Matrix() {
   // Grafik renkleri token'lardan; tema değişince otomatik güncellenir
   const chart = useChartColors();
-  const [matrixData, setMatrixData] = useState(() => withMaintenanceDemo(mockMatrix));
+  const [matrixData, setMatrixData] = useState(() => withQuadrantDemos(mockMatrix));
   const [activeQuadrant, setActiveQuadrant] = useState(null);
 
   useEffect(() => {
     fetchAdminMatrix()
       .then((data) => {
-        setMatrixData(withMaintenanceDemo(data.matrixData));
+        setMatrixData(withQuadrantDemos(data.matrixData));
       })
       .catch(() => {
-        setMatrixData(withMaintenanceDemo(mockMatrix));
+        setMatrixData(withQuadrantDemos(mockMatrix));
       });
   }, []);
 
