@@ -70,12 +70,13 @@
   --glow: 255 59 78;
   --accent: 255 59 78;        /* metin/link vurgusu — koyuda glow ile aynı */
 
-  /* Editoryal admin — kısık (muted) kırmızı. Ana eylemler nötr (beyaz/siyah);
-     kırmızı yalnızca aksan (yıkıcı buton + tablo içi linkler) ve dozu düşük. */
-  --admin-red: 178 76 84;             /* #B24C54 — danger dolgu, muted brick */
-  --admin-red-strong: 196 88 96;      /* danger hover */
-  --admin-red-text: 216 128 136;      /* koyu üstünde okunur muted kırmızı (inline) */
-  --admin-red-text-strong: 232 154 162;
+  /* Editoryal admin kırmızısı — tek marka aksanı #AD2A37. Ana eylemler nötr
+     (beyaz/siyah); kırmızı yalnızca aksan (yıkıcı buton, aktif nav, grafikler,
+     tablo linkleri). Metin tonları koyu zeminde okunur olsun diye açıktır. */
+  --admin-red: 173 42 55;             /* #AD2A37 — admin marka/aksan kırmızısı */
+  --admin-red-strong: 198 58 72;      /* hover — biraz açık */
+  --admin-red-text: 214 108 118;      /* koyu üstünde okunur açık ton (inline link) */
+  --admin-red-text-strong: 230 140 148;
 
   /* Aksan altın #F2A93B — SADECE görev kartı + puan rozeti */
   --gold: 242 169 59;
@@ -148,11 +149,11 @@
   --glow: 214 20 48;          /* açıkta glow biraz koyulaşır — beyaz üstünde okunur */
   --accent: 158 13 37;        /* beyaz üstünde ≥6:1 */
 
-  /* Editoryal admin — kısık kırmızı (açık temada daha koyu, kontrast için) */
-  --admin-red: 168 66 74;
-  --admin-red-strong: 148 52 60;
-  --admin-red-text: 158 58 66;
-  --admin-red-text-strong: 130 44 52;
+  /* Editoryal admin kırmızısı #AD2A37 (açık temada metin tonları daha koyu) */
+  --admin-red: 173 42 55;
+  --admin-red-strong: 150 32 44;
+  --admin-red-text: 158 34 45;
+  --admin-red-text-strong: 130 24 34;
 
   --gold: 191 124 15;         /* açıkta koyulaştırılmış altın — kontrast için */
   --gold-ink: 26 18 6;
@@ -492,6 +493,25 @@ h1, h2, h3 {
    yalnızca admin kabuğunda override edilir). */
 .admin-scope [role="tab"][aria-selected="true"] {
   background-color: rgb(var(--admin-red));
+}
+
+/* Admin yeşili — "doluluk" durum token'ı (Badge/StatCard "green" tonu) admin
+   kabuğunda #A8BD4B'ye sabitlenir. Bileşenler paylaşımlı olduğundan (Badge.jsx,
+   StatCard.jsx), değişken burada .admin-scope altında override edilir; kullanıcı/
+   resepsiyon tarafı --available'ı olduğu gibi kullanmaya devam eder. */
+.admin-scope {
+  --available: 168 189 75;      /* #A8BD4B */
+  --available-soft: 34 38 15;   /* koyu zeminde okunur soft ton */
+  /* text-accent (metin aksanı: sıralama rozetleri, "Detay…" linkleri, stat
+     vurguları) admin'de #AD2A37 ailesine düşer. Koyu zeminde okunur olsun diye
+     açık ton (--admin-red-text); fill/buton kırmızıları tam #AD2A37 kalır. */
+  --accent: var(--admin-red-text);
+  /* Marka 500 tonu admin'de #AD2A37 — puan yıldızları (StarRating), form focus
+     kenarı/ring'leri ve aktif filtre çipi bu tona döner. Kullanıcı tarafı sabit. */
+  --primary-500: 173 42 55;
+}
+:root[data-theme="light"] .admin-scope {
+  --available-soft: 240 243 220; /* açık zeminde pastel ton */
 }
 
 /* Cam input — form alanları */

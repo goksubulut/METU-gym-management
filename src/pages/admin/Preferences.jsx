@@ -12,6 +12,7 @@ import {
   Legend,
 } from "recharts";
 import Card from "../../components/Card.jsx";
+import AdminChartTooltip from "../../components/AdminChartTooltip.jsx";
 import { Select } from "../../components/Input.jsx";
 import {
   machinePreference as mockMachinePref,
@@ -64,8 +65,17 @@ export default function Preferences() {
             <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
             <XAxis dataKey="name" tick={{ fontSize: 11 }} />
             <YAxis tick={{ fontSize: 12 }} />
-            <Tooltip />
-            <Bar dataKey="count" fill={chart.brand} radius={[6, 6, 0, 0]} name="Kullanım" />
+            <Tooltip
+              content={<AdminChartTooltip />}
+              cursor={{ fill: chart.adminBrandFade }}
+            />
+            <Bar
+              dataKey="count"
+              fill={chart.adminBrand}
+              activeBar={{ fill: chart.adminBrandStrong }}
+              radius={[6, 6, 0, 0]}
+              name="Kullanım"
+            />
           </BarChart>
         </ResponsiveContainer>
       </Card>
@@ -92,7 +102,7 @@ export default function Preferences() {
                 type: "circle",
               }))}
             />
-            <Tooltip />
+            <Tooltip content={<AdminChartTooltip />} cursor={false} />
           </RadialBarChart>
         </ResponsiveContainer>
       </Card>

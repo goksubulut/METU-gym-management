@@ -9,6 +9,7 @@ import {
   CartesianGrid,
 } from "recharts";
 import Card from "../../components/Card.jsx";
+import AdminChartTooltip from "../../components/AdminChartTooltip.jsx";
 import StatCard from "../../components/StatCard.jsx";
 import StarRating from "../../components/StarRating.jsx";
 import Tabs from "../../components/Tabs.jsx";
@@ -114,18 +115,21 @@ export default function AdminDashboard() {
             <AreaChart data={occupancyTrend}>
               <defs>
                 <linearGradient id="occ" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={chart.brand} stopOpacity={0.3} />
-                  <stop offset="95%" stopColor={chart.brand} stopOpacity={0} />
+                  <stop offset="5%" stopColor={chart.adminBrand} stopOpacity={0.32} />
+                  <stop offset="95%" stopColor={chart.adminBrand} stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
               <XAxis dataKey="day" tick={{ fontSize: 12 }} />
               <YAxis tick={{ fontSize: 12 }} unit="%" />
-              <Tooltip />
+              <Tooltip
+                content={<AdminChartTooltip />}
+                cursor={{ stroke: chart.adminBrand, strokeWidth: 1, strokeDasharray: "3 3" }}
+              />
               <Area
                 type="monotone"
                 dataKey="occupancy"
-                stroke={chart.brand}
+                stroke={chart.adminBrand}
                 strokeWidth={2.5}
                 fill="url(#occ)"
                 name="Doluluk"

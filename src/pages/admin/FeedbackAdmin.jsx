@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
 import Card from "../../components/Card.jsx";
+import AdminChartTooltip from "../../components/AdminChartTooltip.jsx";
 import Badge from "../../components/Badge.jsx";
 import Tabs from "../../components/Tabs.jsx";
 import { feedbackList as mockFeedback, } from "../../mock/feedback.js";
@@ -98,7 +99,7 @@ export default function FeedbackAdmin() {
                   <Cell key={i} fill={palette[i % palette.length]} />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip content={<AdminChartTooltip />} cursor={false} />
               <Legend />
             </PieChart>
           </ResponsiveContainer>

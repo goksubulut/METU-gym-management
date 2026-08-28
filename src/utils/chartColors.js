@@ -24,6 +24,11 @@ export function token(name, fallback = "#888", alpha) {
 function snapshot() {
   return {
     brand: token("--primary-600", "#E31837"),
+    // Admin panelinin tek aksan kırmızısı (#AD2A37). Kullanıcı tarafı `brand`
+    // kullanmaya devam eder; admin grafikleri `adminBrand`'e bağlanır.
+    adminBrand: token("--admin-red", "#AD2A37"),
+    adminBrandStrong: token("--admin-red-strong", "#C63A48"),
+    adminBrandFade: token("--admin-red", "#AD2A37", 0.14),
     glow: token("--glow", "#FF3B4E"),
     gold: token("--gold", "#F2A93B"),
     available: token("--available", "#34D399"),
@@ -51,21 +56,22 @@ export function useChartColors() {
   return colors;
 }
 
-/** Kadran/kategori serileri için sıralı palet (Matrix scatter vb.). */
+/** Kadran/kategori serileri için sıralı palet (Matrix scatter — admin).
+ *  Admin-only olduğu için marka kırmızısı yerine admin aksanı (#AD2A37). */
 export function categoricalPalette(c) {
-  return [c.available, c.brand, c.info, c.faint];
+  return [c.available, c.adminBrand, c.info, c.faint];
 }
 
-/** Tek renkli (marka) sıralı seri paleti — pasta/donut dilimleri için.
- *  Eski mock/analytics.js'teki sabit dizi (jenerik #dc2626 ailesi) yerine
- *  marka rampasından türer, temayla birlikte döner. */
+/** Admin monokrom kırmızı rampası (#AD2A37 ailesi) — pasta/donut/radial dilimleri.
+ *  Yalnızca admin grafiklerinde kullanılır (Preferences radial, FeedbackAdmin pie);
+ *  dilimler tek hue içinde açıklık farkıyla ayrışır — editoryal. */
 export function seriesPalette() {
   return [
-    token("--primary-600", "#E31837"),
-    token("--primary-400", "#ED5C6F"),
-    token("--primary-300", "#F48A98"),
-    token("--primary-800", "#A00E24"),
-    token("--primary-200", "#541621"),
-    token("--glow", "#FF3B4E"),
+    "rgb(173, 42, 55)",    // #AD2A37 — baz
+    "rgb(201, 78, 90)",    // açık
+    "rgb(226, 132, 140)",  // daha açık
+    "rgb(240, 179, 184)",  // en açık
+    "rgb(154, 51, 65)",    // koyu (yine de koyu zeminde görünür)
+    "rgb(191, 96, 104)",   // orta
   ];
 }
