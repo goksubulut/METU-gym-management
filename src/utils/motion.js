@@ -18,11 +18,6 @@ export const D = {
   exit: 0.20,     // ekran çıkışı               (spec 150ms)
 };
 
-/** Milisaniye cinsinden (setTimeout, CSS eşleştirmesi için). */
-export const MS = Object.fromEntries(
-  Object.entries(D).map(([k, v]) => [k, Math.round(v * 1000)]),
-);
-
 /** Liste öğeleri arası gecikme farkı (saniye). */
 export const STAGGER_STEP = 0.09; // spec 70ms
 

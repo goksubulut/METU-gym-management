@@ -30,10 +30,6 @@ export function saveOnboarding(patch) {
   }
 }
 
-export function isOnboardingDone() {
-  return readOnboarding().completed === true;
-}
-
 export function completeOnboarding() {
   return saveOnboarding({ completed: true, completedAt: new Date().toISOString() });
 }

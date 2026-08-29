@@ -13,7 +13,6 @@
 // Ya da elle indeks vererek (liste map'lerinde):
 //   <StaggerItem index={i}>…</StaggerItem>
 
-import { Children, cloneElement, isValidElement, createContext, useContext } from "react";
 import { motion } from "framer-motion";
 import { D, STAGGER_STEP, EASE as E } from "../../utils/motion.js";
 
@@ -21,8 +20,6 @@ import { D, STAGGER_STEP, EASE as E } from "../../utils/motion.js";
 const DURATION = D.base;
 const STEP = STAGGER_STEP;
 const EASE = E.standard;
-
-const IndexContext = createContext(0);
 
 /** Bir ekran bloğu: çocuklarını sırayla (70ms arayla) yukarı doğru soldurarak açar. */
 export function Stagger({ children, delay = 0, className = "", as = "div" }) {

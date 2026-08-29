@@ -111,8 +111,3 @@ export const feedbackTags = [
   { tag: "Uygulama", value: 8 },
   { tag: "Personel", value: 3 },
 ];
-
-// Grafik paleti artık burada sabit tutulmuyor — marka rampasından türetilir ve
-// tema değişimini takip eder: utils/chartColors.js → seriesPalette().
-// (Eski dizi jenerik #dc2626 ailesindeydi; DESIGN.md bunu açıkça yasaklıyor.)
-export { seriesPalette as chartSeriesColors } from "../utils/chartColors.js";

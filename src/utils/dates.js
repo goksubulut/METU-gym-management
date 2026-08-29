@@ -26,10 +26,6 @@ export function formatDateKey(d) {
   return `${y}-${m}-${day}`;
 }
 
-export function todayKey() {
-  return formatDateKey(new Date());
-}
-
 /** Randevu penceresi; mevcut randevu tarihi listede yoksa eklenir (düzenleme ekranı). */
 export function bookingDates(count = 14, ensureKey) {
   const dates = upcomingDates(count);

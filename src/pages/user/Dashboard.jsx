@@ -6,7 +6,7 @@ import Icon from "../../components/Icon.jsx";
 import Skeleton from "../../components/Skeleton.jsx";
 import { Stagger, StaggerItem } from "../../components/motion/Stagger.jsx";
 import { appointments as mockAppointments } from "../../mock/appointments.js";
-import { machineById, MUSCLE_GROUPS } from "../../mock/machines.js";
+import { MUSCLE_GROUPS } from "../../mock/machines.js";
 import { getAccessToken } from "../../api/client.js";
 import { fetchMyAppointments, mapAppointmentFromApi } from "../../api/bookings.js";
 import { fetchMe } from "../../api/auth.js";

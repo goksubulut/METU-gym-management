@@ -31,10 +31,6 @@ export function padDatePart(n) {
   return String(n).padStart(2, "0");
 }
 
-export function toLocalDateKey(date = new Date()) {
-  return `${date.getFullYear()}-${padDatePart(date.getMonth() + 1)}-${padDatePart(date.getDate())}`;
-}
-
 export function splitBirthDate(iso) {
   const match = String(iso || "").match(/^(\d{4})-(\d{2})-(\d{2})/);
   if (!match) return { year: "", month: "", day: "" };
